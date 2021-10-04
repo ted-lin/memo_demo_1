@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     /**
      * Called when the user taps the button
      */
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplayMesageActivity.class);
         EditText editText = (EditText) findViewById(R.id.editText);
         String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message );
+        intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
         Log.e("TED", "send: " + message);
     }
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         user = string;
         return true;
     }
+
     /**
      * As Host
      */
@@ -71,6 +73,14 @@ public class MainActivity extends AppCompatActivity {
         }
         Intent intent = new Intent(this, MemoMain.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_HOST, "host", user));
+        startActivity(intent);
+    }
+
+    /**
+     * here for jacky to debug
+     */
+    public void toEditorActivity(View v) {
+        Intent intent = new Intent(this, EditorActivity.class);
         startActivity(intent);
     }
 
