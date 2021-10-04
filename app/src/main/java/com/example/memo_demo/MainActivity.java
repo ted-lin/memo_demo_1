@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
     /**
-       * As Host
-       */
+     * As Host
+     */
     public void asHost(View v) {
         if (!checkName()) {
             Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /**
-       * As client
-       */
+   /**
+      * As client
+      */
     public void asClient(View v) {
         if (!checkName()) {
             Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
