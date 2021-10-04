@@ -10,7 +10,7 @@ public class MemoInfo implements Parcelable {
 
                 @Override
                 public MemoInfo createFromParcel(Parcel source) {
-                    return new MemoInfo(source.readInt(), source.readString());
+                    return new MemoInfo(source.readInt(), source.readString(), source.readString());
                 }
 
                 @Override
@@ -21,15 +21,17 @@ public class MemoInfo implements Parcelable {
     static final String TAG = "MemoInfo";
     int type = 0;
     String msg;
+    String user;
 
-    public MemoInfo(int t, String s) {
+    public MemoInfo(int t, String s, String name) {
         type = t;
         msg = s;
-        Log.e(TAG, "creator: type: " + type + ", msg: " + msg);
+        user = name;
+        Log.e(TAG, "creator: type: " + type + ", msg: " + msg + ", name: " + user);
     }
 
     public void dump() {
-        Log.e(TAG, "dump: " + type + " " + msg);
+        Log.e(TAG, "dump: " + type + " " + msg + ", name: " + user);
     }
 
     @Override
@@ -41,5 +43,6 @@ public class MemoInfo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(type);
         dest.writeString(msg);
+        dest.writeString(user);
     }
 }

@@ -9,6 +9,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MemoMain extends AppCompatActivity {
@@ -19,30 +22,22 @@ public class MemoMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_main);
         Log.e(TAG, "created");
+
         MemoInfo memoinfo = getIntent().getParcelableExtra(MainActivity.MEMO_EXTRA);
         memoinfo.dump();
 
+        Date currentTime = Calendar.getInstance().getTime();
+
+        String mode = memoinfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
+        TextView title = findViewById(R.id.textView3);
+
+        title.setText("Hi " + memoinfo.user + ", you are running as " + mode + " mode");
+
         TextView textView = findViewById(R.id.textView2);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        String test[] = {
-                "Status message:\n",
-                "hahaha\n",
-                "is\n",
-                "me\n",
-                "....\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n",
-                "test...\n"
-        };
-        for (int i = 0; i < test.length; ++i) {
-            textView.append(test[i]);
-        }
+        textView.append("Status message:\n");
+        textView.setTextSize(16);
+        textView.append(currentTime.toString());
 
         EditText editText = findViewById(R.id.editText4);
         editText.setMovementMethod(new ScrollingMovementMethod());
@@ -54,7 +49,6 @@ public class MemoMain extends AppCompatActivity {
     public void saveTo(View v) {
         EditText editText = findViewById(R.id.editText4);
         TextView textView = findViewById(R.id.textView2);
-
 
         String message = editText.getText().toString();
         textView.setText(message);
