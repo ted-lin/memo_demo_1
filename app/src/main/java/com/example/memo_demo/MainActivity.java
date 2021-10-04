@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
     /**
-     * As Host
-     */
+       * As Host
+       */
     public void asHost(View v) {
         if (!checkName()) {
             Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * As client
-     */
+       * As client
+       */
     public void asClient(View v) {
         if (!checkName()) {
             Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
@@ -86,4 +86,12 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
         startActivity(intent);
     }
+
+   /**
+     *  check connection
+     */
+   public void checkConnection(View v) {
+        Intent intent = new Intent(this, ConnectionHolder.class);
+        startActivity(intent);
+   }
 }
