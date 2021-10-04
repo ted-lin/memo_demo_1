@@ -78,9 +78,9 @@ public class HostActivity extends AppCompatActivity {
         mP2p.onCreate();
 
         Button schedule = findViewById(R.id.schedule);
-        schedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        //schedule.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            //public void onClick(View view) {
 
 
                 mP2p.createGroup(new WifiP2pManager.ActionListener() {
@@ -94,8 +94,8 @@ public class HostActivity extends AppCompatActivity {
                         log("create host group failure");
                     }
                 });
-            }
-        });
+            //}
+        //});
 
         Button cancel = findViewById(R.id.cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
@@ -120,11 +120,11 @@ public class HostActivity extends AppCompatActivity {
         });
 
         Button discovery = findViewById(R.id.discovery);
-        discovery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mP2pDeviceList.clear();
-                mPeerAdapter.notifyDataSetChanged();
+        //discovery.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View view) {
+        //        mP2pDeviceList.clear();
+        //        mPeerAdapter.notifyDataSetChanged();
 
                 mP2p.discover(new WifiP2pManager.ActionListener() {
                     @Override
@@ -137,8 +137,8 @@ public class HostActivity extends AppCompatActivity {
                         log("discover failure");
                     }
                 });
-            }
-        });
+        //    }
+        //});
 
         mP2pDeviceList = new ArrayList<>();
         mPeerAdapter = new PeerItemAdapter(mP2pDeviceList);
