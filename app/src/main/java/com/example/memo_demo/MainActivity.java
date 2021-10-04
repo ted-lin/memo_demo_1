@@ -75,6 +75,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * here for jacky to debug
+     */
+    public void toEditorActivity(View v) {
+        Intent intent = new Intent(this, EditorActivity.class);
+        startActivity(intent);
+    }
+
+    /**
      * As client
      */
     public void asClient(View v) {
