@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/schedule"
+        android:layout_width="99dp"
+        android:layout_height="wrap_content"
+        android:text="Schedule" />
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="98dp"
+        android:layout_height="wrap_content"
+        android:text="Cancel" />
+
+    <Button
+        android:id="@+id/discovery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="discovery" />
+
+    <EditText
+        android:id="@+id/host_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="edit" />
+
+    <TextView
+        android:id="@+id/host_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="QQQQQ" />
+
+    <Button
+        android:id="@+id/host_to"
+        android:layout_width="103dp"
+        android:layout_height="wrap_content"
+        android:text="hostTo" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/peer_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+
+</LinearLayout>
