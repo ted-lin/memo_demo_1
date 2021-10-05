@@ -66,6 +66,9 @@ public class WifiP2p {
         mManager.connect(mChannel, config, listener);
     }
 
+    public void cancelClient(WifiP2pManager.ActionListener listener) {
+        mManager.cancelConnect(mChannel, listener);
+    }
     public void disconnect(WifiP2pManager.ActionListener listener) {
         mManager.removeGroup(mChannel, listener);
     }
