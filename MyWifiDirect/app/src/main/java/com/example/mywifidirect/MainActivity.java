@@ -5,28 +5,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
-
     private static final int REQ_WIFI_DIRECT_PERMISSION = 5566;
     private static final int HOST_PAGE = 1;
     private static final int CLIENT_PAGE = 2;
-
-    private static boolean permissionComplete = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button permissionButton = findViewById(R.id.permission);
+
+        permissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.CHANGE_NETWORK_STATE,
+                                     Manifest.permission.ACCESS_NETWORK_STATE,
+                                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                     Manifest.permission.READ_EXTERNAL_STORAGE,
+                                     Manifest.permission.ACCESS_WIFI_STATE,
+                                     Manifest.permission.CHANGE_WIFI_STATE,
+                                     Manifest.permission.ACCESS_FINE_LOCATION}, REQ_WIFI_DIRECT_PERMISSION);
+            }
+        });
 
         Button hostButton = findViewById(R.id.host);
         hostButton.setOnClickListener(new View.OnClickListener() {
@@ -45,22 +55,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, HOST_PAGE);
             }
         });
-
-        Log.e(TAG, "permission granting");
-        performPermissionGrant();
-    }
-
-    public void performPermissionGrant() {
-        ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{
-                        Manifest.permission.CHANGE_NETWORK_STATE,
-                        Manifest.permission.ACCESS_NETWORK_STATE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.ACCESS_WIFI_STATE,
-                        Manifest.permission.CHANGE_WIFI_STATE,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                }, REQ_WIFI_DIRECT_PERMISSION);
     }
 
     @Override
@@ -70,18 +64,10 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < grantResults.length; i++) {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     showToast("permission failure: " + permissions[i]);
-                    permissionComplete = false;
-                    Log.e(TAG, "set to false");
                     return;
                 }
             }
-
-            if (grantResults.length == 0)
-                return;
-
             showToast("permission pass");
-            //permissionComplete = true;
-            Log.e(TAG, "set to true " + grantResults.length);
         }
     }
 
