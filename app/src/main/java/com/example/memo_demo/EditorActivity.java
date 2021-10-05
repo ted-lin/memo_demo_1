@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import com.example.protos.Data;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -28,6 +29,7 @@ public class EditorActivity extends AppCompatActivity {
     private Button htmlToProtoBtn;
     private TextView textView;
     private TextView lastTextView;
+    private String lastString;
     byte[] save;
     String html;
     private int mFontSize = 5;
@@ -96,13 +98,17 @@ public class EditorActivity extends AppCompatActivity {
         mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
             DiffMatchPatch dmp = new DiffMatchPatch();
             LinkedList<DiffMatchPatch.Diff> diff;
+            LinkedList<DiffMatchPatch.Patch> patch;
 
             @Override
             public void onTextChange(String text) {
-                diff = dmp.diffMain(textView.getText().toString(), text);
-                dmp.diffCleanupSemantic(diff);
-                textView.setText(text);
-                lastTextView.setText(diff.toString());
+                diff = dmp.diffMain(lastString, text);
+                patch = dmp.patchMake(diff);
+//                dmp.diffCleanupSemantic(diff);
+//                dmp.diffCleanupEfficiency(diff);
+                lastString = text;
+                textView.setText(lastString);
+                lastTextView.setText(patch.toString());
 
             }
         });
@@ -124,6 +130,62 @@ public class EditorActivity extends AppCompatActivity {
         mEditor.setHtml("");
         imgBtnInit();
     }
+
+    public void recievePatch(byte[] patch) throws InvalidProtocolBufferException {
+
+        Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(patch);
+    }
+
+    public void receiveEditorMsg(byte[] proto) {
+        Data.EditorMessage editorMessage;
+        try {
+             editorMessage = Data.EditorMessage.parseFrom(proto);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return;
+        }
+        if(editorMessage.getIsFullHtml()) {
+            mEditor.setHtml(editorMessage.getHtml());
+        } else {
+            DiffMatchPatch dmp = new DiffMatchPatch();
+            String patchText = editorMessage.getPatchText();
+            List<DiffMatchPatch.Patch> patches;
+            patches = dmp.patchFromText(patchText);
+            this.apply_patch(patches);
+        }
+    }
+    public void apply_patch(List<DiffMatchPatch.Patch> patches) {
+        DiffMatchPatch dmp = new DiffMatchPatch();
+        Object[] patch_result = dmp.patchApply((LinkedList<DiffMatchPatch.Patch>)patches, mEditor.getHtml());
+        if ((Boolean)patch_result[1]) {
+            // TODO need to check
+            lastString = (String)patch_result[0];
+            textView.setText(lastString);
+            mEditor.setHtml(lastString);
+
+        } else {
+            // TODO apply patch failed
+        }
+
+    }
+    public void sendPatch(String patchText) {
+        Data.EditorMessage.newBuilder().setHtml("");
+        byte[] b = Data.EditorMessage.newBuilder()
+                .setHtml("")
+                .setIsFullHtml(false)
+                .setPatchText(patchText).build().toByteArray();
+
+        // Todo Send
+    }
+
+    private String buildPatchText(String origin, String newStr) {
+        DiffMatchPatch dmp = new DiffMatchPatch();
+        LinkedList<DiffMatchPatch.Patch> patches;
+        patches = dmp.patchMake(origin, newStr);
+        String patchText = dmp.patchToText(patches);
+        return patchText;
+    }
+
 
     private void imgBtnInit() {
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
