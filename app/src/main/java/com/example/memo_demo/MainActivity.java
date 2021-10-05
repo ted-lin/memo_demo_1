@@ -1,7 +1,9 @@
 package com.example.memo_demo;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,15 +11,21 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
+
     public static final String EXTRA_MESSAGE = "com.example.memo_demo.MESSAGE";
     public static final String MEMO_EXTRA = "memo_extra";
 
-    public static String user = "nobody";
+    private static final int REQ_WIFI_DIRECT_PERMISSION = 5566;
+
+
+    private static String user = "nobody";
 
     public static final int MEMO_HOST = 1;
     public static final int MEMO_CLIENT = 2;
@@ -27,9 +35,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /* hidding keybox after without focus */
         EditText editText = findViewById(R.id.editText);
         View.OnFocusChangeListener ofcListener = new MainActivity.MainFocusChangeListener();
         editText.setOnFocusChangeListener(ofcListener);
+
+        /* acquire reletive permission for connection */
+        performPermissionGrant();
+    }
+
+    public void performPermissionGrant() {
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{
+                        Manifest.permission.CHANGE_NETWORK_STATE,
+                        Manifest.permission.ACCESS_NETWORK_STATE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.CHANGE_WIFI_STATE,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                }, REQ_WIFI_DIRECT_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_WIFI_DIRECT_PERMISSION) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    showToast("permission failure: " + permissions[i]);
+                    Log.e(TAG, "set to false");
+                    return;
+                }
+            }
+
+            if (grantResults.length == 0)
+                return;
+
+            showToast("permission pass");
+            //permissionComplete = true;
+            Log.e(TAG, "set to true " + grantResults.length);
+        }
     }
 
     private class MainFocusChangeListener implements View.OnFocusChangeListener {
@@ -66,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void asHost(View v) {
         if (!checkName()) {
-            Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
+            showToast("Need a name");
             return;
         }
         Intent intent = new Intent(this, MemoMain.class);
@@ -82,16 +128,34 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /**
-     * As client
-     */
+   /**
+      * As client
+      */
     public void asClient(View v) {
         if (!checkName()) {
-            Toast.makeText(getApplicationContext(), "Need a name", Toast.LENGTH_SHORT).show();
+            showToast("Need a name");
             return;
         }
         Intent intent = new Intent(this, MemoMain.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
         startActivity(intent);
+    }
+
+   /**
+     *  check connection
+     */
+   public void checkConnection(View v) {
+        Intent intent = new Intent(this, ConnectionHolder.class);
+        startActivity(intent);
+   }
+
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
     }
 }
