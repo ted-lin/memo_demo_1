@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-option java_package = "com.example.protos";
-option optimize_for = LITE_RUNTIME;
-message Person{
-  string html = 1;
-  bool isFullHtml  = 2;
-}
