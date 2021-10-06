@@ -612,15 +612,7 @@ public class MemoMain extends AppCompatActivity {
             client_stop();
     }
 
-
     public void saveTo(View v) {
-        EditText editText = findViewById(R.id.editText4);
-        TextView textView = findViewById(R.id.textView2);
-
-        String message = editText.getText().toString();
-        textView.setText(message);
-        editText.getText().clear();
-        Log.e(TAG, "save " + message);
     }
 
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
@@ -642,12 +634,11 @@ public class MemoMain extends AppCompatActivity {
     }
 
     private void log(String message) {
-        Log.e(TAG, String.format("%s%s %s", mUser, mMode, message));
+        Log.e(TAG, String.format("%s %s", getPrefix(), message));
     }
 
     public void hostWrite(View v) {
         String msg = getEditText();
-        log(msg);
         for (SocketThread client: mClients)
             client.write(msg);
     }
