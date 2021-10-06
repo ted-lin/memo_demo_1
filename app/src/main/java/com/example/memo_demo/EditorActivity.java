@@ -428,6 +428,41 @@ public class EditorActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.action_blockquote).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.setBlockquote();
+            }
+        });
+
+        findViewById(R.id.action_insert_bullets).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.setBullets();
+            }
+        });
+
+        findViewById(R.id.action_insert_numbers).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.setNumbers();
+            }
+        });
+
+        findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.insertImage("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg",
+                        "dachshund", 320);
+            }
+        });
+
+        findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditor.insertYoutubeVideo("https://www.youtube.com/embed/pS5peqApgUA");
+            }
+        });
 
 
 }
