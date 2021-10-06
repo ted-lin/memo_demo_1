@@ -17,7 +17,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
         android:text="Open"
-        app:layout_constraintBottom_toTopOf="@+id/button5"
+        app:layout_constraintBottom_toTopOf="@+id/start_relay"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -28,11 +28,11 @@
         android:layout_marginBottom="24dp"
         android:onClick="saveTo"
         android:text="Save"
-        app:layout_constraintBottom_toTopOf="@+id/button7"
+        app:layout_constraintBottom_toTopOf="@+id/stop_relay"
         app:layout_constraintStart_toEndOf="@+id/button3" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/start_relay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -43,21 +43,21 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button7"
+        android:id="@+id/stop_relay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="24dp"
         android:onClick="stop_relay"
-        android:text="Stop RELAY"
+        android:text="STOP RELAY"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button5" />
+        app:layout_constraintStart_toEndOf="@+id/start_relay" />
 
     <EditText
         android:id="@+id/editText4"
-        android:layout_width="158dp"
-        android:layout_height="328dp"
-        android:layout_marginTop="56dp"
+        android:layout_width="159dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="36dp"
         android:background="@android:drawable/editbox_background"
         android:ems="10"
         android:focusedByDefault="false"
@@ -83,14 +83,14 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Editor"
         app:layout_constraintBottom_toTopOf="@+id/editText4"
         tools:layout_editor_absoluteX="3dp" />
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="350dp"
-        android:layout_height="100dp"
+        android:layout_width="341dp"
+        android:layout_height="190dp"
         android:layout_marginTop="36dp"
         android:background="@android:drawable/editbox_background_normal"
         android:contentDescription="show the processing message"
@@ -109,9 +109,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/peer_list_view_2"
-        android:layout_width="145dp"
-        android:layout_height="325dp"
-        android:layout_marginTop="56dp"
+        android:layout_width="140dp"
+        android:layout_height="282dp"
+        android:layout_marginTop="36dp"
         android:background="@android:drawable/editbox_background_normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.842"
@@ -119,14 +119,25 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button8"
+        android:id="@+id/write_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
         android:onClick="hostWrite"
         android:text="write"
-        app:layout_constraintStart_toEndOf="@+id/button4"
-        app:layout_constraintTop_toBottomOf="@+id/peer_list_view_2" />
+        app:layout_constraintBottom_toTopOf="@+id/button9"
+        app:layout_constraintStart_toEndOf="@+id/button4" />
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="24dp"
+        android:onClick="clearText"
+        android:text="Clear"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/stop_relay" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

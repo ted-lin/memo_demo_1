@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             showToast("Need a name");
             return;
         }
-        Intent intent = new Intent(this, MemoMain.class);
+        Intent intent = new Intent(this, MemoHost.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_HOST, "host", user));
         startActivity(intent);
     }
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             showToast("Need a name");
             return;
         }
-        Intent intent = new Intent(this, MemoMain.class);
+        Intent intent = new Intent(this, MemoClient.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
         startActivity(intent);
     }
