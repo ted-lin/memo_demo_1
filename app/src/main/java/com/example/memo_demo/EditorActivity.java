@@ -9,6 +9,13 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +36,10 @@ public class EditorActivity extends AppCompatActivity {
     private Button htmlToProtoBtn;
     private TextView textView;
     private TextView lastTextView;
-    private String lastString;
+    private String lastString = "";
+    private TextHelper mTextHelper;
+    private String txtFileName = "a.txt";
+    private String htmlFileName = "a.html";
     byte[] save;
     String html;
     private int mFontSize = 5;
@@ -46,8 +56,12 @@ public class EditorActivity extends AppCompatActivity {
         public void onClick(View v) {
             try {
                 Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(save);
-                System.out.println(editorMessage.toString());
-                textView.setText(editorMessage.toString());
+//                editorMessage
+                String html = editorMessage.getHtml();
+                Boolean isFullHtml = editorMessage.getIsFullHtml();
+                if (isFullHtml) {
+                    mEditor.setHtml(html);
+                }
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
@@ -57,34 +71,103 @@ public class EditorActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             String _html = mEditor.getHtml();
-            if (_html == null) {
-                _html = "";
-            }
             Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                     .setHtml(_html)
                     .setIsFullHtml(true)
                     .build();
             save = editorMessage.toByteArray();
-            System.out.println(save.length);
         }
     };
-    private View.OnClickListener loadHtml = new View.OnClickListener() {
+    private View.OnClickListener saveHtml = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            mEditor.setHtml("hello world");
+            String str = lastString;
+
+            save_file(str, htmlFileName);
         }
     };
-    private View.OnClickListener toBlack = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            mEditor.setTextColor(Color.BLACK);
+
+    private String load_file(String file_name, boolean isPlain) {
+        File docDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        String extStorageState = Environment.getExternalStorageState();
+        if (extStorageState.equals(Environment.MEDIA_MOUNTED)) {
+            File inPutFile = new File(docDir, file_name);
+            StringBuilder stringBuilder = new StringBuilder();
+            try {
+                FileReader fr = new FileReader(inPutFile);
+                BufferedReader br = new BufferedReader(fr);
+                String line = br.readLine();
+                while (line != null) {
+                    stringBuilder.append(line).append('\n');
+                    line = br.readLine();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                String fileContents = stringBuilder.toString();
+                return isPlain ? mTextHelper.toHtml(fileContents) : fileContents;
+            }
+        } else {
+            return "";
         }
-    };
+    }
+
+    private void save_file(String str, String file_name) {
+        File docDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        String extStorageState = Environment.getExternalStorageState();
+        if (extStorageState.equals(Environment.MEDIA_MOUNTED)) {
+            File outPutFile = new File(docDir, file_name);
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(outPutFile);
+                byte[] bytes;
+                bytes = str.getBytes();
+                fos.write(bytes);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // TODO
+        }
+    }
+
     private View.OnClickListener getHtml = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             html = mEditor.getHtml();
             textView.setText(html);
+        }
+    };
+    private View.OnClickListener saveTxt = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String str = mTextHelper.toPlainTxt(lastString);
+            save_file(str, txtFileName);
+        }
+    };
+    private View.OnClickListener loadTxt = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String newString = load_file(txtFileName, true);
+            if (newString != "") {
+                mEditor.setHtml(newString);
+                lastString = newString;
+            }
+        }
+    };
+    private View.OnClickListener loadHtml = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            String newString = load_file(htmlFileName, false);
+            if (newString != "") {
+                mEditor.setHtml(newString);
+                lastString = newString;
+            }
         }
     };
 
@@ -115,17 +198,16 @@ public class EditorActivity extends AppCompatActivity {
 
         textView = findViewById(R.id.hello);
         lastTextView = findViewById(R.id.last);
-        htmlBtn = findViewById(R.id.btnHtml);
-        loadHtmlBtn = findViewById(R.id.btnLoadHtml);
-        imageBtn = findViewById(R.id.btnImg);
-        loadProtoToHtml = findViewById(R.id.btnProto);
-        htmlToProtoBtn = findViewById(R.id.btnToProto);
-        htmlBtn.setOnClickListener(getHtml);
-        loadHtmlBtn.setOnClickListener(loadHtml);
-        imageBtn.setOnClickListener(imageInsert);
-        loadProtoToHtml.setOnClickListener(protoToHtml);
-        htmlToProtoBtn.setOnClickListener(htmlToProto);
+        findViewById(R.id.btnHtml).setOnClickListener(getHtml);
+        findViewById(R.id.btnImg).setOnClickListener(imageInsert);
+        findViewById(R.id.btnProto).setOnClickListener(protoToHtml);
+        findViewById(R.id.btnToProto).setOnClickListener(htmlToProto);
         mEditor.setPadding(10, 10, 10, 10);
+        findViewById(R.id.btnSaveTxt).setOnClickListener(saveTxt);
+        findViewById(R.id.btnSaveHtml).setOnClickListener(saveHtml);
+        findViewById(R.id.btnLoadTxt).setOnClickListener(loadTxt);
+        findViewById(R.id.btnLoadHtml).setOnClickListener(loadHtml);
+
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setHtml("");
         imgBtnInit();
@@ -139,12 +221,12 @@ public class EditorActivity extends AppCompatActivity {
     public void receiveEditorMsg(byte[] proto) {
         Data.EditorMessage editorMessage;
         try {
-             editorMessage = Data.EditorMessage.parseFrom(proto);
+            editorMessage = Data.EditorMessage.parseFrom(proto);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
             return;
         }
-        if(editorMessage.getIsFullHtml()) {
+        if (editorMessage.getIsFullHtml()) {
             mEditor.setHtml(editorMessage.getHtml());
         } else {
             DiffMatchPatch dmp = new DiffMatchPatch();
@@ -154,12 +236,13 @@ public class EditorActivity extends AppCompatActivity {
             this.apply_patch(patches);
         }
     }
+
     public void apply_patch(List<DiffMatchPatch.Patch> patches) {
         DiffMatchPatch dmp = new DiffMatchPatch();
-        Object[] patch_result = dmp.patchApply((LinkedList<DiffMatchPatch.Patch>)patches, mEditor.getHtml());
-        if ((Boolean)patch_result[1]) {
+        Object[] patch_result = dmp.patchApply((LinkedList<DiffMatchPatch.Patch>) patches, mEditor.getHtml());
+        if ((Boolean) patch_result[1]) {
             // TODO need to check
-            lastString = (String)patch_result[0];
+            lastString = (String) patch_result[0];
             textView.setText(lastString);
             mEditor.setHtml(lastString);
 
@@ -168,6 +251,7 @@ public class EditorActivity extends AppCompatActivity {
         }
 
     }
+
     public void sendPatch(String patchText) {
         Data.EditorMessage.newBuilder().setHtml("");
         byte[] b = Data.EditorMessage.newBuilder()
