@@ -17,7 +17,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
         android:text="Open"
-        app:layout_constraintBottom_toTopOf="@+id/button5"
+        app:layout_constraintBottom_toTopOf="@+id/start_relay"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -28,11 +28,11 @@
         android:layout_marginBottom="24dp"
         android:onClick="saveTo"
         android:text="Save"
-        app:layout_constraintBottom_toTopOf="@+id/button7"
+        app:layout_constraintBottom_toTopOf="@+id/stop_relay"
         app:layout_constraintStart_toEndOf="@+id/button3" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/start_relay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -43,15 +43,15 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button7"
+        android:id="@+id/stop_relay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="24dp"
         android:onClick="stop_relay"
-        android:text="Stop RELAY"
+        android:text="STOP RELAY"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button5" />
+        app:layout_constraintStart_toEndOf="@+id/start_relay" />
 
     <EditText
         android:id="@+id/editText4"
@@ -119,7 +119,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <Button
-        android:id="@+id/button8"
+        android:id="@+id/write_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -138,6 +138,6 @@
         android:onClick="clearText"
         android:text="Clear"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button7" />
+        app:layout_constraintStart_toEndOf="@+id/stop_relay" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
