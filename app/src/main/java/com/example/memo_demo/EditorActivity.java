@@ -274,68 +274,6 @@ public class EditorActivity extends AppCompatActivity {
         return false;
     }
 
-        findViewById(R.id.action_blockquote).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.setBlockquote();
-            }
-        });
 
-        findViewById(R.id.action_insert_bullets).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.setBullets();
-            }
-        });
-
-        findViewById(R.id.action_insert_numbers).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.setNumbers();
-            }
-        });
-
-        findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertImage("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg",
-                        "dachshund", 320);
-            }
-        });
-
-        findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertYoutubeVideo("https://www.youtube.com/embed/pS5peqApgUA");
-            }
-        });
-
-        findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertAudio("https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3");
-            }
-        });
-
-        findViewById(R.id.action_insert_video).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertVideo("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4", 360);
-            }
-        });
-
-        findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
-            }
-        });
-        findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertTodo();
-            }
-        });
-    }
 
 }
