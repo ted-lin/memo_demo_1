@@ -24,6 +24,7 @@ import com.example.wifi.WifiDirectListener;
 import com.example.wifi.WifiP2p;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -39,13 +40,16 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MemoMain extends AppCompatActivity {
     public static final String TAG = "MemoMain";
 
-    public static String mode = "None";
-    public PeerItemAdapter mPeerAdapter;
+    /* basic */
+    public static String mMode;
+    public static String mUser;
+
     /* host part */
     private ServerThread mServer;
     private WifiP2p mP2p;
     private List<WifiP2pDevice> mP2pDeviceList;
     private Set<SocketThread> mClients = new HashSet<SocketThread>();
+    public PeerItemAdapter mPeerAdapter;
 
     /* client part */
     private SocketThread mClient;
@@ -53,6 +57,11 @@ public class MemoMain extends AppCompatActivity {
     private EditText mEditText;
     private boolean firstMsg = true;
 
+    /*  utils */
+    enum MEMO_SET_TYPE {
+        MEMO_TEXT_SET,
+        MEMO_TEXT_APPEND
+    };
     private WifiDirectListener mHostListener = new WifiDirectListener() {
         @Override
         public void onChannelDisconnected() {
@@ -81,9 +90,8 @@ public class MemoMain extends AppCompatActivity {
         @Override
         public void onConnect(WifiP2pInfo p2pInfo) {
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
-            EditText editText = findViewById(R.id.editText4);
-            String msg = editText.getText().toString();
-            log(msg.toString());
+            String msg = getEditText();
+            log(msg);
             for (SocketThread client: mClients)
                 client.write(msg);
         }
@@ -166,8 +174,7 @@ public class MemoMain extends AppCompatActivity {
 
                     @Override
                     public void onRemoved(SocketThread socketThread) {
-                        EditText editText = findViewById(R.id.editText4);
-                        mClient.write(editText.getText().toString());
+                        mClient.write(getEditText());
                         log(String.format("Socket remove: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
                     }
 
@@ -183,11 +190,12 @@ public class MemoMain extends AppCompatActivity {
                                 log(msg.toString());
 
                                 if (firstMsg) {
-                                    mEditText.setText(msg);
-                                    mClient.write("End relay");
+                                    updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                    mClient.write("End relay\n");
                                     firstMsg = false;
-                                } else
-                                    mEditText.append(msg);
+                                } else {
+                                    updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                }
                             }
                         });
                     }
@@ -249,20 +257,16 @@ public class MemoMain extends AppCompatActivity {
         Log.e(TAG, "created");
 
         MemoInfo memoinfo = getIntent().getParcelableExtra(MainActivity.MEMO_EXTRA);
-        memoinfo.dump();
-
-        Date currentTime = Calendar.getInstance().getTime();
-
-        mode = memoinfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
+        mMode = memoinfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
+        mUser = memoinfo.user;
         TextView title = findViewById(R.id.textView3);
+        title.setText("Hi " + mUser + ", you are running as " + mMode + " mMode");
 
-        title.setText("Hi " + memoinfo.user + ", you are running as " + mode + " mode");
 
         TextView textView = findViewById(R.id.textView2);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        textView.append("Status message:\n");
         textView.setTextSize(16);
-        textView.append(currentTime.toString());
+        textView.setText(getPrefix() + "start\n");
 
         EditText editText = findViewById(R.id.editText4);
         editText.setMovementMethod(new ScrollingMovementMethod());
@@ -271,9 +275,9 @@ public class MemoMain extends AppCompatActivity {
         editText.setOnFocusChangeListener(ofcListener);
 
 
-        if (mode == "Host") {
+        if (mMode == "Host") {
             mP2p = new WifiP2p(this, mHostListener);
-        } else if (mode == "Client") {
+        } else if (mMode == "Client") {
             mEditText = findViewById(R.id.editText4);
             mP2p = new WifiP2p(this, mClientListener);
         }
@@ -313,8 +317,10 @@ public class MemoMain extends AppCompatActivity {
             mP2p.onDestory();
             mP2p = null;
         }
-        if (mClient != null)
+        if (mClient != null) {
             mClient.close();
+            mClient = null;
+        }
     }
 
     public void force_sleep(int ms) {
@@ -375,6 +381,9 @@ public class MemoMain extends AppCompatActivity {
             mPeerAdapter.setListener(new PeerItemAdapter.PeerItemListener() {
                 @Override
                 public void onItemClick(int position) {
+                    updateStatusText(getPrefix() + "start relay\n",
+                            MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+
                     final WifiP2pDevice device = mP2pDeviceList.get(position);
 
                     if (device.status == WifiP2pDevice.CONNECTED) return;
@@ -453,15 +462,18 @@ public class MemoMain extends AppCompatActivity {
 
                 @Override
                 public void onRead(SocketThread socketThread, byte[] message) {
-                    final String str = String.format("Socket read %s:%d [%s]",
-                            socketThread.getHostAddress(),
-                            socketThread.getPort(),
-                            new String(message, StandardCharsets.UTF_8));
+                    final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
                     log(str);
                     MemoMain.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            textView.append(str);
+                            if (!firstMsg) {
+                                updateStatusText(getPrefix() + "client send back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            } else {
+                                updateStatusText(getPrefix() + str, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                firstMsg = false;
+                            }
                         }
                     });
                 }
@@ -504,13 +516,14 @@ public class MemoMain extends AppCompatActivity {
     }
 
     public void start_relay(View v) {
-        if (mode == "Host") {
+        if (mMode == "Host") {
             host_start();
-        } else if (mode == "Client")
+        } else if (mMode == "Client")
             client_start();
     }
 
     public void host_stop() {
+        firstMsg = true;
         if (mP2pDeviceList != null) {
             mP2pDeviceList.clear();
             //mP2pDeviceList = null;
@@ -575,9 +588,9 @@ public class MemoMain extends AppCompatActivity {
 
     public void client_stop() {
         if (mP2p != null) {
-            EditText editText = findViewById(R.id.editText4);
+            updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
             if (mClient != null)
-                mClient.write(editText.getText().toString());
+                mClient.write(getEditText());
 
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
@@ -593,9 +606,9 @@ public class MemoMain extends AppCompatActivity {
         }
     }
     public void stop_relay(View v) {
-        if (mode == "Host") {
+        if (mMode == "Host") {
             host_stop();
-        } else if (mode == "Client")
+        } else if (mMode == "Client")
             client_stop();
     }
 
@@ -629,14 +642,84 @@ public class MemoMain extends AppCompatActivity {
     }
 
     private void log(String message) {
-        Log.e(TAG, String.format("[%s] %s", mode, message));
+        Log.e(TAG, String.format("%s%s %s", mUser, mMode, message));
     }
 
     public void hostWrite(View v) {
-        EditText editText = findViewById(R.id.editText4);
-        String msg = editText.getText().toString();
-        log(msg.toString());
+        String msg = getEditText();
+        log(msg);
         for (SocketThread client: mClients)
             client.write(msg);
+    }
+
+    public String getTime() {
+        SimpleDateFormat now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss ");
+        return now.format(new Date());
+    }
+
+    public String getUser() {
+        return "[" + mUser + "] ";
+    }
+
+    public String getMode() {
+        return "[" + mMode + "] ";
+    }
+
+    public String getPrefix() {
+        return getTime() + getUser() + getMode();
+    }
+    public void clearText(View v) {
+        updateStatusText(getPrefix() + "reset\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
+        updateEditText("", MEMO_SET_TYPE.MEMO_TEXT_SET);
+    }
+
+    public void updateStatusText(String msg, MEMO_SET_TYPE type) {
+        TextView tv = findViewById(R.id.textView2);
+        if (tv == null) {
+            log("can't find target to update");
+            return;
+        }
+
+        switch (type) {
+            case MEMO_TEXT_SET:
+                tv.setText(msg);
+                break;
+            case MEMO_TEXT_APPEND:
+                tv.append(msg);
+                break;
+        }
+        log("update status: " + type + " " + msg);
+    }
+
+    public void updateEditText(String msg, MEMO_SET_TYPE type) {
+        EditText et = findViewById(R.id.editText4);
+        if (et == null) {
+            log("can't find target to update");
+            return;
+        }
+
+        switch (type) {
+            case MEMO_TEXT_SET:
+                et.setText(msg);
+                break;
+            case MEMO_TEXT_APPEND:
+                et.append(msg);
+                break;
+        }
+        log("update editor: " + type + " " + msg);
+    }
+
+    public String getStatusText() {
+        TextView tv = findViewById(R.id.textView2);
+            if (tv == null)
+                return "";
+        return tv.getText().toString();
+    }
+
+    public String getEditText() {
+        EditText et = findViewById(R.id.editText4);
+        if (et == null)
+            return "";
+        return et.getText().toString();
     }
 }

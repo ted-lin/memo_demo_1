@@ -32,6 +32,7 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action == null) return;
+        if (mListener == null) return;
 
         switch (action) {
             case WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION: {
