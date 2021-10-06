@@ -59,11 +59,36 @@
                     android:text="get_html" />
 
                 <Button
+                    android:id="@+id/btnSaveTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/hello"
+                    android:layout_alignParentRight="true"
+                    android:text=" save txt " />
+
+                <Button
+                    android:id="@+id/btnSaveHtml"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnSaveTxt"
+                    android:layout_alignParentRight="true"
+                    android:text=" save html" />
+
+                <Button
+                    android:id="@+id/btnLoadTxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/hello"
+                    android:layout_toLeftOf="@id/btnSaveTxt"
+                    android:text="load txt " />
+
+                <Button
                     android:id="@+id/btnLoadHtml"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/btnHtml"
-                    android:text="load_html" />
+                    android:layout_below="@id/btnLoadTxt"
+                    android:layout_toLeftOf="@id/btnSaveHtml"
+                    android:text="load html" />
 
                 <Button
                     android:id="@+id/btnImg"
@@ -85,6 +110,12 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/btnProto"
                     android:text="html to proto" />
+
+                <WebView
+                    android:id="@+id/webView"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_below="@id/btnProto" />
             </RelativeLayout>
 
 

@@ -45,6 +45,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.apandroid:colorwheel:1.0.3'
     implementation 'org.bitbucket.cowwoc:diff-match-patch:1.2'
+    implementation 'junit:junit:4.12'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
