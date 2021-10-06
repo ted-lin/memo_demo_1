@@ -1,10 +1,17 @@
 package com.example.memo_demo;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.view.View;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,15 +36,10 @@ import jp.wasabeef.richeditor.RichEditor;
 public class EditorActivity extends AppCompatActivity {
     public static final String TAG = "EditorActivity";
     private RichEditor mEditor;
-    private Button htmlBtn;
-    private Button loadHtmlBtn;
-    private Button loadProtoToHtml;
-    private Button imageBtn;
-    private Button htmlToProtoBtn;
+    private WebView webView;
     private TextView textView;
     private TextView lastTextView;
     private String lastString = "";
-    private TextHelper mTextHelper;
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
     byte[] save;
@@ -47,8 +49,10 @@ public class EditorActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            getExternalFilesDir(null);
-            mEditor.insertImage("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/s1.png", "", 400, 500);
+            mEditor.getSettings().setAllowContentAccess(true);
+            mEditor.getSettings().setAllowFileAccessFromFileURLs(true);
+            mEditor.setOnTextChangeListener(null);
+//            mEditor.insertImage("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/s1.png", "", 400, 500);
         }
     };
     private View.OnClickListener protoToHtml = new View.OnClickListener() {
@@ -107,7 +111,7 @@ public class EditorActivity extends AppCompatActivity {
                 e.printStackTrace();
             } finally {
                 String fileContents = stringBuilder.toString();
-                return isPlain ? mTextHelper.toHtml(fileContents) : fileContents;
+                return isPlain ? TextHelper.toHtml(fileContents) : fileContents;
             }
         } else {
             return "";
@@ -146,7 +150,7 @@ public class EditorActivity extends AppCompatActivity {
     private View.OnClickListener saveTxt = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String str = mTextHelper.toPlainTxt(lastString);
+            String str = TextHelper.toPlainTxt(lastString);
             save_file(str, txtFileName);
         }
     };
@@ -154,10 +158,8 @@ public class EditorActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             String newString = load_file(txtFileName, true);
-            if (newString != "") {
-                mEditor.setHtml(newString);
-                lastString = newString;
-            }
+            mEditor.setHtml(newString);
+            lastString = newString;
         }
     };
     private View.OnClickListener loadHtml = new View.OnClickListener() {
@@ -253,12 +255,10 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public void sendPatch(String patchText) {
-        Data.EditorMessage.newBuilder().setHtml("");
-        byte[] b = Data.EditorMessage.newBuilder()
+        byte[] bytes = Data.EditorMessage.newBuilder()
                 .setHtml("")
                 .setIsFullHtml(false)
                 .setPatchText(patchText).build().toByteArray();
-
         // Todo Send
     }
 
@@ -481,7 +481,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
+                showLinkDialog();
             }
         });
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
@@ -490,6 +490,38 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.insertTodo();
             }
         });
+    }
+
+    private void showLinkDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_link, null, false);
+        final EditText editText = view.findViewById(R.id.edit);
+        builder.setView(view);
+        builder.setTitle("Insert link");
+        final String[] mlink = new String[1];
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String link = editText.getText().toString().trim();
+                if (TextUtils.isEmpty(link)) {
+
+                    return;
+                }
+                mEditor.insertLink("https://github.com/wasabeef", link);
+            }
+        });
+
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // DO NOTHING HERE
+            }
+        });
+
+        builder.create().show();
     }
 
 }
