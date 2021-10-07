@@ -17,7 +17,7 @@ import java.util.Collection;
 
 public class MemoClient extends MemoMain {
     private SocketThread mClient;
-    private boolean mConnected = false;
+    //private boolean mConnected = false;
     private boolean mFirstMsg = true;
     private WifiP2p mP2p;
 
@@ -49,7 +49,7 @@ public class MemoClient extends MemoMain {
             log("connect group owner:" + p2pInfo.isGroupOwner);
             log("connect group formed:" + p2pInfo.groupFormed);
             log("--------------------------------");
-            mConnected = true;
+            //mConnected = true;
             if (mClient == null) {
                 mClient = new SocketThread(p2pInfo.groupOwnerAddress, new SocketListener() {
                     @Override
@@ -59,7 +59,9 @@ public class MemoClient extends MemoMain {
 
                     @Override
                     public void onRemoved(SocketThread socketThread) {
-                        mClient.write(getEditText());
+                        if (mClient != null) {
+                            mClient.write(getEditText());
+                        }
                         log(String.format("Socket remove: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
                     }
 
@@ -77,7 +79,9 @@ public class MemoClient extends MemoMain {
                                 if (mFirstMsg) {
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-                                    mClient.write("End relay\n");
+                                    if (mClient != null) {
+                                        mClient.write("End relay\n");
+                                    }
                                     mFirstMsg = false;
                                 } else {
                                     updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -97,7 +101,8 @@ public class MemoClient extends MemoMain {
             log("disconnect group owner:" + p2pInfo.isGroupOwner);
             log("disconnect group formed:" + p2pInfo.groupFormed);
             log("--------------------------------");
-            mConnected = false;
+           // mConnected = false;
+            disconnect();
             if (mClient != null) {
                 mClient.close();
                 mClient = null;
@@ -117,7 +122,7 @@ public class MemoClient extends MemoMain {
         public void onDiscoveryChanged(int discoveryState) {
             switch (discoveryState) {
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
-                    if (mConnected) return;
+                    //if (mConnected) return;
                     mP2p.discover(new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
@@ -125,8 +130,8 @@ public class MemoClient extends MemoMain {
                         }
 
                         @Override
-                        public void onFailure(int i) {
-                            log("discover again failure");
+                        public void onFailure(int status) {
+                            log("discover again failure:" + status);
                         }
                     });
                     break;
@@ -142,8 +147,6 @@ public class MemoClient extends MemoMain {
         setContentView(R.layout.activity_memo_main);
 
         init(getIntent());
-
-        mP2p = new WifiP2p(this, mClientListener);
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +169,9 @@ public class MemoClient extends MemoMain {
             @Override
             public void onClick(View v) {
                 String msg = getEditText();
-                mClient.write(msg);
+                if (mClient != null) {
+                    mClient.write(msg);
+                }
             }
         });
     }
@@ -175,14 +180,9 @@ public class MemoClient extends MemoMain {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mP2p != null) {
-            disconnect();
+        stop();
+        if (mP2p != null){
             mP2p.onDestory();
-            mP2p = null;
-        }
-        if (mClient != null) {
-            mClient.close();
-            mClient = null;
         }
     }
 
@@ -195,8 +195,8 @@ public class MemoClient extends MemoMain {
                 }
 
                 @Override
-                public void onFailure(int i) {
-                    log("disconnect failed " + i);
+                public void onFailure(int status) {
+                    log("disconnect failed " + WifiP2p.getActionFailure(status));
                 }
             });
         }
@@ -220,13 +220,16 @@ public class MemoClient extends MemoMain {
     }
 
     protected void start() {
-        if (mP2p != null) {
-            mFirstMsg = true;
+        if (mP2p == null) {
+            mP2p = new WifiP2p(this, mClientListener);
             mP2p.onCreate();
+        }
+
+        if (mP2p != null) {
             // always disconnect before really use.
             disconnect();
-            force_sleep(1000);
             discover();
+
             log("start finished");
         } else
             log("mP2p is null");
@@ -238,5 +241,10 @@ public class MemoClient extends MemoMain {
         if (mClient != null)
             mClient.write(getEditText());
         disconnect();
+        discover();
+        if (mClient != null) {
+            mClient.close();
+            mClient = null;
+        }
     }
 }
