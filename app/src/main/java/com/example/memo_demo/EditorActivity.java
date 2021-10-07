@@ -506,6 +506,13 @@ public class EditorActivity extends AppCompatActivity {
                 save_file(mEditor.getHtml(), htmlFileName);
             }
         });
+        findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String _html = load_file(htmlFileName, false);
+                mEditor.setHtml(_html);
+            }
+        });
     }
 
     private void showLinkDialog() {
