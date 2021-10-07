@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option java_package = "com.example.protos";
+option optimize_for = LITE_RUNTIME;
+message EditorMessage{
+  string html = 1;
+  string patchText = 2;
+  bool isFullHtml = 3;
+}
