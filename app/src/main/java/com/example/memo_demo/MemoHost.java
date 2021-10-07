@@ -215,6 +215,7 @@ public class MemoHost extends MemoMain {
             public void onItemClick(int position) {
                 updateStatusText(getPrefix() + "start relay\n",
                         MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                log(getPrefix() + "start relay\n");
 
                 if (mRecycleView != null)
                     mRecycleView.setVisibility(View.INVISIBLE);
@@ -309,12 +310,12 @@ public class MemoHost extends MemoMain {
             @Override
             public void onRead(SocketThread socketThread, byte[] message) {
                 final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
-                log(str);
+                log(getPrefix() + str);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client send back\n", MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            updateStatusText(getPrefix() + "client relay back\n", MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             updateEditText(str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_SET);
                         } else {
                             updateStatusText(getPrefix() + str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
