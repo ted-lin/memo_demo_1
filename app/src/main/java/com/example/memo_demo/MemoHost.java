@@ -123,6 +123,8 @@ public class MemoHost extends EditorActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init(getIntent());
+        setTitle("Memo " + mMode);
+
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,7 +332,6 @@ public class MemoHost extends EditorActivity {
     }
 
     protected void start() {
-        log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + getEditText() + "!!!!!!!!!!!!!!!!!!!!!!!!");
         mStop = false;
         if (mP2p == null) {
             mP2p = new WifiP2p(this, mHostListener);

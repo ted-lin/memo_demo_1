@@ -150,6 +150,7 @@ public class MemoClient extends EditorActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init(getIntent());
+        setTitle("Memo " + mMode);
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
