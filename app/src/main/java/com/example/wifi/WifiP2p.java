@@ -1,11 +1,14 @@
 package com.example.wifi;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pManager;
+
+import java.lang.reflect.Method;
 
 import androidx.core.app.ActivityCompat;
 
@@ -14,6 +17,10 @@ public class WifiP2p {
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
     WifiDirectBroadcastReceiver mReceiver;
+    boolean mRegisted = false;
+
+    private ConnectThread mConnectThread = null;
+
 
     public WifiP2p(Context context, WifiDirectListener listener) {
         mContext = context;
@@ -39,38 +46,152 @@ public class WifiP2p {
         return "Unknown";
     }
 
+    public static String getActionFailure(int status) {
+        switch (status) {
+            case 0:
+                return "Error";
+            case 1:
+                return "P2p unsupport";
+            case 2:
+                return "Busy";
+            case 3:
+                return "No service sequest";
+
+        }
+        return "";
+    }
+
     public void onCreate() {
-        mContext.registerReceiver(mReceiver, getIntentFilter());
+        if (!mRegisted) {
+            mContext.registerReceiver(mReceiver, getIntentFilter());
+            mRegisted = true;
+
+            mConnectThread = new ConnectThread();
+            mConnectThread.start();
+        }
     }
 
     public void onDestory() {
-        mContext.unregisterReceiver(mReceiver);
+        if (mRegisted) {
+            mContext.unregisterReceiver(mReceiver);
+            mRegisted = false;
+            mConnectThread.close();
+            mConnectThread = null;
+        }
     }
 
-    public void discover(WifiP2pManager.ActionListener listener) {
+    public void discover(final WifiP2pManager.ActionListener listener) {
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        mManager.discoverPeers(mChannel, listener);
+
+        mConnectThread.addTask(new Runnable() {
+
+            @SuppressLint("MissingPermission")
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                mManager.discoverPeers(mChannel, proxyListener);
+            }
+        });
     }
 
-    public void stopDiscover(WifiP2pManager.ActionListener listener) {
-        mManager.stopPeerDiscovery(mChannel, listener);
+    public void stopDiscover(final WifiP2pManager.ActionListener listener) {
+        mConnectThread.addTask(new Runnable() {
+
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                mManager.stopPeerDiscovery(mChannel, proxyListener);
+            }
+        });
+
     }
 
-    public void createGroup(WifiP2pManager.ActionListener listener) {
-        mManager.createGroup(mChannel, listener);
+    public void createGroup(final WifiP2pManager.ActionListener listener) {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        mConnectThread.addTask(new Runnable() {
+
+            @SuppressLint("MissingPermission")
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                mManager.createGroup(mChannel, proxyListener);
+            }
+        });
     }
 
-    public void connect(WifiP2pConfig config, WifiP2pManager.ActionListener listener) {
-        mManager.connect(mChannel, config, listener);
+    public void connect(final WifiP2pConfig config, final WifiP2pManager.ActionListener listener) {
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        mConnectThread.addTask(new Runnable() {
+
+            @SuppressLint("MissingPermission")
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                mManager.connect(mChannel, config, proxyListener);
+            }
+        });
     }
 
-    public void cancelClient(WifiP2pManager.ActionListener listener) {
-        mManager.cancelConnect(mChannel, listener);
+    public void disconnect(final WifiP2pManager.ActionListener listener) {
+        mConnectThread.addTask(new Runnable() {
+
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                deletePersistentGroups();
+                mManager.removeGroup(mChannel, proxyListener);
+            }
+        });
+
     }
-    public void disconnect(WifiP2pManager.ActionListener listener) {
-        mManager.removeGroup(mChannel, listener);
+
+    private void deletePersistentGroups(){
+        try {
+            Method[] methods = WifiP2pManager.class.getMethods();
+            for (int i = 0; i < methods.length; i++) {
+                if (methods[i].getName().equals("deletePersistentGroup")) {
+                    // Delete any persistent group
+                    for (int netid = 0; netid < 32; netid++) {
+                        methods[i].invoke(mManager, mChannel, netid, null);
+                    }
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private IntentFilter getIntentFilter() {
@@ -82,7 +203,41 @@ public class WifiP2p {
         return intentFilter;
     }
 
+    private static class ProxyListener implements WifiP2pManager.ActionListener {
+        private WifiP2pManager.ActionListener mListener = null;
+        private ConnectThread mConnectThread = null;
 
+        public void addListener(WifiP2pManager.ActionListener listener) {
+            mListener = listener;
+        }
+
+        public void setConnect(ConnectThread connectThread) {
+            mConnectThread = connectThread;
+        }
+
+        @Override
+        public void onSuccess() {
+            if(mListener != null) {
+                mListener.onSuccess();
+            }
+
+            if (mConnectThread != null) {
+                mConnectThread.notifyState(ConnectThread.CONNECT_PASS);
+            }
+
+        }
+
+        @Override
+        public void onFailure(int status) {
+            if(mListener != null) {
+                mListener.onFailure(status);
+            }
+            if (mConnectThread != null) {
+                mConnectThread.notifyState(ConnectThread.CONNECT_FAIL);
+            }
+
+        }
+    }
 }
 
 
