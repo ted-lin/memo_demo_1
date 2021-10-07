@@ -27,6 +27,7 @@ import java.util.Set;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import jp.wasabeef.richeditor.RichEditor;
 
 public class MemoHost extends EditorActivity {
     private boolean mFirstMsg = true;
@@ -39,6 +40,7 @@ public class MemoHost extends EditorActivity {
     private Set<SocketThread> mClients = new HashSet<SocketThread>();
     public PeerItemAdapter mPeerAdapter;
     private boolean mStop = false;
+    private RichEditor mEditor;
 
     private static final int RETRY = 3;
     private RecyclerView mRecycleView;
@@ -120,15 +122,11 @@ public class MemoHost extends EditorActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
-        log("xx");
         init(getIntent());
-
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                log("xxxxx");
                 start();
             }
         });
@@ -331,19 +329,8 @@ public class MemoHost extends EditorActivity {
         mServer.start();
     }
 
-    /*
-    protected void inflactConnectionList() {
-        Intent intent = new Intent(this, MemoHost.class);
-        PeerItemAdapterWrapper adapter = new PeerItemAdapterWrapper(HOST_RECYCLER_VIEW_ID, mPeerAdapter);
-        intent.putExtra(HOST_EXTRA, adapter);
-
-        startActivityForResult(intent, 0);
-
-
-    }
-    */
-
     protected void start() {
+        log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + getEditText() + "!!!!!!!!!!!!!!!!!!!!!!!!");
         mStop = false;
         if (mP2p == null) {
             mP2p = new WifiP2p(this, mHostListener);

@@ -667,21 +667,18 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public void updateEditText(String msg, EditorActivity.MEMO_SET_TYPE type) {
-//        EditText et = findViewById(R.id.editText4);
-//        if (et == null) {
-//            log("can't find target to update");
-//            return;
-//        }
-//
-//        switch (type) {
-//            case MEMO_TEXT_SET:
-//                et.setText(msg);
-//                break;
-//            case MEMO_TEXT_APPEND:
-//                et.append(msg);
-//                break;
-//        }
-//        log("update editor: " + type + " " + msg);
+        if (mEditor == null)
+            return;
+
+        switch (type) {
+            case MEMO_TEXT_SET:
+                mEditor.setHtml(msg);
+                break;
+            case MEMO_TEXT_APPEND:
+                mEditor.setHtml(msg);
+                break;
+        }
+        log("update editor: " + type + " " + msg);
     }
 
     public String getStatusText() {
@@ -692,10 +689,8 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public String getEditText() {
-//        EditText et = findViewById(R.id.editText4);
-//        if (et == null)
-//            return "";
-//        return et.getText().toString();
+        if (mEditor != null)
+            return mEditor.getHtml();
         return "";
     }
 }

@@ -149,8 +149,6 @@ public class MemoClient extends EditorActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
-
         init(getIntent());
 
         Button start = findViewById(R.id.start_relay);
