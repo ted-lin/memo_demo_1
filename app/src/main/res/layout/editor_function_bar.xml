@@ -141,14 +141,14 @@
             android:src="@drawable/txt_color" />
 
         <ImageButton
-            android:id="@+id/txt_color"
+            android:id="@+id/change_txt_color"
             android:layout_width="24dp"
             android:layout_height="48dp"
             android:background="@drawable/background"
             android:contentDescription="@null"
             android:padding="6dp"
             android:scaleType="fitCenter"
-            android:src="@color/font_color" />
+            android:src="@color/BLACK" />
 
         <ImageButton
             android:id="@+id/action_bg_color"
@@ -161,14 +161,14 @@
             android:src="@drawable/bg_color" />
 
         <ImageButton
-            android:id="@+id/bg_txt_color"
+            android:id="@+id/change_bg_txt_color"
             android:layout_width="24dp"
             android:layout_height="48dp"
             android:background="@drawable/background"
             android:contentDescription="@null"
             android:padding="6dp"
             android:scaleType="fitCenter"
-            android:src="@color/font_bg_color" />
+            android:src="@color/WHITE" />
 
         <ImageButton
             android:id="@+id/action_indent"

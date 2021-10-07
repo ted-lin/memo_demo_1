@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -55,6 +56,12 @@ public class EditorActivity extends AppCompatActivity {
     byte[] save;
     String html;
     private int mFontSize = 5;
+    int text_color_index = 0;
+    int text_bg_color_index = 6;
+    int[] text_color_src_id = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
+            R.color.CYAN, R.color.RED, R.color.WHITE};
+    int[] text_colors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
+            Color.CYAN, Color.RED, Color.WHITE};
     private View.OnClickListener imageInsert = new View.OnClickListener() {
 
         @Override
@@ -70,7 +77,6 @@ public class EditorActivity extends AppCompatActivity {
         public void onClick(View v) {
             try {
                 Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(save);
-//                editorMessage
                 String html = editorMessage.getHtml();
                 Boolean isFullHtml = editorMessage.getIsFullHtml();
                 if (isFullHtml) {
@@ -396,14 +402,33 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.setHeading(6);
             }
         });
+        findViewById(R.id.change_txt_color).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text_color_index += 1;
+                if (text_color_index >= text_color_src_id.length) {
+                    text_color_index = 0;
+                }
+                ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(text_color_src_id[text_color_index]);
+                mEditor.setTextColor(text_colors[text_color_index]);
+            }
+        });
+        findViewById(R.id.change_bg_txt_color).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text_bg_color_index += 1;
+                if (text_bg_color_index >= text_color_src_id.length)
+                    text_bg_color_index = 0;
+                ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(text_color_src_id[text_bg_color_index]);
+                mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
+            }
+        });
 
         findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
-            private boolean isChanged;
 
             @Override
             public void onClick(View v) {
-                mEditor.setTextColor(isChanged ? Color.BLACK : Color.RED);
-                isChanged = !isChanged;
+                mEditor.setTextColor(text_colors[text_color_index]);
             }
         });
 
@@ -412,8 +437,7 @@ public class EditorActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                mEditor.setTextBackgroundColor(isChanged ? Color.TRANSPARENT : Color.YELLOW);
-                isChanged = !isChanged;
+                mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
             }
         });
 
@@ -517,15 +541,13 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.saveImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save_file(mEditor.getHtml(), htmlFileName);
+                createFile("text/plain", htmlFileName);
             }
         });
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openFile("text/plain");
-//                load_file(htmlFileName, false);
-//                mEditor.setHtml(_html);
             }
         });
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
@@ -747,18 +769,11 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void createFile(String mimeType, String fileName) {
-
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
         intent.putExtra(Intent.EXTRA_TITLE, fileName);
-//        setResult(0);
-//        intent.putExtra(Intent.EXTRA_F)
         startActivityForResult(intent, WRITE_REQUEST_CODE);
-//        getContentResolver().openOutputStream()
-//        onActivityResult(WRITE_REQUEST_CODE);
-//        FileOutputStream fos = null;
-//        fos = openFileOutput(fileName, )
     }
 
 
