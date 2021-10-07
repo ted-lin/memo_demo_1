@@ -42,6 +42,7 @@ public class ServerThread extends Thread {
                 if (mServerSocket != null) {
                     mServerSocket.close();
                 }
+
                 Log.d(TAG, "[Server] server socket close");
             } catch (IOException e1) {
                 e1.printStackTrace();

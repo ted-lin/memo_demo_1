@@ -21,6 +21,7 @@ public class WifiP2p {
 
     private ConnectThread mConnectThread = null;
 
+
     public WifiP2p(Context context, WifiDirectListener listener) {
         mContext = context;
         mManager = (WifiP2pManager) mContext.getSystemService(Context.WIFI_P2P_SERVICE);
@@ -190,6 +191,7 @@ public class WifiP2p {
         } catch(Exception e) {
             e.printStackTrace();
         }
+
     }
 
     private IntentFilter getIntentFilter() {
@@ -236,9 +238,6 @@ public class WifiP2p {
 
         }
     }
-
-
-
 }
 
 

@@ -4,122 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EditorActivity">
 
-    <RelativeLayout
+    tools:context=".EditorActivity">
+    <!--    <fragment-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent">-->
+
+    <!--    </fragment>-->
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/RelayWindowSize"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        android:layout_marginTop="@dimen/RelayWindowSize"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <include
-            android:id="@id/scrollView"
-            layout="@layout/editor_function_bar" />
+        <include layout="@layout/fragment_richeditor"></include>
 
-        <LinearLayout
-            android:id="@+id/helloview"
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:layout_below="@id/scrollView">
+    </LinearLayout>
 
-            <jp.wasabeef.richeditor.RichEditor
-                android:id="@+id/editor"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:layout_below="@id/helloview">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/last"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hello World!"></TextView>
-
-                <TextView
-                    android:id="@+id/hello"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/last"
-                    android:text="Hello World!"></TextView>
-
-                <Button
-                    android:id="@+id/btnHtml"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/hello"
-                    android:text="get_html" />
-
-                <Button
-                    android:id="@+id/btnSaveTxt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/hello"
-                    android:layout_alignParentRight="true"
-                    android:text=" save txt " />
-
-                <Button
-                    android:id="@+id/btnSaveHtml"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnSaveTxt"
-                    android:layout_alignParentRight="true"
-                    android:text=" save html" />
-
-                <Button
-                    android:id="@+id/btnLoadTxt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/hello"
-                    android:layout_toLeftOf="@id/btnSaveTxt"
-                    android:text="load txt " />
-
-                <Button
-                    android:id="@+id/btnLoadHtml"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnLoadTxt"
-                    android:layout_toLeftOf="@id/btnSaveHtml"
-                    android:text="load html" />
-
-                <Button
-                    android:id="@+id/btnImg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnLoadHtml"
-                    android:text="img" />
-
-                <Button
-                    android:id="@+id/btnProto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnImg"
-                    android:text="proto" />
-
-                <Button
-                    android:id="@+id/btnToProto"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/btnProto"
-                    android:text="html to proto" />
-
-                <WebView
-                    android:id="@+id/webView"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:layout_below="@id/btnProto" />
-            </RelativeLayout>
-
-
-        </ScrollView>
-
-    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

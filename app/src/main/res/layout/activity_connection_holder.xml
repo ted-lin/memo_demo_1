@@ -6,12 +6,4 @@
     android:layout_height="match_parent"
     tools:context=".ConnectionHolder">
 
-    <FrameLayout
-        android:id="@+id/connection_fragment"
-        android:layout_width="411dp"
-        android:layout_height="0px"
-        tools:layout_editor_absoluteY="178dp">
-
-    </FrameLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

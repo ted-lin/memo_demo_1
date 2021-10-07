@@ -95,7 +95,6 @@ public class SocketThread extends Thread {
         }
 
         while (mSocket != null && !mSocket.isClosed()) {
-
             try {
 
                 ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();

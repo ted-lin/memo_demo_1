@@ -31,12 +31,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoHost extends MemoMain {
     private boolean mFirstMsg = true;
+
+    public static final String HOST_EXTRA = "RecyclerViewExtra";
+    public static final int HOST_RECYCLER_VIEW_ID = 1;
 
     private ServerThread mServer;
     private WifiP2p mP2p;
@@ -46,6 +48,7 @@ public class MemoHost extends MemoMain {
     private boolean mStop = false;
 
     private static final int RETRY = 3;
+    private RecyclerView mRecycleView;
 
     private WifiDirectListener mHostListener = new WifiDirectListener() {
         @Override
@@ -62,6 +65,7 @@ public class MemoHost extends MemoMain {
         public void onPeersChanged(Collection<WifiP2pDevice> wifiP2pDeviceList) {
             for (final WifiP2pDevice device : wifiP2pDeviceList) {
                 log("peer: " + device.deviceAddress + " " + device.deviceName + " " + device.isGroupOwner() + " " + WifiP2p.getConnectStatus(device.status));
+
             }
 
             if (mP2pDeviceList != null) {
@@ -214,8 +218,12 @@ public class MemoHost extends MemoMain {
             public void onItemClick(final int position) {
                 updateStatusText(getPrefix() + "start relay\n",
                         MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-
+                log(getPrefix() + "start relay\n");
+                if (mRecycleView != null)
+                    mRecycleView.setVisibility(View.INVISIBLE);
+                setAllButtonView(View.VISIBLE);
                 final WifiP2pDevice device = mP2pDeviceList.get(position);
+
 
                 if (device.status == WifiP2pDevice.CONNECTED) return;
 
@@ -270,9 +278,11 @@ public class MemoHost extends MemoMain {
             }
         });
 
-        RecyclerView recycleView = findViewById(R.id.peer_list_view_2);
-        recycleView.setAdapter(mPeerAdapter);
-        recycleView.setLayoutManager(new LinearLayoutManager(this));
+        mRecycleView = findViewById(R.id.peer_list_view_2);
+        setAllButtonView(View.INVISIBLE);
+        mRecycleView.setVisibility(View.VISIBLE);
+        mPeerAdapter.setAdapter(mPeerAdapter);
+        mPeerAdapter.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void serverStart() {
@@ -339,7 +349,6 @@ public class MemoHost extends MemoMain {
             disconnect();
             createGroup();
             discover();
-
             buildConnectionList();
             serverStart();
             log("start finished");
@@ -349,6 +358,8 @@ public class MemoHost extends MemoMain {
 
     protected void stop() {
         mStop = true;
+        updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+
         mFirstMsg = true;
         if (mP2pDeviceList != null) {
             mP2pDeviceList.clear();
@@ -361,7 +372,6 @@ public class MemoHost extends MemoMain {
 
         if (mP2p != null) {
             discover();
-
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
                 public void onSuccess() {
@@ -382,9 +392,6 @@ public class MemoHost extends MemoMain {
         if (mServer != null) {
             mServer.close();
             mServer = null;
-        }
-
-        if (mP2p != null) {
         }
     }
 

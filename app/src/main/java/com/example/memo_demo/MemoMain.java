@@ -8,6 +8,7 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,6 +16,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -45,7 +47,7 @@ public class MemoMain extends AppCompatActivity {
     public static String mMode;
     public static String mUser;
 
-
+    private List<Button> mButtons;
     public void init(Intent intent) {
         Log.e(TAG, "created");
 
@@ -53,25 +55,41 @@ public class MemoMain extends AppCompatActivity {
         mMode = memoInfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
         mUser = memoInfo.user;
 
-        TextView title = findViewById(R.id.textView3);
+
+        TextView title = findViewById(R.id.textViewTitle);
         title.setText("Hi " + mUser + ", you are running as " + mMode + " mMode");
 
-        TextView textView = findViewById(R.id.textView2);
+        TextView textView = findViewById(R.id.textViewStatus);
         textView.setMovementMethod(new ScrollingMovementMethod());
         textView.setTextSize(16);
         textView.setText(getPrefix() + "start\n");
 
-        EditText editText = findViewById(R.id.editText4);
-        editText.setMovementMethod(new ScrollingMovementMethod());
+//        EditText editText = findViewById(R.id.editText4);
+//        editText.setMovementMethod(new ScrollingMovementMethod());
 
         View.OnFocusChangeListener ofcListener = new MemoFocusChangeListener();
-        editText.setOnFocusChangeListener(ofcListener);
+//        editText.setOnFocusChangeListener(ofcListener);
+
+        findAllButtons();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_memo_main);
+    }
+
+    protected void findAllButtons() {
+        mButtons = new ArrayList<>();
+        mButtons.add((Button) findViewById(R.id.write_to));
+        mButtons.add((Button) findViewById(R.id.clear));
+        mButtons.add((Button) findViewById(R.id.start_relay));
+        mButtons.add((Button) findViewById(R.id.stop_relay));
+    }
+
+    protected void setAllButtonView(int v) {
+        for (Button btn : mButtons)
+            btn.setVisibility(v);
     }
 
     @Override
@@ -81,11 +99,27 @@ public class MemoMain extends AppCompatActivity {
 
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
         public void onFocusChange(View v, boolean hasFocus) {
-            if (v.getId() == R.id.editText4 && !hasFocus) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (null != imm)
-                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }
+//            if (v.getId() == R.id.editText4 && !hasFocus) {
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                if (null != imm)
+//                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//            }
+        }
+    }
+
+    /*  utils */
+    enum MEMO_SET_TYPE {
+        MEMO_TEXT_SET,
+        MEMO_TEXT_APPEND
+    }
+
+    ;
+
+    public void force_sleep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -130,7 +164,7 @@ public class MemoMain extends AppCompatActivity {
     }
 
     public void updateStatusText(String msg, MEMO_SET_TYPE type) {
-        TextView tv = findViewById(R.id.textView2);
+        TextView tv = findViewById(R.id.textViewStatus);
         if (tv == null) {
             log("can't find target to update");
             return;
@@ -148,34 +182,37 @@ public class MemoMain extends AppCompatActivity {
     }
 
     public void updateEditText(String msg, MEMO_SET_TYPE type) {
-        EditText et = findViewById(R.id.editText4);
-        if (et == null) {
-            log("can't find target to update");
-            return;
-        }
 
-        switch (type) {
-            case MEMO_TEXT_SET:
-                et.setText(msg);
-                break;
-            case MEMO_TEXT_APPEND:
-                et.append(msg);
-                break;
-        }
-        log("update editor: " + type + " " + msg);
+//        EditText et = findViewById(R.id.editText4);
+//        if (et == null) {
+//            log("can't find target to update");
+//            return;
+//        }
+//
+//        switch (type) {
+//            case MEMO_TEXT_SET:
+//                et.setText(msg);
+//                break;
+//            case MEMO_TEXT_APPEND:
+//                et.append(msg);
+//                break;
+//        }
+//        log("update editor: " + type + " " + msg);
     }
 
     public String getStatusText() {
-        TextView tv = findViewById(R.id.textView2);
-            if (tv == null)
-                return "";
+        TextView tv = findViewById(R.id.textViewStatus);
+        if (tv == null)
+            return "";
         return tv.getText().toString();
     }
 
     public String getEditText() {
-        EditText et = findViewById(R.id.editText4);
-        if (et == null)
-            return "";
-        return et.getText().toString();
+
+//        EditText et = findViewById(R.id.editText4);
+//        if (et == null)
+//            return "";
+//        return et.getText().toString();
+        return "";
     }
 }

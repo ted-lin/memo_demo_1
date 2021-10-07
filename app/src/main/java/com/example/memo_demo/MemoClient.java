@@ -18,6 +18,7 @@ import java.util.Collection;
 public class MemoClient extends MemoMain {
     private SocketThread mClient;
     //private boolean mConnected = false;
+
     private boolean mFirstMsg = true;
     private WifiP2p mP2p;
 
@@ -50,6 +51,7 @@ public class MemoClient extends MemoMain {
             log("connect group formed:" + p2pInfo.groupFormed);
             log("--------------------------------");
             //mConnected = true;
+
             if (mClient == null) {
                 mClient = new SocketThread(p2pInfo.groupOwnerAddress, new SocketListener() {
                     @Override
@@ -62,6 +64,7 @@ public class MemoClient extends MemoMain {
                         if (mClient != null) {
                             mClient.write(getEditText());
                         }
+
                         log(String.format("Socket remove: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
                     }
 
@@ -80,7 +83,7 @@ public class MemoClient extends MemoMain {
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     if (mClient != null) {
-                                        mClient.write("End relay\n");
+                                        mClient.write("end relay\n");
                                     }
                                     mFirstMsg = false;
                                 } else {
@@ -103,6 +106,7 @@ public class MemoClient extends MemoMain {
             log("--------------------------------");
            // mConnected = false;
             disconnect();
+
             if (mClient != null) {
                 mClient.close();
                 mClient = null;
@@ -123,6 +127,7 @@ public class MemoClient extends MemoMain {
             switch (discoveryState) {
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
                     //if (mConnected) return;
+
                     mP2p.discover(new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
@@ -229,7 +234,6 @@ public class MemoClient extends MemoMain {
             // always disconnect before really use.
             disconnect();
             discover();
-
             log("start finished");
         } else
             log("mP2p is null");

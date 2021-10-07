@@ -13,25 +13,6 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/action_undo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/undo" />
-
-
-        <ImageButton
-            android:id="@+id/action_redo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/redo" />
-
-        <ImageButton
             android:id="@+id/action_bold"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -159,6 +140,17 @@
             android:src="@drawable/txt_color" />
 
         <ImageButton
+
+            android:id="@+id/txt_color"
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:background="@drawable/background"
+            android:contentDescription="@null"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:src="@color/font_color" />
+
+        <ImageButton
             android:id="@+id/action_bg_color"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -168,6 +160,16 @@
             android:scaleType="fitCenter"
             android:src="@drawable/bg_color" />
 
+
+        <ImageButton
+            android:id="@+id/bg_txt_color"
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:background="@drawable/background"
+            android:contentDescription="@null"
+            android:padding="6dp"
+            android:scaleType="fitCenter"
+            android:src="@color/font_bg_color" />
 
         <ImageButton
             android:id="@+id/action_indent"
@@ -307,7 +309,7 @@
             android:contentDescription="@null"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@android:drawable/checkbox_on_background" />
+            android:src="@drawable/checkbox_on_background" />
 
     </LinearLayout>
 </HorizontalScrollView>
