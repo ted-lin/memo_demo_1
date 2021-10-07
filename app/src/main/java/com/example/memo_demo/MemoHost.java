@@ -1,8 +1,5 @@
 package com.example.memo_demo;
 
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.Intent;
 import android.net.MacAddress;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -11,10 +8,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.wifi.ServerThread;
@@ -24,15 +19,12 @@ import com.example.wifi.WifiDirectListener;
 import com.example.wifi.WifiP2p;
 
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -282,7 +274,7 @@ public class MemoHost extends MemoMain {
     }
 
     private void serverStart() {
-        final TextView textView = findViewById(R.id.textView2);
+        final TextView textView = findViewById(R.id.textViewStatus);
         mServer = new ServerThread();
         mServer.setListener(new SocketListener() {
             @Override
