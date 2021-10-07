@@ -192,23 +192,23 @@ public class EditorActivity extends AppCompatActivity {
 //                dmp.diffCleanupSemantic(diff);
 //                dmp.diffCleanupEfficiency(diff);
                 lastString = text;
-                textView.setText(lastString);
-                lastTextView.setText(patch.toString());
+//                textView.setText(lastString);
+//                lastTextView.setText(patch.toString());
 
             }
         });
 
-        textView = findViewById(R.id.hello);
-        lastTextView = findViewById(R.id.last);
-        findViewById(R.id.btnHtml).setOnClickListener(getHtml);
-        findViewById(R.id.btnImg).setOnClickListener(imageInsert);
-        findViewById(R.id.btnProto).setOnClickListener(protoToHtml);
-        findViewById(R.id.btnToProto).setOnClickListener(htmlToProto);
+//        textView = findViewById(R.id.hello);
+//        lastTextView = findViewById(R.id.last);
+//        findViewById(R.id.btnHtml).setOnClickListener(getHtml);
+//        findViewById(R.id.btnImg).setOnClickListener(imageInsert);
+//        findViewById(R.id.btnProto).setOnClickListener(protoToHtml);
+//        findViewById(R.id.btnToProto).setOnClickListener(htmlToProto);
         mEditor.setPadding(10, 10, 10, 10);
-        findViewById(R.id.btnSaveTxt).setOnClickListener(saveTxt);
-        findViewById(R.id.btnSaveHtml).setOnClickListener(saveHtml);
-        findViewById(R.id.btnLoadTxt).setOnClickListener(loadTxt);
-        findViewById(R.id.btnLoadHtml).setOnClickListener(loadHtml);
+//        findViewById(R.id.btnSaveTxt).setOnClickListener(saveTxt);
+//        findViewById(R.id.btnSaveHtml).setOnClickListener(saveHtml);
+//        findViewById(R.id.btnLoadTxt).setOnClickListener(loadTxt);
+//        findViewById(R.id.btnLoadHtml).setOnClickListener(loadHtml);
 
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setHtml("");
@@ -275,6 +275,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.undo();
             }
 
@@ -284,6 +285,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.redo();
             }
         });
@@ -292,6 +294,7 @@ public class EditorActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setBold();
             }
         });
@@ -299,6 +302,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_italic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setItalic();
             }
         });
@@ -306,6 +310,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_subscript).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setSubscript();
             }
         });
@@ -313,6 +318,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_superscript).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setSuperscript();
             }
         });
@@ -320,6 +326,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_strikethrough).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setStrikeThrough();
             }
         });
@@ -327,6 +334,8 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_underline).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mEditor.focusEditor();
                 mEditor.setUnderline();
             }
         });
@@ -334,6 +343,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_heading1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setHeading(1);
             }
         });
@@ -341,6 +351,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_heading2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setHeading(2);
             }
         });
@@ -348,6 +359,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_heading3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setHeading(3);
             }
         });
@@ -355,6 +367,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_heading4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setHeading(4);
             }
         });
@@ -362,6 +375,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_heading5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mEditor.focusEditor();
                 mEditor.setHeading(5);
             }
         });
@@ -493,7 +507,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void showLinkDialog() {
-
+        // TODO need to fix link problem
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
 
@@ -501,7 +515,6 @@ public class EditorActivity extends AppCompatActivity {
         final EditText editText = view.findViewById(R.id.edit);
         builder.setView(view);
         builder.setTitle("Insert link");
-        final String[] mlink = new String[1];
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
