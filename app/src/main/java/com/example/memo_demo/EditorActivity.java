@@ -504,6 +504,12 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.insertTodo();
             }
         });
+        findViewById(R.id.save).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save_file(mEditor.getHtml(), htmlFileName);
+            }
+        });
     }
 
     private void showLinkDialog() {
