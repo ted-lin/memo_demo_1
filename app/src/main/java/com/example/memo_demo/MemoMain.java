@@ -2,16 +2,7 @@ package com.example.memo_demo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.MacAddress;
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
-
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -20,25 +11,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.wifi.ServerThread;
-import com.example.wifi.SocketListener;
-import com.example.wifi.SocketThread;
-import com.example.wifi.WifiDirectListener;
-import com.example.wifi.WifiP2p;
-
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoMain extends AppCompatActivity {
     public static final String TAG = "MemoMain";
@@ -46,15 +24,15 @@ public class MemoMain extends AppCompatActivity {
     /* basic */
     public static String mMode;
     public static String mUser;
-
     private List<Button> mButtons;
+
+
     public void init(Intent intent) {
         Log.e(TAG, "created");
 
         MemoInfo memoInfo = intent.getParcelableExtra(MainActivity.MEMO_EXTRA);
         mMode = memoInfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
         mUser = memoInfo.user;
-
 
         TextView title = findViewById(R.id.textViewTitle);
         title.setText("Hi " + mUser + ", you are running as " + mMode + " mMode");
@@ -73,12 +51,6 @@ public class MemoMain extends AppCompatActivity {
         findAllButtons();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_memo_main);
-    }
-
     protected void findAllButtons() {
         mButtons = new ArrayList<>();
         mButtons.add((Button) findViewById(R.id.write_to));
@@ -90,6 +62,12 @@ public class MemoMain extends AppCompatActivity {
     protected void setAllButtonView(int v) {
         for (Button btn : mButtons)
             btn.setVisibility(v);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_memo_main);
     }
 
     @Override
@@ -114,20 +92,6 @@ public class MemoMain extends AppCompatActivity {
     }
 
     ;
-
-    public void force_sleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*  utils */
-    enum MEMO_SET_TYPE {
-        MEMO_TEXT_SET,
-        MEMO_TEXT_APPEND
-    };
 
     public void force_sleep(int ms) {
         try {
@@ -182,7 +146,6 @@ public class MemoMain extends AppCompatActivity {
     }
 
     public void updateEditText(String msg, MEMO_SET_TYPE type) {
-
 //        EditText et = findViewById(R.id.editText4);
 //        if (et == null) {
 //            log("can't find target to update");
@@ -208,7 +171,6 @@ public class MemoMain extends AppCompatActivity {
     }
 
     public String getEditText() {
-
 //        EditText et = findViewById(R.id.editText4);
 //        if (et == null)
 //            return "";

@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:drawable="@drawable/selected_state"
-        android:state_pressed="true"></item>
-    <item
-        android:drawable="@drawable/activied_state"
-        android:state_activated="true">
-    </item>
-
+    <item android:state_pressed="true" android:drawable="@drawable/selected_state" />
+    <item android:state_activated="true" android:drawable="@drawable/activied_state" />
 </selector>

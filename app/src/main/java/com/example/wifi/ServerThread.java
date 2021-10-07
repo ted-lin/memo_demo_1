@@ -39,10 +39,7 @@ public class ServerThread extends Thread {
 
         } catch (SocketException e) {
             try {
-                if (mServerSocket != null) {
-                    mServerSocket.close();
-                }
-
+                mServerSocket.close();
                 Log.d(TAG, "[Server] server socket close");
             } catch (IOException e1) {
                 e1.printStackTrace();

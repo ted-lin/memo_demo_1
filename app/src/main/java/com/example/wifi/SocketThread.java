@@ -94,7 +94,9 @@ public class SocketThread extends Thread {
             e.printStackTrace();
         }
 
-        while (mSocket != null && !mSocket.isClosed()) {
+        Log.d(TAG, "SocketThread start run:" + mSocket.isClosed());
+        while (!mSocket.isClosed()) {
+
             try {
 
                 ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
