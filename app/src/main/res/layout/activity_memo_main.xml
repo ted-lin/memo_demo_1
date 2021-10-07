@@ -10,154 +10,105 @@
     android:shape="rectangle"
     tools:context=".MemoMain">
 
-    <Button
-        android:id="@+id/open"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Open"
-        app:layout_constraintEnd_toStartOf="@+id/save"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+    <LinearLayout
+        android:id="@+id/connect"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/RelayWindowSize"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:onClick="saveTo"
-        android:text="Save"
-        app:layout_constraintEnd_toStartOf="@+id/write_to"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/open"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+        <LinearLayout
+            android:id="@+id/messageBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/start_relay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:onClick="start_relay"
-        android:text="Start Relay"
-        app:layout_constraintEnd_toStartOf="@+id/stop_relay"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/open" />
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                app:layout_constraintBottom_toTopOf="@+id/textViewStatus"
+                app:layout_constraintStart_toStartOf="@+id/textViewStatus" />
+        </LinearLayout>
 
-    <Button
-        android:id="@+id/stop_relay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:onClick="stop_relay"
-        android:text="STOP RELAY"
-        app:layout_constraintEnd_toStartOf="@+id/clear"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/start_relay"
-        app:layout_constraintTop_toBottomOf="@+id/save" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editText4"
-        android:layout_width="350dp"
-        android:layout_height="279dp"
-        android:layout_marginTop="24dp"
-        android:background="@android:drawable/editbox_background"
-        android:ems="10"
-        android:focusedByDefault="false"
-        android:gravity="top"
-        android:inputType="textLongMessage|textAutoCorrect|textMultiLine|textImeMultiLine"
-        android:selectAllOnFocus="false"
-        android:singleLine="true"
-        android:textAlignment="viewStart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            <TextView
+                android:id="@+id/textViewStatus"
+                android:layout_width="match_parent"
+                android:layout_height="66dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:contentDescription="show the processing message"
+                android:editable="false"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:overScrollMode="always"
+                android:scrollbarSize="8dp"
+                android:scrollbars="vertical"
+                android:selectAllOnFocus="false"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Status"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
-        app:layout_constraintStart_toStartOf="@+id/textView2" />
+        <include
+            layout="@layout/buttons"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editor"
-        app:layout_constraintBottom_toTopOf="@+id/editText4"
-        app:layout_constraintStart_toStartOf="@+id/editText4" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="350dp"
-        android:layout_height="190dp"
-        android:layout_marginTop="36dp"
-        android:background="@android:drawable/editbox_background_normal"
-        android:contentDescription="show the processing message"
-        android:editable="false"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:overScrollMode="always"
-        android:scrollbarSize="8dp"
-        android:scrollbars="vertical"
-        android:selectAllOnFocus="false"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!--        <EditText-->
+        <!--            android:id="@+id/editText4"-->
+        <!--            android:layout_width="350dp"-->
+        <!--            android:layout_height="279dp"-->
+        <!--            android:layout_marginTop="24dp"-->
+        <!--            android:background="@android:drawable/editbox_background"-->
+        <!--            android:ems="10"-->
+        <!--            android:focusedByDefault="false"-->
+        <!--            android:gravity="top"-->
+        <!--            android:inputType="textLongMessage|textAutoCorrect|textMultiLine|textImeMultiLine"-->
+        <!--            android:selectAllOnFocus="false"-->
+        <!--            android:singleLine="true"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintHorizontal_bias="0.5"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/textViewStatus" />-->
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/peer_list_view_2"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@android:drawable/editbox_background_normal"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/peer_list_view_2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@android:drawable/editbox_background_normal"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </LinearLayout>
+
+    <!--        app:layout_constraintTop_toBottomOf="@+id/write_to" />-->
+
+    <!--    <androidx.constraintlayout.widget.Guideline-->
+    <!--        android:id="@+id/guideline"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintGuide_begin="20dp" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/RelayWindowSize"
+        app:layout_constraintBottom_toBottomOf="@id/connect"
+        app:layout_constraintTop_toBottomOf="parent">
 
         <include layout="@layout/edit_layout" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/write_to"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:onClick="hostWrite"
-        android:text="write"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/save"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
-
-    <Button
-        android:id="@+id/clear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:onClick="clearText"
-        android:text="Clear"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/stop_relay"
-        app:layout_constraintTop_toBottomOf="@+id/write_to" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

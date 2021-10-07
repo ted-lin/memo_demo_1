@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         user = string;
         return true;
     }
+
     /**
      * As Host
      */
@@ -123,9 +124,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-   /**
-      * As client
-      */
+    /**
+     * As client
+     */
     public void asClient(View v) {
         if (!checkName()) {
             showToast("Need a name");
