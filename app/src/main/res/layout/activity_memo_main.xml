@@ -10,7 +10,6 @@
     android:shape="rectangle"
     tools:context=".MemoMain">
 
-
     <LinearLayout
         android:id="@+id/connect"
         android:layout_width="match_parent"

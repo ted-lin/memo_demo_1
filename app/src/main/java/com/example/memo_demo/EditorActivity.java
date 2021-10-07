@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -189,13 +188,11 @@ public class EditorActivity extends AppCompatActivity {
 //                dmp.diffCleanupSemantic(diff);
 //                dmp.diffCleanupEfficiency(diff);
                 lastString = text;
-
 //                textView.setText(lastString);
 //                lastTextView.setText(patch.toString());
 
             }
         });
-
 
 //        textView = findViewById(R.id.hello);
 //        lastTextView = findViewById(R.id.last);
@@ -274,7 +271,6 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mEditor.focusEditor();
                 mEditor.undo();
             }
@@ -285,7 +281,6 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mEditor.focusEditor();
                 mEditor.redo();
             }
@@ -335,6 +330,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_underline).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 mEditor.focusEditor();
                 mEditor.setUnderline();
             }
@@ -504,7 +500,6 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.insertTodo();
             }
         });
-      
         findViewById(R.id.saveImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
