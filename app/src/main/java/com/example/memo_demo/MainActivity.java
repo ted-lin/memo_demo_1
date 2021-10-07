@@ -8,11 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void findAllButton() {
 
     }
+
     public void performPermissionGrant() {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{
