@@ -28,7 +28,7 @@ import java.util.Set;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MemoHost extends MemoMain {
+public class MemoHost extends EditorActivity {
     private boolean mFirstMsg = true;
     public static final String HOST_EXTRA = "RecyclerViewExtra";
     public static final int HOST_RECYCLER_VIEW_ID = 1;
@@ -120,14 +120,15 @@ public class MemoHost extends MemoMain {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_memo_main);
-
+        setContentView(R.layout.activity_editor);
+        log("xx");
         init(getIntent());
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                log("xxxxx");
                 start();
             }
         });
@@ -209,7 +210,7 @@ public class MemoHost extends MemoMain {
             @Override
             public void onItemClick(final int position) {
                 updateStatusText(getPrefix() + "start relay\n",
-                        MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                        MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 log(getPrefix() + "start relay\n");
 
                 if (mRecycleView != null)
@@ -317,10 +318,10 @@ public class MemoHost extends MemoMain {
                     @Override
                     public void run() {
                         if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client relay back\n", MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            updateEditText(str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            updateStatusText(getPrefix() + "client relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
                         } else {
-                            updateStatusText(getPrefix() + str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            updateStatusText(getPrefix() + str, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             mFirstMsg = false;
                         }
                     }

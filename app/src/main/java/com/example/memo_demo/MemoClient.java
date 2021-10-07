@@ -15,7 +15,7 @@ import com.example.wifi.WifiP2p;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-public class MemoClient extends MemoMain {
+public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     //private boolean mConnected = false;
 
@@ -149,7 +149,7 @@ public class MemoClient extends MemoMain {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_memo_main);
+        setContentView(R.layout.activity_editor);
 
         init(getIntent());
 
