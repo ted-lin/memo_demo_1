@@ -87,17 +87,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    /**
-     * Called when the user taps the button
-     */
-    public void sendMessage(View v) {
-        Intent intent = new Intent(this, DisplayMesageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.editText);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message );
-        startActivity(intent);
-        Log.e("TED", "send: " + message);
-    }
 
     public boolean checkName() {
         EditText editView = (EditText) findViewById(R.id.editText);
@@ -140,14 +129,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
         startActivity(intent);
     }
-
-   /**
-     *  check connection
-     */
-   public void checkConnection(View v) {
-        Intent intent = new Intent(this, ConnectionHolder.class);
-        startActivity(intent);
-   }
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

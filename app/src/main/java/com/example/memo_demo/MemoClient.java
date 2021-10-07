@@ -77,7 +77,7 @@ public class MemoClient extends MemoMain {
                                 if (mFirstMsg) {
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-                                    mClient.write("End relay\n");
+                                    mClient.write("end relay\n");
                                     mFirstMsg = false;
                                 } else {
                                     updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
