@@ -509,7 +509,8 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                load_file(htmlFileName, false);
+                String _html = load_file(htmlFileName, false);
+                mEditor.setHtml(_html);
             }
         });
     }
