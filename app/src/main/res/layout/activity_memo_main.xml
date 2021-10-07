@@ -81,16 +81,6 @@
         <!--            app:layout_constraintTop_toBottomOf="@+id/textViewStatus" />-->
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/peer_list_view_2"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@android:drawable/editbox_background_normal"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
-
     </LinearLayout>
 
     <!--        app:layout_constraintTop_toBottomOf="@+id/write_to" />-->
@@ -110,5 +100,18 @@
         app:layout_constraintTop_toBottomOf="parent">
 
         <include layout="@layout/edit_layout" />
+
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/peer_list_view_2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:drawable/editbox_background_normal"
+        android:visibility="invisible"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>
