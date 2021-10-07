@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:showIn="@layout/activity_memo_main">
+
+    <Button
+        android:id="@+id/write_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="write to" />
+
+    <Button
+        android:id="@+id/start_relay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Relay" />
+
+    <Button
+        android:id="@+id/stop_relay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="STOP RELAY" />
+
+    <Button
+        android:id="@+id/clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clearText"
+        android:text="Clear" />
+</LinearLayout>
+        
