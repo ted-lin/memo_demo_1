@@ -15,6 +15,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -44,6 +45,7 @@ public class MemoMain extends AppCompatActivity {
     /* basic */
     public static String mMode;
     public static String mUser;
+    private List<Button> mButtons;
 
 
     public void init(Intent intent) {
@@ -66,6 +68,23 @@ public class MemoMain extends AppCompatActivity {
 
         View.OnFocusChangeListener ofcListener = new MemoFocusChangeListener();
         editText.setOnFocusChangeListener(ofcListener);
+
+        findAllButtons();
+    }
+
+    protected void findAllButtons() {
+        mButtons = new ArrayList<>();
+        mButtons.add((Button) findViewById(R.id.open));
+        mButtons.add((Button) findViewById(R.id.save));
+        mButtons.add((Button) findViewById(R.id.write_to));
+        mButtons.add((Button) findViewById(R.id.clear));
+        mButtons.add((Button) findViewById(R.id.start_relay));
+        mButtons.add((Button) findViewById(R.id.stop_relay));
+    }
+
+    protected void setAllButtonView(int v) {
+        for (Button btn: mButtons)
+            btn.setVisibility(v);
     }
 
     @Override

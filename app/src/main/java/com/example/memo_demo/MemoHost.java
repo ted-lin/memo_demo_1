@@ -2,6 +2,7 @@ package com.example.memo_demo;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.net.MacAddress;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -37,12 +38,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoHost extends MemoMain {
     private boolean mFirstMsg = true;
+    public static final String HOST_EXTRA = "RecyclerViewExtra";
+    public static final int HOST_RECYCLER_VIEW_ID = 1;
 
     private ServerThread mServer;
     private WifiP2p mP2p;
     private List<WifiP2pDevice> mP2pDeviceList;
     private Set<SocketThread> mClients = new HashSet<SocketThread>();
     public PeerItemAdapter mPeerAdapter;
+    private RecyclerView mRecycleView;
 
     private WifiDirectListener mHostListener = new WifiDirectListener() {
         @Override
@@ -212,8 +216,13 @@ public class MemoHost extends MemoMain {
                 updateStatusText(getPrefix() + "start relay\n",
                         MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
+                if (mRecycleView != null)
+                    mRecycleView.setVisibility(View.INVISIBLE);
+                setAllButtonView(View.VISIBLE);
+
                 final WifiP2pDevice device = mP2pDeviceList.get(position);
 
+                log("item status" + device.status);
                 if (device.status == WifiP2pDevice.CONNECTED) return;
 
                 WifiP2pConfig config = new WifiP2pConfig.Builder()
@@ -257,13 +266,18 @@ public class MemoHost extends MemoMain {
                             });
                         }
                     }
-                }, 1000);
+                }, 2000);
             }
         });
 
-        RecyclerView recycleView = findViewById(R.id.peer_list_view_2);
-        recycleView.setAdapter(mPeerAdapter);
-        recycleView.setLayoutManager(new LinearLayoutManager(this));
+        mRecycleView = findViewById(R.id.peer_list_view_2);
+
+        setAllButtonView(View.INVISIBLE);
+        mRecycleView.setVisibility(View.VISIBLE);
+        mRecycleView.setAdapter(mPeerAdapter);
+        mRecycleView.setLayoutManager(new LinearLayoutManager(this));
+
+
     }
 
     private void serverStart() {
@@ -274,7 +288,6 @@ public class MemoHost extends MemoMain {
             public void onAdded(SocketThread socketThread) {
                 log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
                 mClients.add(socketThread);
-
 
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
@@ -314,6 +327,17 @@ public class MemoHost extends MemoMain {
         mServer.start();
     }
 
+    /*
+    protected void inflactConnectionList() {
+        Intent intent = new Intent(this, MemoHost.class);
+        PeerItemAdapterWrapper adapter = new PeerItemAdapterWrapper(HOST_RECYCLER_VIEW_ID, mPeerAdapter);
+        intent.putExtra(HOST_EXTRA, adapter);
+
+        startActivityForResult(intent, 0);
+
+
+    }
+    */
     protected void start() {
         if (mP2p != null) {
             mP2p.onCreate();
@@ -330,6 +354,8 @@ public class MemoHost extends MemoMain {
     }
 
     protected void stop() {
+        updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+
         mFirstMsg = true;
         if (mP2pDeviceList != null) {
             mP2pDeviceList.clear();
