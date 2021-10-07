@@ -8,8 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String MEMO_EXTRA = "memo_extra";
 
     private static final int REQ_WIFI_DIRECT_PERMISSION = 5566;
-
 
     private static String user = "nobody";
 
@@ -42,8 +44,12 @@ public class MainActivity extends AppCompatActivity {
 
         /* acquire reletive permission for connection */
         performPermissionGrant();
+
     }
 
+    protected void findAllButton() {
+
+    }
     public void performPermissionGrant() {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{
@@ -137,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
     }
+
+
 }
