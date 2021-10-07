@@ -2,7 +2,9 @@ package com.example.memo_demo;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -11,6 +13,7 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.protos.Data;
@@ -20,6 +23,7 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -31,6 +35,8 @@ import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
     public static final String TAG = "EditorActivity";
+    private static final int WRITE_REQUEST_CODE = 43;
+    private static final int READ_REQUEST_CODE = 40;
     private RichEditor mEditor;
     private WebView webView;
     private TextView textView;
@@ -115,6 +121,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void save_file(String str, String file_name) {
+        createFile("text/plain", file_name);
         File docDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         String extStorageState = Environment.getExternalStorageState();
         if (extStorageState.equals(Environment.MEDIA_MOUNTED)) {
@@ -509,8 +516,9 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String _html = load_file(htmlFileName, false);
-                mEditor.setHtml(_html);
+                openFile("text/plain");
+//                load_file(htmlFileName, false);
+//                mEditor.setHtml(_html);
             }
         });
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
@@ -584,4 +592,83 @@ public class EditorActivity extends AppCompatActivity {
         builder.create().show();
     }
 
+    private void openFile(String mimeType) {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        startActivityForResult(intent, READ_REQUEST_CODE);
+    }
+
+    private void createFile(String mimeType, String fileName) {
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+//        setResult(0);
+//        intent.putExtra(Intent.EXTRA_F)
+        startActivityForResult(intent, WRITE_REQUEST_CODE);
+//        getContentResolver().openOutputStream()
+//        onActivityResult(WRITE_REQUEST_CODE);
+//        FileOutputStream fos = null;
+//        fos = openFileOutput(fileName, )
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
+        switch (requestCode) {
+            case WRITE_REQUEST_CODE: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        try {
+                            FileOutputStream fos = null;
+                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
+                            byte[] bytes;
+                            System.out.println(mEditor.getHtml());
+                            bytes = mEditor.getHtml().getBytes();
+                            fos.write(bytes);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // TODO
+                    }
+                }
+                break;
+            }
+            case READ_REQUEST_CODE: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        FileInputStream fins = null;
+                        StringBuilder stringBuilder = new StringBuilder();
+                        try {
+                            fins = (FileInputStream) getContentResolver().openInputStream(uri);
+                            byte[] b = new byte[1024];
+                            while (fins.read(b) != -1) {
+                                stringBuilder.append(new String(b));
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            String fileContents = stringBuilder.toString();
+                            mEditor.setHtml(fileContents);
+                        }
+                    } else {
+                        // TODO
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }
