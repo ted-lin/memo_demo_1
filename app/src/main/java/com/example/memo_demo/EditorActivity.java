@@ -13,6 +13,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.protos.Data;
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,11 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.example.protos.Data;
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
 import jp.wasabeef.richeditor.RichEditor;
 
@@ -513,6 +513,12 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.setHtml(_html);
             }
         });
+        findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertCheck();
+            }
+        });
     }
 
     private void showLinkDialog() {
@@ -533,6 +539,38 @@ public class EditorActivity extends AppCompatActivity {
                     return;
                 }
                 mEditor.insertLink("https://github.com/wasabeef", link);
+            }
+        });
+
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // DO NOTHING HERE
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void alertCheck() {
+        // TODO need to fix link problem
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_new, null, false);
+        builder.setView(view);
+        builder.setTitle("New file");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mEditor.setHtml("");
+                lastString = "";
+//                String link = editText.getText().toString().trim();
+//                if (TextUtils.isEmpty(link)) {
+//
+//                    return;
+//                }
+//                mEditor.insertLink("https://github.com/wasabeef", link);
             }
         });
 
