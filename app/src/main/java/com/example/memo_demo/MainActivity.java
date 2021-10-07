@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -44,12 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
         /* acquire reletive permission for connection */
         performPermissionGrant();
-
     }
 
-    protected void findAllButton() {
-
-    }
     public void performPermissionGrant() {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{
@@ -118,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * here for jacky to debug
+
      */
     public void toEditorActivity(View v) {
         Intent intent = new Intent(this, EditorActivity.class);
@@ -127,6 +122,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * As client
      */
+    public void toEditorActivity(View v) {
+        Intent intent = new Intent(this, EditorActivity.class);
+        startActivity(intent);
+    }
+
+   /**
+      * As client
+      */
     public void asClient(View v) {
         if (!checkName()) {
             showToast("Need a name");
@@ -144,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
     }
-
-
 }

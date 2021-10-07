@@ -9,13 +9,10 @@ import android.os.Bundle;
 
 public class ConnectionHolder extends AppCompatActivity {
 
-    public PeerItemAdapter mPeerAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection_holder);
-
     }
 
 }

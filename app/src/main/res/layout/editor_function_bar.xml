@@ -12,7 +12,6 @@
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
-
         <ImageButton
             android:id="@+id/action_bold"
             android:layout_width="48dp"
@@ -141,6 +140,7 @@
             android:src="@drawable/txt_color" />
 
         <ImageButton
+
             android:id="@+id/txt_color"
             android:layout_width="24dp"
             android:layout_height="48dp"
@@ -159,6 +159,7 @@
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/bg_color" />
+
 
         <ImageButton
             android:id="@+id/bg_txt_color"

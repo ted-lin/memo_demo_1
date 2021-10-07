@@ -8,34 +8,22 @@ import android.widget.TextView;
 
 import com.example.wifi.WifiP2p;
 
-import java.io.Serializable;
 import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHolder> implements Serializable {
+public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHolder> {
 
-    private List<WifiP2pDevice> mP2pDeviceList;
+    private final List<WifiP2pDevice> mP2pDeviceList;
+
     private PeerItemListener mListener;
 
     public PeerItemAdapter(List<WifiP2pDevice> p2pDeviceList) {
         mP2pDeviceList = p2pDeviceList;
     }
 
-    public void setP2pDeviceList(List<WifiP2pDevice> list) {
-        this.mP2pDeviceList = list;
-    }
-
-    public List<WifiP2pDevice> getP2pDeviceList() {
-        return mP2pDeviceList;
-    }
-
     public void setListener(PeerItemListener listener) {
         mListener = listener;
-    }
-
-    public PeerItemListener getListener() {
-        return mListener;
     }
 
     @Override
@@ -83,4 +71,3 @@ public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHo
 
     }
 }
-

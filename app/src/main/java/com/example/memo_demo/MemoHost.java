@@ -1,5 +1,7 @@
 package com.example.memo_demo;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.net.MacAddress;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -8,8 +10,10 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.wifi.ServerThread;
@@ -19,8 +23,10 @@ import com.example.wifi.WifiDirectListener;
 import com.example.wifi.WifiP2p;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoHost extends MemoMain {
     private boolean mFirstMsg = true;
+
     public static final String HOST_EXTRA = "RecyclerViewExtra";
     public static final int HOST_RECYCLER_VIEW_ID = 1;
 
@@ -38,6 +45,9 @@ public class MemoHost extends MemoMain {
     private List<WifiP2pDevice> mP2pDeviceList;
     private Set<SocketThread> mClients = new HashSet<SocketThread>();
     public PeerItemAdapter mPeerAdapter;
+    private boolean mStop = false;
+
+    private static final int RETRY = 3;
     private RecyclerView mRecycleView;
 
     private WifiDirectListener mHostListener = new WifiDirectListener() {
@@ -53,13 +63,16 @@ public class MemoHost extends MemoMain {
 
         @Override
         public void onPeersChanged(Collection<WifiP2pDevice> wifiP2pDeviceList) {
-            for (WifiP2pDevice device : wifiP2pDeviceList) {
-                log("peer: " + device.deviceAddress + " " + device.deviceName + " " + device.isGroupOwner() + " " + device.status);
+            for (final WifiP2pDevice device : wifiP2pDeviceList) {
+                log("peer: " + device.deviceAddress + " " + device.deviceName + " " + device.isGroupOwner() + " " + WifiP2p.getConnectStatus(device.status));
+
             }
 
             if (mP2pDeviceList != null) {
                 mP2pDeviceList.clear();
-                mP2pDeviceList.addAll(wifiP2pDeviceList);
+                if (!mStop) {
+                    mP2pDeviceList.addAll(wifiP2pDeviceList);
+                }
             }
             if (mPeerAdapter != null)
                 mPeerAdapter.notifyDataSetChanged();
@@ -118,8 +131,6 @@ public class MemoHost extends MemoMain {
         setContentView(R.layout.activity_memo_main);
 
         init(getIntent());
-
-        mP2p = new WifiP2p(this, mHostListener);
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
@@ -193,7 +204,7 @@ public class MemoHost extends MemoMain {
 
                 @Override
                 public void onFailure(int i) {
-                    log("discover failure " + i);
+                    log("discover failure:" + WifiP2p.getActionFailure(i));
                 }
             });
         }
@@ -204,24 +215,23 @@ public class MemoHost extends MemoMain {
         mPeerAdapter = new PeerItemAdapter(mP2pDeviceList);
         mPeerAdapter.setListener(new PeerItemAdapter.PeerItemListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(final int position) {
                 updateStatusText(getPrefix() + "start relay\n",
                         MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 log(getPrefix() + "start relay\n");
-
                 if (mRecycleView != null)
                     mRecycleView.setVisibility(View.INVISIBLE);
                 setAllButtonView(View.VISIBLE);
-
                 final WifiP2pDevice device = mP2pDeviceList.get(position);
 
-                log("item status" + device.status);
+
                 if (device.status == WifiP2pDevice.CONNECTED) return;
 
                 WifiP2pConfig config = new WifiP2pConfig.Builder()
                         .setDeviceAddress(MacAddress.fromString(device.deviceAddress))
                         .setNetworkName("DIRECT-GG")
                         .setPassphrase("1234567890")
+                        .enablePersistentMode(false)
                         .build();
 
                 mP2p.connect(config, new WifiP2pManager.ActionListener() {
@@ -232,112 +242,112 @@ public class MemoHost extends MemoMain {
 
                     @Override
                     public void onFailure(int reason) {
-                        log("connect onFailure:" + device.deviceName);
+                        log(String.format("connect onFailure: %s, %s", device.deviceName, WifiP2p.getActionFailure(reason)));
                     }
                 });
 
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (device.status != WifiP2pDevice.CONNECTED) {
-                            WifiP2pConfig config = new WifiP2pConfig.Builder()
-                                    .setDeviceAddress(MacAddress.fromString(device.deviceAddress))
-                                    .setNetworkName("DIRECT-GG")
-                                    .setPassphrase("1234567890")
-                                    .build();
+                // wifi direct feature should be has some issue, that cannot fast response connection when invitation
+                // retry it
+                for(int i = 0; i < RETRY; ++i) {
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            final WifiP2pDevice device = mP2pDeviceList.get(position);
+                            if (device.status == WifiP2pDevice.INVITED) {
+                                WifiP2pConfig config = new WifiP2pConfig.Builder()
+                                        .setDeviceAddress(MacAddress.fromString(device.deviceAddress))
+                                        .setNetworkName("DIRECT-GG")
+                                        .setPassphrase("1234567890")
+                                        .build();
 
-                            mP2p.connect(config, new WifiP2pManager.ActionListener() {
-                                @Override
-                                public void onSuccess() {
-                                    log("connect onSuccess:" + device.deviceName);
-                                }
+                                mP2p.connect(config, new WifiP2pManager.ActionListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        log(String.format("connect again onSuccess: %s, %s", device.deviceName, WifiP2p.getConnectStatus(device.status)));
+                                    }
 
-                                @Override
-                                public void onFailure(int reason) {
-                                    log("connect onFailure:" + device.deviceName);
-                                }
-                            });
+                                    @Override
+                                    public void onFailure(int reason) {
+                                        log("connect again onFailure:" + device.deviceName);
+                                    }
+                                });
+                            }
                         }
-                    }
-                }, 2000);
+                    }, 1500 * (i+1));
+                }
             }
         });
 
         mRecycleView = findViewById(R.id.peer_list_view_2);
-
         setAllButtonView(View.INVISIBLE);
         mRecycleView.setVisibility(View.VISIBLE);
-        mRecycleView.setAdapter(mPeerAdapter);
-        mRecycleView.setLayoutManager(new LinearLayoutManager(this));
-
-
+        mPeerAdapter.setAdapter(mPeerAdapter);
+        mPeerAdapter.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void serverStart() {
-        final TextView textView = findViewById(R.id.textViewStatus);
-        mServer = new ServerThread();
-        mServer.setListener(new SocketListener() {
-            @Override
-            public void onAdded(SocketThread socketThread) {
-                log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
-                mClients.add(socketThread);
+        final TextView textView = findViewById(R.id.textView2);
 
-                MemoHost.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String msg = getEditText();
-                        log(msg);
-                        for (SocketThread client: mClients)
-                            client.write(msg);
-                    }
-                });
-            }
+        if (mServer == null) {
+            mServer = new ServerThread();
+            mServer.setListener(new SocketListener() {
+                @Override
+                public void onAdded(SocketThread socketThread) {
+                    log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
+                    mClients.add(socketThread);
 
-            @Override
-            public void onRemoved(SocketThread socketThread) {
-                log(String.format("Socket remove %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
-                mClients.remove(socketThread);
-            }
 
-            @Override
-            public void onRead(SocketThread socketThread, byte[] message) {
-                final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
-                log(getPrefix() + str);
-                MemoHost.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client relay back\n", MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            updateEditText(str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_SET);
-                        } else {
-                            updateStatusText(getPrefix() + str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            mFirstMsg = false;
+                    MemoHost.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String msg = getEditText();
+                            log(msg);
+                            for (SocketThread client : mClients)
+                                client.write(msg);
                         }
-                    }
-                });
-            }
-        });
-        mServer.start();
+                    });
+                }
+
+                @Override
+                public void onRemoved(SocketThread socketThread) {
+                    log(String.format("Socket remove %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
+                    mClients.remove(socketThread);
+                }
+
+                @Override
+                public void onRead(SocketThread socketThread, byte[] message) {
+                    final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
+                    log(str);
+                    MemoHost.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!mFirstMsg) {
+                                updateStatusText(getPrefix() + "client send back\n", MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                updateEditText(str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            } else {
+                                updateStatusText(getPrefix() + str, MemoMain.MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                mFirstMsg = false;
+                            }
+                        }
+                    });
+                }
+            });
+            mServer.start();
+        }
     }
 
-    /*
-    protected void inflactConnectionList() {
-        Intent intent = new Intent(this, MemoHost.class);
-        PeerItemAdapterWrapper adapter = new PeerItemAdapterWrapper(HOST_RECYCLER_VIEW_ID, mPeerAdapter);
-        intent.putExtra(HOST_EXTRA, adapter);
-
-        startActivityForResult(intent, 0);
-
-
-    }
-    */
     protected void start() {
-        if (mP2p != null) {
+        mStop = false;
+        if (mP2p == null) {
+            mP2p = new WifiP2p(this, mHostListener);
             mP2p.onCreate();
+
+        }
+        if (mP2p != null) {
             // always disconnect before really use.
+
             disconnect();
             createGroup();
-            force_sleep(1000);
             discover();
             buildConnectionList();
             serverStart();
@@ -347,6 +357,7 @@ public class MemoHost extends MemoMain {
     }
 
     protected void stop() {
+        mStop = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
         mFirstMsg = true;
@@ -360,18 +371,7 @@ public class MemoHost extends MemoMain {
         }
 
         if (mP2p != null) {
-            mP2p.cancelClient(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("cancelClient pass");
-                }
-
-                @Override
-                public void onFailure(int i) {
-                    log("cancelClient failure" + i);
-                }
-            });
-
+            discover();
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
                 public void onSuccess() {
@@ -380,7 +380,7 @@ public class MemoHost extends MemoMain {
 
                 @Override
                 public void onFailure(int i) {
-                    log("cancel host group failure");
+                    log("cancel host group failure:" + WifiP2p.getActionFailure(i));
                 }
             });
         }
@@ -399,21 +399,9 @@ public class MemoHost extends MemoMain {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mP2p != null) {
-            mP2p.disconnect(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("disconnect remove group pass");
-                }
-
-                @Override
-                public void onFailure(int i) {
-                    log("disconnect remove group failure");
-                }
-            });
-
+        stop();
+        if (mP2p != null){
             mP2p.onDestory();
-            mP2p = null;
         }
     }
 }
