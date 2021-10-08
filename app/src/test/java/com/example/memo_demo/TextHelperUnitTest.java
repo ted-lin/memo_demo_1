@@ -53,5 +53,61 @@ public class TextHelperUnitTest {
         assertEquals(expect, text1);
     }
 
+    @Test
+    public void space_isCorrect() {
+        String text1 = TextHelper.toPlainTxt("&nbsp;");
+        String expect = " ";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void space_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml(" ");
+        String expect = "&nbsp;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void less_than_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml("<");
+        String expect = "&lt;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void great_than_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml(">");
+        String expect = "&gt;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void ampe_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml("&");
+        String expect = "&amp;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void quot_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml("\"");
+        String expect = "&quot;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void apos_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml("\'");
+        String expect = "&apos;";
+        assertEquals(expect, text1);
+    }
+
+    @Test
+    public void yen_to_html_isCorrect() {
+        String text1 = TextHelper.toHtml("¥");
+        String expect = "&yen;";
+        assertEquals(expect, text1);
+    }
+
 }
 

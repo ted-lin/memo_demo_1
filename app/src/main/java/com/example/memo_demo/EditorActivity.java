@@ -615,7 +615,7 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        save_file(uri, mEditor.getHtml());
+                        save_file(uri, TextHelper.toPlainTxt(mEditor.getHtml()));
                     }
                 }
                 break;
@@ -624,7 +624,7 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        save_file(uri, TextHelper.toPlainTxt(mEditor.getHtml()));
+                        save_file(uri, mEditor.getHtml());
                     }
                 }
                 break;
