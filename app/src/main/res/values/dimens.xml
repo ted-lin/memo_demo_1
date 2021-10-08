@@ -3,4 +3,5 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="RelayWindowSize">200dp</dimen>
+    <dimen name="RelayWindowSize2">20dp</dimen>
 </resources>

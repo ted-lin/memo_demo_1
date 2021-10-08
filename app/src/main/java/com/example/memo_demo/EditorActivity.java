@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,10 @@ public class EditorActivity extends AppCompatActivity {
     private String lastString = "";
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
+    private boolean hidding = false;
+    int margin_origin_index = 0;
+    int margin_new_index = 1;
+    int margin[] = {0, 0};
 
     // color changers
     int text_color_index = 0;
@@ -89,6 +94,8 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void imgBtnInit() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+        margin[margin_origin_index] = params.topMargin;
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -366,6 +373,24 @@ public class EditorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 newfile_check_dialog();
+            }
+        });
+
+        findViewById(R.id.hideImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hidding = !hidding;
+                if (hidding) {
+                    ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+                    params.topMargin = margin[margin_new_index];
+                    findViewById(R.id.editor_layout).setLayoutParams(params);
+                } else {
+                    ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+                    params.topMargin = margin[margin_origin_index];
+                    findViewById(R.id.editor_layout).setLayoutParams(params);
+                }
             }
         });
     }

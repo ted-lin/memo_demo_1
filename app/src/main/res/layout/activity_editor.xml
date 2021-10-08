@@ -14,12 +14,13 @@
 
 
     <LinearLayout
+        android:id="@+id/network_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="@dimen/RelayWindowSize"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/textViewTitle"
@@ -30,23 +31,23 @@
             app:layout_constraintStart_toStartOf="@+id/textViewStatus" />
 
         <TextView
-                android:id="@+id/textViewStatus"
-                android:layout_width="match_parent"
-                android:layout_height="140dp"
-                android:background="@android:drawable/editbox_background_normal"
-                android:contentDescription="show the processing message"
-                android:editable="false"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:overScrollMode="always"
-                android:scrollbarSize="8dp"
-                android:scrollbars="vertical"
-                android:selectAllOnFocus="false"
-                android:textSize="22sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/textViewStatus"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="@android:drawable/editbox_background_normal"
+            android:contentDescription="show the processing message"
+            android:editable="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:overScrollMode="always"
+            android:scrollbarSize="8dp"
+            android:scrollbars="vertical"
+            android:selectAllOnFocus="false"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <include
             layout="@layout/buttons"
@@ -56,10 +57,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/editor_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/RelayWindowSize"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/network_view">
 
         <include layout="@layout/fragment_richeditor"></include>
 
