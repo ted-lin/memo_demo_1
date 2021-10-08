@@ -77,8 +77,11 @@ public class MemoHost extends EditorActivity {
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
             String msg = getEditText();
             log(msg);
-            for (SocketThread client: mClients)
+            updateStatusText(getPrefix() + "client connected\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            for (SocketThread client: mClients) {
                 client.write(StringProcessor.htmlToByteArray(msg));
+            }
         }
 
         @Override
@@ -147,8 +150,20 @@ public class MemoHost extends EditorActivity {
             public void onClick(View v) {
                 String msg = getEditText();
                 log(msg);
+                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 for (SocketThread client : mClients)
                     client.write(StringProcessor.htmlToByteArray(msg));
+            }
+        });
+
+        Button showList = findViewById(R.id.show_list);
+        showList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRecycleView != null && mStop == false) {
+                    setAllButtonView(View.INVISIBLE);
+                    mRecycleView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -311,12 +326,13 @@ public class MemoHost extends EditorActivity {
             public void onAdded(SocketThread socketThread) {
                 log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
                 mClients.add(socketThread);
-
+                updateStatusText(getPrefix() + "client added\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String msg = getEditText();
                         log(msg);
+                        updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                         for (SocketThread client: mClients)
                             client.write(StringProcessor.htmlToByteArray(msg));
                     }
@@ -327,6 +343,7 @@ public class MemoHost extends EditorActivity {
             public void onRemoved(SocketThread socketThread) {
                 log(String.format("Socket remove %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
                 mClients.remove(socketThread);
+                updateStatusText(getPrefix() + "receive client removed\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
             }
 
             @Override
@@ -337,14 +354,15 @@ public class MemoHost extends EditorActivity {
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
+/*
                         if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            updateStatusText(getPrefix() + "client stop relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             //updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
                         } else {
                             //updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             mFirstMsg = false;
                         }
+                        */
                         switch (ret.type) {
                             case StringProcessor.status:
                                 updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);

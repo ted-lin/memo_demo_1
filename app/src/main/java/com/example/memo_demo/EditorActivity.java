@@ -607,6 +607,7 @@ public class EditorActivity extends AppCompatActivity {
             btn.setVisibility(v);
     }
 
+
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
         public void onFocusChange(View v, boolean hasFocus) {
             log("touch");

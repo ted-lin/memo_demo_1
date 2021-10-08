@@ -5,6 +5,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.wifi.SocketListener;
@@ -12,8 +13,12 @@ import com.example.wifi.SocketThread;
 import com.example.wifi.WifiDirectListener;
 import com.example.wifi.WifiP2p;
 
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
 public class MemoClient extends EditorActivity {
     private SocketThread mClient;
@@ -62,6 +67,7 @@ public class MemoClient extends EditorActivity {
                     @Override
                     public void onRemoved(SocketThread socketThread) {
                         if (mClient != null) {
+                            mClient.write(StringProcessor.statusToByteArray("client stop relay by remove itself\n"));
                             mClient.write(StringProcessor.htmlToByteArray(getEditText()));
                         }
 
@@ -156,7 +162,7 @@ public class MemoClient extends EditorActivity {
                 start();
             }
         });
-
+        start.setText("WAIT");
         Button stop = findViewById(R.id.stop_relay);
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,17 +170,21 @@ public class MemoClient extends EditorActivity {
                 stop();
             }
         });
-
+        stop.setText("END");
         Button writeTo = findViewById(R.id.write_to);
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String msg = getEditText();
                 if (mClient != null) {
+                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
                     mClient.write(StringProcessor.htmlToByteArray(msg));
                 }
             }
         });
+
+        Button showList = findViewById(R.id.show_list);
+        ((ViewGroup) showList.getParent()).removeView(showList);
     }
 
     @Override
@@ -221,6 +231,8 @@ public class MemoClient extends EditorActivity {
     }
 
     protected void start() {
+        updateStatusText(getPrefix() + "wait relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+
         if (mP2p == null) {
             mP2p = new WifiP2p(this, mClientListener);
             mP2p.onCreate();
@@ -238,8 +250,10 @@ public class MemoClient extends EditorActivity {
     protected void stop() {
         mFirstMsg = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-        if (mClient != null)
+        if (mClient != null) {
+            mClient.write(StringProcessor.statusToByteArray("client stop relay\n"));
             mClient.write(StringProcessor.htmlToByteArray(getEditText()));
+        }
         disconnect();
         discover();
         if (mClient != null) {
