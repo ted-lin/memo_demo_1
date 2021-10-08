@@ -50,16 +50,6 @@
             android:src="@drawable/load" />
 
         <ImageButton
-            android:id="@+id/loadTxtImg"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="4dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/load_txt" />
-
-
-        <ImageButton
             android:id="@+id/saveImg"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -67,6 +57,15 @@
             android:padding="4dp"
             android:scaleType="fitCenter"
             android:src="@drawable/save" />
+
+        <ImageButton
+            android:id="@+id/loadTxtImg"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/background"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/load_txt" />
 
         <ImageButton
             android:id="@+id/saveTxtImg"
