@@ -46,10 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    protected void findAllButton() {
-
-    }
-
     public void performPermissionGrant() {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{
@@ -125,13 +121,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /**
-     * here for jacky to debug
-     */
-    public void toEditorActivity(View v) {
-        Intent intent = new Intent(this, EditorActivity.class);
-        startActivity(intent);
-    }
 
     /**
      * As client

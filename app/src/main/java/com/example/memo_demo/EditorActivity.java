@@ -7,13 +7,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,17 +20,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.protos.Data;
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,123 +42,25 @@ public class EditorActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE_HTML = 41;
     private static final int READ_REQUEST_CODE = 40;
     private RichEditor mEditor;
-    private WebView webView;
-    private TextView textView;
-    private TextView lastTextView;
     private String lastString = "";
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
-    byte[] save;
-    String html;
-    private int mFontSize = 5;
+
+    // color changers
     int text_color_index = 0;
     int text_bg_color_index = 6;
     int[] text_color_src_id = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
             R.color.CYAN, R.color.RED, R.color.WHITE};
     int[] text_colors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
             Color.CYAN, Color.RED, Color.WHITE};
-    private View.OnClickListener imageInsert = new View.OnClickListener() {
 
-        @Override
-        public void onClick(View v) {
-            mEditor.getSettings().setAllowContentAccess(true);
-            mEditor.getSettings().setAllowFileAccessFromFileURLs(true);
-            mEditor.setOnTextChangeListener(null);
-//            mEditor.insertImage("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/s1.png", "", 400, 500);
-        }
-    };
-
-
-    private View.OnClickListener saveHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String str = lastString;
-
-            save_file(str, htmlFileName);
-        }
-    };
-
-    private String load_file(String file_name, boolean isPlain) {
-        File docDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        String extStorageState = Environment.getExternalStorageState();
-        if (extStorageState.equals(Environment.MEDIA_MOUNTED)) {
-            File inPutFile = new File(docDir, file_name);
-            StringBuilder stringBuilder = new StringBuilder();
-            try {
-                FileReader fr = new FileReader(inPutFile);
-                BufferedReader br = new BufferedReader(fr);
-                String line = br.readLine();
-                while (line != null) {
-                    stringBuilder.append(line).append('\n');
-                    line = br.readLine();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                String fileContents = stringBuilder.toString();
-                return isPlain ? TextHelper.toHtml(fileContents) : fileContents;
-            }
-        } else {
-            return "";
-        }
-    }
-
-    private void save_file(String str, String file_name) {
-        File docDir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        String extStorageState = Environment.getExternalStorageState();
-        if (extStorageState.equals(Environment.MEDIA_MOUNTED)) {
-            File outPutFile = new File(docDir, file_name);
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(outPutFile);
-                byte[] bytes;
-                bytes = str.getBytes();
-                fos.write(bytes);
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // TODO
-        }
-    }
-
-    private View.OnClickListener getHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            html = mEditor.getHtml();
-            textView.setText(html);
-        }
-    };
-    private View.OnClickListener saveTxt = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String str = TextHelper.toPlainTxt(lastString);
-            save_file(str, txtFileName);
-        }
-    };
-    private View.OnClickListener loadTxt = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String newString = load_file(txtFileName, true);
-            mEditor.setHtml(newString);
-            lastString = newString;
-        }
-    };
-    private View.OnClickListener loadHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String newString = load_file(htmlFileName, false);
-            if (newString != "") {
-                mEditor.setHtml(newString);
-                lastString = newString;
-            }
-        }
-    };
+    // default test url
+    private String mp3_url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
+    private String video_url = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
+    private String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
+    private String youtube_url = "https://www.youtube.com/embed/pS5peqApgUA";
+    private int img_width = 320;
+    private int video_width = 360;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +68,6 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         mEditor = findViewById(R.id.editor);
-        mEditor.setEditorHeight(300);
         mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
             DiffMatchPatch dmp = new DiffMatchPatch();
             LinkedList<DiffMatchPatch.Diff> diff;
@@ -182,75 +75,18 @@ public class EditorActivity extends AppCompatActivity {
 
             @Override
             public void onTextChange(String text) {
+                //TODO realtime patch
                 diff = dmp.diffMain(lastString, text);
                 patch = dmp.patchMake(diff);
                 lastString = text;
-
             }
         });
 
         mEditor.setPadding(10, 10, 10, 10);
 
-        //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setHtml("");
         imgBtnInit();
     }
-
-    public void recievePatch(byte[] patch) throws InvalidProtocolBufferException {
-
-        Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(patch);
-    }
-
-//    public void receiveEditorMsg(byte[] proto) {
-//        Data.EditorMessage editorMessage;
-//        try {
-//            editorMessage = Data.EditorMessage.parseFrom(proto);
-//        } catch (InvalidProtocolBufferException e) {
-//            e.printStackTrace();
-//            return;
-//        }
-//        if (editorMessage.getIsFullHtml()) {
-//            mEditor.setHtml(editorMessage.getHtml());
-//        } else {
-//            DiffMatchPatch dmp = new DiffMatchPatch();
-//            String patchText = editorMessage.getPatchText();
-//            List<DiffMatchPatch.Patch> patches;
-//            patches = dmp.patchFromText(patchText);
-//            this.apply_patch(patches);
-//        }
-//    }
-
-    public void apply_patch(List<DiffMatchPatch.Patch> patches) {
-        DiffMatchPatch dmp = new DiffMatchPatch();
-        Object[] patch_result = dmp.patchApply((LinkedList<DiffMatchPatch.Patch>) patches, mEditor.getHtml());
-        if ((Boolean) patch_result[1]) {
-            // TODO need to check
-            lastString = (String) patch_result[0];
-            textView.setText(lastString);
-            mEditor.setHtml(lastString);
-
-        } else {
-            // TODO apply patch failed
-        }
-
-    }
-
-//    public void sendPatch(String patchText) {
-//        byte[] bytes = Data.EditorMessage.newBuilder()
-//                .setHtml("")
-//                .setIsFullHtml(false)
-//                .setPatchText(patchText).build().toByteArray();
-//        // Todo Send
-//    }
-
-    private String buildPatchText(String origin, String newStr) {
-        DiffMatchPatch dmp = new DiffMatchPatch();
-        LinkedList<DiffMatchPatch.Patch> patches;
-        patches = dmp.patchMake(origin, newStr);
-        String patchText = dmp.patchToText(patches);
-        return patchText;
-    }
-
 
     private void imgBtnInit() {
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
@@ -465,29 +301,28 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.insertImage("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg",
-                        "dachshund", 320);
+                mEditor.insertImage(img_url, "dachshund", img_width);
             }
         });
 
         findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.insertYoutubeVideo("https://www.youtube.com/embed/pS5peqApgUA");
+                mEditor.insertYoutubeVideo(youtube_url);
             }
         });
 
         findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.insertAudio("https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3");
+                mEditor.insertAudio(mp3_url);
             }
         });
 
         findViewById(R.id.action_insert_video).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mEditor.insertVideo("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4", 360);
+                mEditor.insertVideo(video_url, video_width);
             }
         });
 
@@ -530,7 +365,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertCheck();
+                newfile_check_dialog();
             }
         });
     }
@@ -707,25 +542,18 @@ public class EditorActivity extends AppCompatActivity {
         return "";
     }
 
-    private void alertCheck() {
+    private void newfile_check_dialog() {
         // TODO need to fix link problem
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
 
         View view = getLayoutInflater().inflate(R.layout.dialog_new, null, false);
         builder.setView(view);
-        builder.setTitle("New file");
+        builder.setTitle("New file log");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mEditor.setHtml("");
-                lastString = "";
-//                String link = editText.getText().toString().trim();
-//                if (TextUtils.isEmpty(link)) {
-//
-//                    return;
-//                }
-//                mEditor.insertLink("https://github.com/wasabeef", link);
             }
         });
 
@@ -773,19 +601,7 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        try {
-                            FileOutputStream fos = null;
-                            byte[] bytes;
-                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
-                            bytes = mEditor.getHtml().getBytes();
-                            fos.write(bytes);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        // TODO
+                        save_file(uri, mEditor.getHtml());
                     }
                 }
                 break;
@@ -794,19 +610,7 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        try {
-                            FileOutputStream fos = null;
-                            byte[] bytes;
-                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
-                            bytes = TextHelper.toPlainTxt(mEditor.getHtml()).getBytes();
-                            fos.write(bytes);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        // TODO
+                        save_file(uri, TextHelper.toPlainTxt(mEditor.getHtml()));
                     }
                 }
                 break;
@@ -815,52 +619,55 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        try {
-                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
-                            byte[] b = new byte[1024];
-                            while (fins.read(b) != -1) {
-                                stringBuilder.append(new String(b));
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            String fileContents = stringBuilder.toString();
-                            mEditor.setHtml(TextHelper.toHtml(fileContents));
-                        }
-                    } else {
-                        // TODO
+                        load_file(uri, false);
                     }
-                    break;
                 }
+                break;
             }
             case READ_REQUEST_CODE_HTML: {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        try {
-                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
-                            byte[] b = new byte[1024];
-                            while (fins.read(b) != -1) {
-                                stringBuilder.append(new String(b));
-                            }
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            String fileContents = stringBuilder.toString();
-                            mEditor.setHtml(fileContents);
-                        }
-                    } else {
-                        // TODO
+                        load_file(uri, true);
                     }
-                    break;
                 }
+                break;
             }
+            default:
+                break;
+        }
+    }
+
+    private void load_file(Uri uri, Boolean isHtml) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            byte[] bytes = new byte[1024];
+            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
+            while (fins.read(bytes) != -1) {
+                stringBuilder.append(new String(bytes));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            String fileContents = stringBuilder.toString();
+            if (isHtml)
+                mEditor.setHtml(fileContents);
+            else
+                mEditor.setHtml(TextHelper.toHtml(fileContents));
+        }
+    }
+
+    private void save_file(Uri uri, String text) {
+        try {
+            byte[] bytes = text.getBytes();
+            FileOutputStream fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
+            fos.write(bytes);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
