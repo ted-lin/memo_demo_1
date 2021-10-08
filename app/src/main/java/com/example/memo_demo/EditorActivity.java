@@ -419,7 +419,7 @@ public class EditorActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.textViewStatus);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        textView.setTextSize(16);
+        textView.setTextSize(10);
         textView.setText(getPrefix() + "start\n");
 
         View.OnFocusChangeListener ofcListener = new EditorActivity.MemoFocusChangeListener();
@@ -494,8 +494,13 @@ public class EditorActivity extends AppCompatActivity {
     public void clearText(View v) {
         updateStatusText(getPrefix() + "reset\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
         updateEditText("", MEMO_SET_TYPE.MEMO_TEXT_SET);
+        resetStatusTextCursor();
     }
 
+    public void resetStatusTextCursor() {
+        TextView tv = findViewById(R.id.textViewStatus);
+        tv.scrollTo(0,0);
+    }
     public void updateStatusText(String msg, EditorActivity.MEMO_SET_TYPE type) {
         TextView tv = findViewById(R.id.textViewStatus);
         if (tv == null) {

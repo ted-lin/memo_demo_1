@@ -74,6 +74,10 @@ public class MemoHost extends EditorActivity {
 
         @Override
         public void onConnect(WifiP2pInfo p2pInfo) {
+            if (mClients.size() == 0) {
+                log("no client added\n");
+                return;
+            }
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
             String msg = getEditText();
             log(msg);
@@ -148,6 +152,10 @@ public class MemoHost extends EditorActivity {
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mClients.size() == 0) {
+                    log("no client added\n");
+                    return;
+                }
                 String msg = getEditText();
                 log(msg);
                 updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -330,6 +338,10 @@ public class MemoHost extends EditorActivity {
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (mClients.size() == 0) {
+                            log("no client added\n");
+                            return;
+                        }
                         String msg = getEditText();
                         log(msg);
                         updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
