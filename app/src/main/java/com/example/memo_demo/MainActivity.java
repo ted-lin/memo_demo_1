@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEMO_HOST = 1;
     public static final int MEMO_CLIENT = 2;
 
+    private boolean mPermissaionValid = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     showToast("permission failure: " + permissions[i]);
                     Log.e(TAG, "set to false");
+                    mPermissaionValid = false;
+
                     return;
                 }
             }
@@ -79,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
 
             showToast("permission pass");
+            mPermissaionValid = true;
             //permissionComplete = true;
             Log.e(TAG, "set to true " + grantResults.length);
         }
@@ -111,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
             showToast("Need a name");
             return;
         }
+        performPermissionGrant();
+        if (!mPermissaionValid) {
+            showToast("permission failure");
+            return ;
+        }
+
         Intent intent = new Intent(this, MemoHost.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_HOST, "host", user));
         startActivity(intent);
@@ -132,6 +143,12 @@ public class MainActivity extends AppCompatActivity {
             showToast("Need a name");
             return;
         }
+        performPermissionGrant();
+        if (!mPermissaionValid) {
+            showToast("permission failure");
+            return;
+        }
+
         Intent intent = new Intent(this, MemoClient.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
         startActivity(intent);
