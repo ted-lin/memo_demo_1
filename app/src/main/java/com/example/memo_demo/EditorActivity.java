@@ -444,7 +444,7 @@ public class EditorActivity extends AppCompatActivity {
 
         TextView textView = findViewById(R.id.textViewStatus);
         textView.setMovementMethod(new ScrollingMovementMethod());
-        textView.setTextSize(16);
+        textView.setTextSize(10);
         textView.setText(getPrefix() + "start\n");
 
         View.OnFocusChangeListener ofcListener = new EditorActivity.MemoFocusChangeListener();
@@ -466,6 +466,7 @@ public class EditorActivity extends AppCompatActivity {
         for (Button btn : mButtons)
             btn.setVisibility(v);
     }
+
 
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
         public void onFocusChange(View v, boolean hasFocus) {
@@ -518,8 +519,13 @@ public class EditorActivity extends AppCompatActivity {
     public void clearText(View v) {
         updateStatusText(getPrefix() + "reset\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
         updateEditText("", MEMO_SET_TYPE.MEMO_TEXT_SET);
+        resetStatusTextCursor();
     }
 
+    public void resetStatusTextCursor() {
+        TextView tv = findViewById(R.id.textViewStatus);
+        tv.scrollTo(0,0);
+    }
     public void updateStatusText(String msg, EditorActivity.MEMO_SET_TYPE type) {
         TextView tv = findViewById(R.id.textViewStatus);
         if (tv == null) {
@@ -527,15 +533,24 @@ public class EditorActivity extends AppCompatActivity {
             return;
         }
 
-        switch (type) {
-            case MEMO_TEXT_SET:
-                tv.setText(msg);
-                break;
-            case MEMO_TEXT_APPEND:
+        synchronized (this) {
+            try {
+                switch (type) {
+                    case MEMO_TEXT_SET:
+                        tv.setText(msg);
+                        break;
+                    case MEMO_TEXT_APPEND:
+                        tv.append(msg);
+                        break;
+                }
+                log("update status: " + type + " " + msg);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+                log("index out of bound\n");
+                tv.setText("");
                 tv.append(msg);
-                break;
+            }
         }
-        log("update status: " + type + " " + msg);
     }
 
     public void updateEditText(String msg, EditorActivity.MEMO_SET_TYPE type) {

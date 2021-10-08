@@ -77,8 +77,11 @@ public class MemoHost extends EditorActivity {
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
             String msg = getEditText();
             log(msg);
-            for (SocketThread client: mClients)
+            updateStatusText(getPrefix() + "client connected\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            for (SocketThread client: mClients) {
                 client.write(StringProcessor.htmlToByteArray(msg));
+            }
         }
 
         @Override
@@ -101,17 +104,17 @@ public class MemoHost extends EditorActivity {
         public void onDiscoveryChanged(int discoveryState) {
             switch (discoveryState) {
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
-                    mP2p.discover(new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            log("discover again pass");
-                        }
-
-                        @Override
-                        public void onFailure(int i) {
-                            log("discover again failure");
-                        }
-                    });
+//                    mP2p.discover(new WifiP2pManager.ActionListener() {
+//                        @Override
+//                        public void onSuccess() {
+//                            log("discover again pass");
+//                        }
+//
+//                        @Override
+//                        public void onFailure(int i) {
+//                            log("discover again failure");
+//                        }
+//                    });
                     break;
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STARTED:
                     break;
@@ -147,8 +150,20 @@ public class MemoHost extends EditorActivity {
             public void onClick(View v) {
                 String msg = getEditText();
                 log(msg);
+                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 for (SocketThread client : mClients)
                     client.write(StringProcessor.htmlToByteArray(msg));
+            }
+        });
+
+        Button showList = findViewById(R.id.show_list);
+        showList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRecycleView != null && mStop == false) {
+                    setAllButtonView(View.INVISIBLE);
+                    mRecycleView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -165,6 +180,17 @@ public class MemoHost extends EditorActivity {
 
     private void disconnect() {
         if (mP2p != null) {
+            mP2p.cancelConnect(new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    log("cancelConnect success");
+                }
+
+                @Override
+                public void onFailure(int status) {
+                    log("cancelConnect failed " + WifiP2p.getActionFailure(status));
+                }
+            });
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
                 public void onSuccess() {
@@ -219,7 +245,7 @@ public class MemoHost extends EditorActivity {
         mPeerAdapter.setListener(new PeerItemAdapter.PeerItemListener() {
             @Override
             public void onItemClick(final int position) {
-                updateStatusText(getPrefix() + "start relay\n",
+                updateStatusText(getPrefix() + "start establish connection\n",
                         MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 log(getPrefix() + "start relay\n");
 
@@ -237,6 +263,7 @@ public class MemoHost extends EditorActivity {
                         .setNetworkName("DIRECT-GG")
                         .setPassphrase("1234567890")
                         .enablePersistentMode(false)
+
                         .build();
 
                 mP2p.connect(config, new WifiP2pManager.ActionListener() {
@@ -259,7 +286,7 @@ public class MemoHost extends EditorActivity {
                         public void run() {
                             WifiP2pDevice current = null;
                             for(WifiP2pDevice p2pDevice : mP2pDeviceList) {
-                                if (p2pDevice.deviceAddress == device.deviceAddress) {
+                                if (p2pDevice.deviceAddress.equals(device.deviceAddress)) {
                                     current = p2pDevice;
                                     break;
                                 }
@@ -311,12 +338,13 @@ public class MemoHost extends EditorActivity {
             public void onAdded(SocketThread socketThread) {
                 log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
                 mClients.add(socketThread);
-
+                updateStatusText(getPrefix() + "client added\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String msg = getEditText();
                         log(msg);
+                        updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                         for (SocketThread client: mClients)
                             client.write(StringProcessor.htmlToByteArray(msg));
                     }
@@ -327,24 +355,16 @@ public class MemoHost extends EditorActivity {
             public void onRemoved(SocketThread socketThread) {
                 log(String.format("Socket remove %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
                 mClients.remove(socketThread);
+                updateStatusText(getPrefix() + "receive client removed\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
             }
 
             @Override
             public void onRead(SocketThread socketThread, byte[] message) {
-                final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
                 final ReturnMessage ret = StringProcessor.decodeByteArray(message);
                 log(getPrefix() + ret.data);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-                        if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            //updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
-                        } else {
-                            //updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            mFirstMsg = false;
-                        }
                         switch (ret.type) {
                             case StringProcessor.status:
                                 updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -395,18 +415,8 @@ public class MemoHost extends EditorActivity {
         }
 
         if (mP2p != null) {
+            disconnect();
             discover();
-            mP2p.disconnect(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("cancel host group pass");
-                }
-
-                @Override
-                public void onFailure(int i) {
-                    log("cancel host group failure:" + WifiP2p.getActionFailure(i));
-                }
-            });
         }
 
         for (SocketThread client : mClients) {
