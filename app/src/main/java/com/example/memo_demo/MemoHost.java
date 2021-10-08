@@ -153,6 +153,16 @@ public class MemoHost extends EditorActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mRecycleView != null && mRecycleView.getVisibility() == View.VISIBLE) {
+            mRecycleView.setVisibility(View.INVISIBLE);
+            setAllButtonView(View.VISIBLE);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void disconnect() {
         if (mP2p != null) {
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
@@ -247,10 +257,19 @@ public class MemoHost extends EditorActivity {
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            final WifiP2pDevice device = mP2pDeviceList.get(position);
-                            if (device.status == WifiP2pDevice.INVITED) {
+                            WifiP2pDevice current = null;
+                            for(WifiP2pDevice p2pDevice : mP2pDeviceList) {
+                                if (p2pDevice.deviceAddress == device.deviceAddress) {
+                                    current = p2pDevice;
+                                    break;
+                                }
+                            }
+
+                            final WifiP2pDevice targetDevice = current;
+
+                            if (targetDevice != null && targetDevice.status == WifiP2pDevice.INVITED) {
                                 WifiP2pConfig config = new WifiP2pConfig.Builder()
-                                        .setDeviceAddress(MacAddress.fromString(device.deviceAddress))
+                                        .setDeviceAddress(MacAddress.fromString(targetDevice.deviceAddress))
                                         .setNetworkName("DIRECT-GG")
                                         .setPassphrase("1234567890")
                                         .build();
@@ -258,12 +277,12 @@ public class MemoHost extends EditorActivity {
                                 mP2p.connect(config, new WifiP2pManager.ActionListener() {
                                     @Override
                                     public void onSuccess() {
-                                        log(String.format("connect again onSuccess: %s, %s", device.deviceName, WifiP2p.getConnectStatus(device.status)));
+                                        log(String.format("connect again onSuccess: %s, %s", targetDevice.deviceName, WifiP2p.getConnectStatus(targetDevice.status)));
                                     }
 
                                     @Override
                                     public void onFailure(int reason) {
-                                        log("connect again onFailure:" + device.deviceName);
+                                        log("connect again onFailure:" + targetDevice.deviceName);
                                     }
                                 });
                             }
