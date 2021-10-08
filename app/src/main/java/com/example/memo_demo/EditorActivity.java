@@ -94,7 +94,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void imgBtnInit() {
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         margin[margin_origin_index] = params.topMargin;
         findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -382,14 +382,14 @@ public class EditorActivity extends AppCompatActivity {
                 hidding = !hidding;
                 if (hidding) {
                     ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
                     params.topMargin = margin[margin_new_index];
-                    findViewById(R.id.editor_layout).setLayoutParams(params);
+                    findViewById(R.id.editor_view).setLayoutParams(params);
                 } else {
                     ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
-                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_layout).getLayoutParams();
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
                     params.topMargin = margin[margin_origin_index];
-                    findViewById(R.id.editor_layout).setLayoutParams(params);
+                    findViewById(R.id.editor_view).setLayoutParams(params);
                 }
             }
         });
@@ -524,8 +524,9 @@ public class EditorActivity extends AppCompatActivity {
 
     public void resetStatusTextCursor() {
         TextView tv = findViewById(R.id.textViewStatus);
-        tv.scrollTo(0,0);
+        tv.scrollTo(0, 0);
     }
+
     public void updateStatusText(String msg, EditorActivity.MEMO_SET_TYPE type) {
         TextView tv = findViewById(R.id.textViewStatus);
         if (tv == null) {
