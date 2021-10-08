@@ -45,6 +45,13 @@ public class SocketThread extends Thread {
         }
     }
 
+    public void write(byte[] message) {
+        if (mSocket == null || mSocket.isClosed()) return;
+        if (mWriter != null) {
+            mWriter.setMessage(message);
+        }
+    }
+
     public String getHostAddress() {
         if (mSocket != null) {
             return mSocket.getInetAddress().getHostAddress();
@@ -154,7 +161,10 @@ public class SocketThread extends Thread {
         }
 
         public void setMessage(byte[] bytes) {
-
+            synchronized (this) {
+                mMessages.add(bytes);
+                this.notifyAll();
+            }
         }
 
         public void close() {
