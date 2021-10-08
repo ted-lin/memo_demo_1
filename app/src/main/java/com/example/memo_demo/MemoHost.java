@@ -78,7 +78,7 @@ public class MemoHost extends EditorActivity {
             String msg = getEditText();
             log(msg);
             for (SocketThread client: mClients)
-                client.write(msg);
+                client.write(StringProcessor.htmlToByteArray(msg));
         }
 
         @Override
@@ -148,9 +148,19 @@ public class MemoHost extends EditorActivity {
                 String msg = getEditText();
                 log(msg);
                 for (SocketThread client : mClients)
-                    client.write(msg);
+                    client.write(StringProcessor.htmlToByteArray(msg));
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mRecycleView != null && mRecycleView.getVisibility() == View.VISIBLE) {
+            mRecycleView.setVisibility(View.INVISIBLE);
+            setAllButtonView(View.VISIBLE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void disconnect() {
@@ -247,10 +257,19 @@ public class MemoHost extends EditorActivity {
                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            final WifiP2pDevice device = mP2pDeviceList.get(position);
-                            if (device.status == WifiP2pDevice.INVITED) {
+                            WifiP2pDevice current = null;
+                            for(WifiP2pDevice p2pDevice : mP2pDeviceList) {
+                                if (p2pDevice.deviceAddress == device.deviceAddress) {
+                                    current = p2pDevice;
+                                    break;
+                                }
+                            }
+
+                            final WifiP2pDevice targetDevice = current;
+
+                            if (targetDevice != null && targetDevice.status == WifiP2pDevice.INVITED) {
                                 WifiP2pConfig config = new WifiP2pConfig.Builder()
-                                        .setDeviceAddress(MacAddress.fromString(device.deviceAddress))
+                                        .setDeviceAddress(MacAddress.fromString(targetDevice.deviceAddress))
                                         .setNetworkName("DIRECT-GG")
                                         .setPassphrase("1234567890")
                                         .build();
@@ -258,12 +277,12 @@ public class MemoHost extends EditorActivity {
                                 mP2p.connect(config, new WifiP2pManager.ActionListener() {
                                     @Override
                                     public void onSuccess() {
-                                        log(String.format("connect again onSuccess: %s, %s", device.deviceName, WifiP2p.getConnectStatus(device.status)));
+                                        log(String.format("connect again onSuccess: %s, %s", targetDevice.deviceName, WifiP2p.getConnectStatus(targetDevice.status)));
                                     }
 
                                     @Override
                                     public void onFailure(int reason) {
-                                        log("connect again onFailure:" + device.deviceName);
+                                        log("connect again onFailure:" + targetDevice.deviceName);
                                     }
                                 });
                             }
@@ -299,7 +318,7 @@ public class MemoHost extends EditorActivity {
                         String msg = getEditText();
                         log(msg);
                         for (SocketThread client: mClients)
-                            client.write(msg);
+                            client.write(StringProcessor.htmlToByteArray(msg));
                     }
                 });
             }
@@ -313,17 +332,28 @@ public class MemoHost extends EditorActivity {
             @Override
             public void onRead(SocketThread socketThread, byte[] message) {
                 final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
-                log(getPrefix() + str);
+                final ReturnMessage ret = StringProcessor.decodeByteArray(message);
+                log(getPrefix() + ret.data);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         if (!mFirstMsg) {
                             updateStatusText(getPrefix() + "client relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            //updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
                         } else {
-                            updateStatusText(getPrefix() + str, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            //updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             mFirstMsg = false;
                         }
+                        switch (ret.type) {
+                            case StringProcessor.status:
+                                updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                break;
+                            case StringProcessor.editor:
+                                updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                break;
+                        }
+                        log("[" + ret.type + "] " + ret.data);
                     }
                 });
             }

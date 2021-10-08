@@ -43,6 +43,7 @@ import java.util.List;
 import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
+
     public static final String TAG = "EditorActivity";
     private static final int WRITE_REQUEST_CODE_HTML = 43;
     private static final int WRITE_REQUEST_CODE = 42;
@@ -74,32 +75,8 @@ public class EditorActivity extends AppCompatActivity {
 //            mEditor.insertImage("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/s1.png", "", 400, 500);
         }
     };
-    private View.OnClickListener protoToHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            try {
-                Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(save);
-                String html = editorMessage.getHtml();
-                Boolean isFullHtml = editorMessage.getIsFullHtml();
-                if (isFullHtml) {
-                    mEditor.setHtml(html);
-                }
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-            }
-        }
-    };
-    private View.OnClickListener htmlToProto = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String _html = mEditor.getHtml();
-            Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
-                    .setHtml(_html)
-                    .setIsFullHtml(true)
-                    .build();
-            save = editorMessage.toByteArray();
-        }
-    };
+
+
     private View.OnClickListener saveHtml = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -224,24 +201,24 @@ public class EditorActivity extends AppCompatActivity {
         Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(patch);
     }
 
-    public void receiveEditorMsg(byte[] proto) {
-        Data.EditorMessage editorMessage;
-        try {
-            editorMessage = Data.EditorMessage.parseFrom(proto);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-            return;
-        }
-        if (editorMessage.getIsFullHtml()) {
-            mEditor.setHtml(editorMessage.getHtml());
-        } else {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            String patchText = editorMessage.getPatchText();
-            List<DiffMatchPatch.Patch> patches;
-            patches = dmp.patchFromText(patchText);
-            this.apply_patch(patches);
-        }
-    }
+//    public void receiveEditorMsg(byte[] proto) {
+//        Data.EditorMessage editorMessage;
+//        try {
+//            editorMessage = Data.EditorMessage.parseFrom(proto);
+//        } catch (InvalidProtocolBufferException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//        if (editorMessage.getIsFullHtml()) {
+//            mEditor.setHtml(editorMessage.getHtml());
+//        } else {
+//            DiffMatchPatch dmp = new DiffMatchPatch();
+//            String patchText = editorMessage.getPatchText();
+//            List<DiffMatchPatch.Patch> patches;
+//            patches = dmp.patchFromText(patchText);
+//            this.apply_patch(patches);
+//        }
+//    }
 
     public void apply_patch(List<DiffMatchPatch.Patch> patches) {
         DiffMatchPatch dmp = new DiffMatchPatch();
@@ -258,13 +235,13 @@ public class EditorActivity extends AppCompatActivity {
 
     }
 
-    public void sendPatch(String patchText) {
-        byte[] bytes = Data.EditorMessage.newBuilder()
-                .setHtml("")
-                .setIsFullHtml(false)
-                .setPatchText(patchText).build().toByteArray();
-        // Todo Send
-    }
+//    public void sendPatch(String patchText) {
+//        byte[] bytes = Data.EditorMessage.newBuilder()
+//                .setHtml("")
+//                .setIsFullHtml(false)
+//                .setPatchText(patchText).build().toByteArray();
+//        // Todo Send
+//    }
 
     private String buildPatchText(String origin, String newStr) {
         DiffMatchPatch dmp = new DiffMatchPatch();
@@ -622,6 +599,7 @@ public class EditorActivity extends AppCompatActivity {
         mButtons.add((Button) findViewById(R.id.clear));
         mButtons.add((Button) findViewById(R.id.start_relay));
         mButtons.add((Button) findViewById(R.id.stop_relay));
+        mButtons.add((Button) findViewById(R.id.show_list));
     }
 
     protected void setAllButtonView(int v) {

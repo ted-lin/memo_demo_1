@@ -132,41 +132,7 @@ public class RichEditorFragment extends Fragment {
 //            mEditor.insertImage("file://" + Environment.getExternalStorageDirectory().getAbsolutePath() + "/s1.png", "", 400, 500);
         }
     };
-    private View.OnClickListener protoToHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            try {
-                Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(save);
-//                editorMessage
-                String html = editorMessage.getHtml();
-                Boolean isFullHtml = editorMessage.getIsFullHtml();
-                if (isFullHtml) {
-                    mEditor.setHtml(html);
-                }
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-            }
-        }
-    };
-    private View.OnClickListener htmlToProto = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String _html = mEditor.getHtml();
-            Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
-                    .setHtml(_html)
-                    .setIsFullHtml(true)
-                    .build();
-            save = editorMessage.toByteArray();
-        }
-    };
-    private View.OnClickListener saveHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String str = lastString;
 
-            save_file(v, str, htmlFileName);
-        }
-    };
 
     private String load_file(View view, String file_name, boolean isPlain) {
         File docDir = view.getContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
@@ -260,24 +226,7 @@ public class RichEditorFragment extends Fragment {
         Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(patch);
     }
 
-    public void receiveEditorMsg(byte[] proto) {
-        Data.EditorMessage editorMessage;
-        try {
-            editorMessage = Data.EditorMessage.parseFrom(proto);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-            return;
-        }
-        if (editorMessage.getIsFullHtml()) {
-            mEditor.setHtml(editorMessage.getHtml());
-        } else {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            String patchText = editorMessage.getPatchText();
-            List<DiffMatchPatch.Patch> patches;
-            patches = dmp.patchFromText(patchText);
-            this.apply_patch(patches);
-        }
-    }
+
 
     public void apply_patch(List<DiffMatchPatch.Patch> patches) {
         DiffMatchPatch dmp = new DiffMatchPatch();
@@ -291,15 +240,6 @@ public class RichEditorFragment extends Fragment {
         } else {
             // TODO apply patch failed
         }
-
-    }
-
-    public void sendPatch(String patchText) {
-        byte[] bytes = Data.EditorMessage.newBuilder()
-                .setHtml("")
-                .setIsFullHtml(false)
-                .setPatchText(patchText).build().toByteArray();
-        // Todo Send
     }
 
     private String buildPatchText(String origin, String newStr) {
@@ -309,7 +249,6 @@ public class RichEditorFragment extends Fragment {
         String patchText = dmp.patchToText(patches);
         return patchText;
     }
-
 
     private void imgBtnInit(View view) {
         view.findViewById(R.id.action_undo).setOnClickListener(new View.OnClickListener() {
