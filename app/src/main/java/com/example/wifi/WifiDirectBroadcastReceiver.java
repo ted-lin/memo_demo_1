@@ -85,7 +85,9 @@ public class WifiDirectBroadcastReceiver extends BroadcastReceiver {
                     return;
                 }
                 WifiP2pDevice wifiP2pDevice = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-                mListener.onSelfChanged(wifiP2pDevice);
+                if (wifiP2pDevice != null) {
+                    mListener.onSelfChanged(wifiP2pDevice);
+                }
                 break;
             }
         }

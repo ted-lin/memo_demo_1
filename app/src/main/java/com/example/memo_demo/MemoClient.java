@@ -62,7 +62,7 @@ public class MemoClient extends EditorActivity {
                     @Override
                     public void onRemoved(SocketThread socketThread) {
                         if (mClient != null) {
-                            mClient.write(getEditText());
+                            mClient.write(StringProcessor.htmlToByteArray(getEditText()));
                         }
 
                         log(String.format("Socket remove: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
@@ -73,21 +73,18 @@ public class MemoClient extends EditorActivity {
                         MemoClient.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                String msg = String.format("[%s:%d] %s",
-                                        socketThread.getHostAddress(),
-                                        socketThread.getPort(),
-                                        new String(message, StandardCharsets.UTF_8));
-                                log(msg.toString());
+                                ReturnMessage ret = StringProcessor.decodeByteArray(message);
+                                log("[" + ret.type + "] " + ret.data);
 
                                 if (mFirstMsg) {
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                    updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     if (mClient != null) {
-                                        mClient.write("end relay\n");
+                                        mClient.write(StringProcessor.statusToByteArray("end relay\n"));
                                     }
                                     mFirstMsg = false;
                                 } else {
-                                    updateEditText(new String(message, StandardCharsets.UTF_8) + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                 }
                             }
                         });
@@ -174,7 +171,7 @@ public class MemoClient extends EditorActivity {
             public void onClick(View v) {
                 String msg = getEditText();
                 if (mClient != null) {
-                    mClient.write(msg);
+                    mClient.write(StringProcessor.htmlToByteArray(msg));
                 }
             }
         });
@@ -242,7 +239,7 @@ public class MemoClient extends EditorActivity {
         mFirstMsg = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
         if (mClient != null)
-            mClient.write(getEditText());
+            mClient.write(StringProcessor.htmlToByteArray(getEditText()));
         disconnect();
         discover();
         if (mClient != null) {
