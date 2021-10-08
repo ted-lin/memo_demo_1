@@ -74,10 +74,6 @@ public class MemoHost extends EditorActivity {
 
         @Override
         public void onConnect(WifiP2pInfo p2pInfo) {
-            if (mClients.size() == 0) {
-                log("no client added\n");
-                return;
-            }
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
             String msg = getEditText();
             log(msg);
@@ -108,17 +104,17 @@ public class MemoHost extends EditorActivity {
         public void onDiscoveryChanged(int discoveryState) {
             switch (discoveryState) {
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
-                    mP2p.discover(new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            log("discover again pass");
-                        }
-
-                        @Override
-                        public void onFailure(int i) {
-                            log("discover again failure");
-                        }
-                    });
+//                    mP2p.discover(new WifiP2pManager.ActionListener() {
+//                        @Override
+//                        public void onSuccess() {
+//                            log("discover again pass");
+//                        }
+//
+//                        @Override
+//                        public void onFailure(int i) {
+//                            log("discover again failure");
+//                        }
+//                    });
                     break;
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STARTED:
                     break;
@@ -152,10 +148,6 @@ public class MemoHost extends EditorActivity {
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mClients.size() == 0) {
-                    log("no client added\n");
-                    return;
-                }
                 String msg = getEditText();
                 log(msg);
                 updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -188,6 +180,17 @@ public class MemoHost extends EditorActivity {
 
     private void disconnect() {
         if (mP2p != null) {
+            mP2p.cancelConnect(new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    log("cancelConnect success");
+                }
+
+                @Override
+                public void onFailure(int status) {
+                    log("cancelConnect failed " + WifiP2p.getActionFailure(status));
+                }
+            });
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
                 public void onSuccess() {
@@ -260,6 +263,7 @@ public class MemoHost extends EditorActivity {
                         .setNetworkName("DIRECT-GG")
                         .setPassphrase("1234567890")
                         .enablePersistentMode(false)
+
                         .build();
 
                 mP2p.connect(config, new WifiP2pManager.ActionListener() {
@@ -282,7 +286,7 @@ public class MemoHost extends EditorActivity {
                         public void run() {
                             WifiP2pDevice current = null;
                             for(WifiP2pDevice p2pDevice : mP2pDeviceList) {
-                                if (p2pDevice.deviceAddress == device.deviceAddress) {
+                                if (p2pDevice.deviceAddress.equals(device.deviceAddress)) {
                                     current = p2pDevice;
                                     break;
                                 }
@@ -338,10 +342,6 @@ public class MemoHost extends EditorActivity {
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (mClients.size() == 0) {
-                            log("no client added\n");
-                            return;
-                        }
                         String msg = getEditText();
                         log(msg);
                         updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -425,18 +425,8 @@ public class MemoHost extends EditorActivity {
         }
 
         if (mP2p != null) {
+            disconnect();
             discover();
-            mP2p.disconnect(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("cancel host group pass");
-                }
-
-                @Override
-                public void onFailure(int i) {
-                    log("cancel host group failure:" + WifiP2p.getActionFailure(i));
-                }
-            });
         }
 
         for (SocketThread client : mClients) {
