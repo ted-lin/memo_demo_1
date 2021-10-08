@@ -5,11 +5,12 @@ public class TextHelper {
 
     public static String toPlainTxt(String html) {
         return html.replaceAll("<br>", "\n")
+                .replaceAll("<[^>]*[^\\\\s>][^>]*>", "")
                 .replaceAll("&nbsp;", " ")
                 .replaceAll("&amp;", "&")
                 .replaceAll("&lt;", "<")
-                .replaceAll("&gt;", ">")
-                .replaceAll("\\<.*?>", "");
+                .replaceAll("&gt;", ">");
+
     }
 
     public static String toHtml(String plainText) {

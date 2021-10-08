@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -15,12 +16,20 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.protos.Data;
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -31,15 +40,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.example.protos.Data;
-import com.google.protobuf.InvalidProtocolBufferException;
-
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-
 import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
     public static final String TAG = "EditorActivity";
+    private static final int WRITE_REQUEST_CODE_HTML = 43;
+    private static final int WRITE_REQUEST_CODE = 42;
+    private static final int READ_REQUEST_CODE_HTML = 41;
+    private static final int READ_REQUEST_CODE = 40;
     private RichEditor mEditor;
     private WebView webView;
     private TextView textView;
@@ -50,6 +58,12 @@ public class EditorActivity extends AppCompatActivity {
     byte[] save;
     String html;
     private int mFontSize = 5;
+    int text_color_index = 0;
+    int text_bg_color_index = 6;
+    int[] text_color_src_id = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
+            R.color.CYAN, R.color.RED, R.color.WHITE};
+    int[] text_colors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
+            Color.CYAN, Color.RED, Color.WHITE};
     private View.OnClickListener imageInsert = new View.OnClickListener() {
 
         @Override
@@ -65,7 +79,6 @@ public class EditorActivity extends AppCompatActivity {
         public void onClick(View v) {
             try {
                 Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(save);
-//                editorMessage
                 String html = editorMessage.getHtml();
                 Boolean isFullHtml = editorMessage.getIsFullHtml();
                 if (isFullHtml) {
@@ -194,26 +207,12 @@ public class EditorActivity extends AppCompatActivity {
             public void onTextChange(String text) {
                 diff = dmp.diffMain(lastString, text);
                 patch = dmp.patchMake(diff);
-//                dmp.diffCleanupSemantic(diff);
-//                dmp.diffCleanupEfficiency(diff);
                 lastString = text;
-//                textView.setText(lastString);
-//                lastTextView.setText(patch.toString());
 
             }
         });
 
-//        textView = findViewById(R.id.hello);
-//        lastTextView = findViewById(R.id.last);
-//        findViewById(R.id.btnHtml).setOnClickListener(getHtml);
-//        findViewById(R.id.btnImg).setOnClickListener(imageInsert);
-//        findViewById(R.id.btnProto).setOnClickListener(protoToHtml);
-//        findViewById(R.id.btnToProto).setOnClickListener(htmlToProto);
         mEditor.setPadding(10, 10, 10, 10);
-//        findViewById(R.id.btnSaveTxt).setOnClickListener(saveTxt);
-//        findViewById(R.id.btnSaveHtml).setOnClickListener(saveHtml);
-//        findViewById(R.id.btnLoadTxt).setOnClickListener(loadTxt);
-//        findViewById(R.id.btnLoadHtml).setOnClickListener(loadHtml);
 
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setHtml("");
@@ -391,14 +390,33 @@ public class EditorActivity extends AppCompatActivity {
                 mEditor.setHeading(6);
             }
         });
+        findViewById(R.id.change_txt_color).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text_color_index += 1;
+                if (text_color_index >= text_color_src_id.length) {
+                    text_color_index = 0;
+                }
+                ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(text_color_src_id[text_color_index]);
+                mEditor.setTextColor(text_colors[text_color_index]);
+            }
+        });
+        findViewById(R.id.change_bg_txt_color).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text_bg_color_index += 1;
+                if (text_bg_color_index >= text_color_src_id.length)
+                    text_bg_color_index = 0;
+                ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(text_color_src_id[text_bg_color_index]);
+                mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
+            }
+        });
 
         findViewById(R.id.action_txt_color).setOnClickListener(new View.OnClickListener() {
-            private boolean isChanged;
 
             @Override
             public void onClick(View v) {
-                mEditor.setTextColor(isChanged ? Color.BLACK : Color.RED);
-                isChanged = !isChanged;
+                mEditor.setTextColor(text_colors[text_color_index]);
             }
         });
 
@@ -407,8 +425,7 @@ public class EditorActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                mEditor.setTextBackgroundColor(isChanged ? Color.TRANSPARENT : Color.YELLOW);
-                isChanged = !isChanged;
+                mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
             }
         });
 
@@ -512,14 +529,31 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.saveImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                save_file(mEditor.getHtml(), htmlFileName);
+                createFile("text/html", htmlFileName, true);
+            }
+        });
+        findViewById(R.id.saveTxtImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createFile("text/plain", txtFileName, false);
             }
         });
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String _html = load_file(htmlFileName, false);
-                mEditor.setHtml(_html);
+                openFile("text/html", true);
+            }
+        });
+        findViewById(R.id.loadTxtImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFile("text/plain", false);
+            }
+        });
+        findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertCheck();
             }
         });
     }
@@ -575,7 +609,7 @@ public class EditorActivity extends AppCompatActivity {
         textView.setMovementMethod(new ScrollingMovementMethod());
         textView.setTextSize(16);
         textView.setText(getPrefix() + "start\n");
-        
+
         View.OnFocusChangeListener ofcListener = new EditorActivity.MemoFocusChangeListener();
         mEditor.setOnFocusChangeListener(ofcListener);
 
@@ -692,5 +726,162 @@ public class EditorActivity extends AppCompatActivity {
         if (mEditor != null)
             return mEditor.getHtml();
         return "";
+    }
+
+    private void alertCheck() {
+        // TODO need to fix link problem
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_new, null, false);
+        builder.setView(view);
+        builder.setTitle("New file");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mEditor.setHtml("");
+                lastString = "";
+//                String link = editText.getText().toString().trim();
+//                if (TextUtils.isEmpty(link)) {
+//
+//                    return;
+//                }
+//                mEditor.insertLink("https://github.com/wasabeef", link);
+            }
+        });
+
+        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // DO NOTHING HERE
+            }
+        });
+
+        builder.create().show();
+    }
+
+    private void openFile(String mimeType, boolean isHtml) {
+
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        if (isHtml) {
+            startActivityForResult(intent, READ_REQUEST_CODE_HTML);
+        } else {
+            startActivityForResult(intent, READ_REQUEST_CODE);
+        }
+    }
+
+    private void createFile(String mimeType, String fileName, boolean isHtml) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        if (isHtml) {
+            startActivityForResult(intent, WRITE_REQUEST_CODE_HTML);
+        } else {
+            startActivityForResult(intent, WRITE_REQUEST_CODE);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
+        switch (requestCode) {
+            case WRITE_REQUEST_CODE: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        try {
+                            FileOutputStream fos = null;
+                            byte[] bytes;
+                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
+                            bytes = mEditor.getHtml().getBytes();
+                            fos.write(bytes);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // TODO
+                    }
+                }
+                break;
+            }
+            case WRITE_REQUEST_CODE_HTML: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        try {
+                            FileOutputStream fos = null;
+                            byte[] bytes;
+                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
+                            bytes = TextHelper.toPlainTxt(mEditor.getHtml()).getBytes();
+                            fos.write(bytes);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // TODO
+                    }
+                }
+                break;
+            }
+            case READ_REQUEST_CODE: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        try {
+                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
+                            byte[] b = new byte[1024];
+                            while (fins.read(b) != -1) {
+                                stringBuilder.append(new String(b));
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            String fileContents = stringBuilder.toString();
+                            mEditor.setHtml(TextHelper.toHtml(fileContents));
+                        }
+                    } else {
+                        // TODO
+                    }
+                    break;
+                }
+            }
+            case READ_REQUEST_CODE_HTML: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        try {
+                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
+                            byte[] b = new byte[1024];
+                            while (fins.read(b) != -1) {
+                                stringBuilder.append(new String(b));
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            String fileContents = stringBuilder.toString();
+                            mEditor.setHtml(fileContents);
+                        }
+                    } else {
+                        // TODO
+                    }
+                    break;
+                }
+            }
+        }
     }
 }

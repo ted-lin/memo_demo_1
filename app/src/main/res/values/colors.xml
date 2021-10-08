@@ -3,6 +3,11 @@
     <color name="colorPrimary">#A0EEE6</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#751135</color>
-    <color name="font_color">#000000</color>
-    <color name="font_bg_color">#FFFFFF</color>
+    <color name="BLACK">#000000</color>
+    <color name="WHITE">#FFFFFF</color>
+    <color name="RED">#FF0000</color>
+    <color name="GREEN">#00FF00</color>
+    <color name="BLUE">#0000FF</color>
+    <color name="YELLOW">#FFFF00</color>
+    <color name="CYAN">#00FFFF</color>
 </resources>
