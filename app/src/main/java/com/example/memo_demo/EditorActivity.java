@@ -44,7 +44,9 @@ import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
     public static final String TAG = "EditorActivity";
-    private static final int WRITE_REQUEST_CODE = 43;
+    private static final int WRITE_REQUEST_CODE_HTML = 43;
+    private static final int WRITE_REQUEST_CODE = 42;
+    private static final int READ_REQUEST_CODE_HTML = 41;
     private static final int READ_REQUEST_CODE = 40;
     private RichEditor mEditor;
     private WebView webView;
@@ -205,26 +207,12 @@ public class EditorActivity extends AppCompatActivity {
             public void onTextChange(String text) {
                 diff = dmp.diffMain(lastString, text);
                 patch = dmp.patchMake(diff);
-//                dmp.diffCleanupSemantic(diff);
-//                dmp.diffCleanupEfficiency(diff);
                 lastString = text;
-//                textView.setText(lastString);
-//                lastTextView.setText(patch.toString());
 
             }
         });
 
-//        textView = findViewById(R.id.hello);
-//        lastTextView = findViewById(R.id.last);
-//        findViewById(R.id.btnHtml).setOnClickListener(getHtml);
-//        findViewById(R.id.btnImg).setOnClickListener(imageInsert);
-//        findViewById(R.id.btnProto).setOnClickListener(protoToHtml);
-//        findViewById(R.id.btnToProto).setOnClickListener(htmlToProto);
         mEditor.setPadding(10, 10, 10, 10);
-//        findViewById(R.id.btnSaveTxt).setOnClickListener(saveTxt);
-//        findViewById(R.id.btnSaveHtml).setOnClickListener(saveHtml);
-//        findViewById(R.id.btnLoadTxt).setOnClickListener(loadTxt);
-//        findViewById(R.id.btnLoadHtml).setOnClickListener(loadHtml);
 
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setHtml("");
@@ -541,13 +529,25 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.saveImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createFile("text/plain", htmlFileName);
+                createFile("text/html", htmlFileName, true);
+            }
+        });
+        findViewById(R.id.saveTxtImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createFile("text/plain", txtFileName, false);
             }
         });
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openFile("text/plain");
+                openFile("text/html", true);
+            }
+        });
+        findViewById(R.id.loadTxtImg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFile("text/plain", false);
             }
         });
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
@@ -760,20 +760,28 @@ public class EditorActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    private void openFile(String mimeType) {
+    private void openFile(String mimeType, boolean isHtml) {
 
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
-        startActivityForResult(intent, READ_REQUEST_CODE);
+        if (isHtml) {
+            startActivityForResult(intent, READ_REQUEST_CODE_HTML);
+        } else {
+            startActivityForResult(intent, READ_REQUEST_CODE);
+        }
     }
 
-    private void createFile(String mimeType, String fileName) {
+    private void createFile(String mimeType, String fileName, boolean isHtml) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType(mimeType);
         intent.putExtra(Intent.EXTRA_TITLE, fileName);
-        startActivityForResult(intent, WRITE_REQUEST_CODE);
+        if (isHtml) {
+            startActivityForResult(intent, WRITE_REQUEST_CODE_HTML);
+        } else {
+            startActivityForResult(intent, WRITE_REQUEST_CODE);
+        }
     }
 
 
@@ -788,10 +796,30 @@ public class EditorActivity extends AppCompatActivity {
                     if (uri != null) {
                         try {
                             FileOutputStream fos = null;
-                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
                             byte[] bytes;
-                            System.out.println(mEditor.getHtml());
+                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
                             bytes = mEditor.getHtml().getBytes();
+                            fos.write(bytes);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        // TODO
+                    }
+                }
+                break;
+            }
+            case WRITE_REQUEST_CODE_HTML: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        try {
+                            FileOutputStream fos = null;
+                            byte[] bytes;
+                            fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
+                            bytes = TextHelper.toPlainTxt(mEditor.getHtml()).getBytes();
                             fos.write(bytes);
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -808,10 +836,34 @@ public class EditorActivity extends AppCompatActivity {
                 if (data != null) {
                     Uri uri = data.getData();
                     if (uri != null) {
-                        FileInputStream fins = null;
                         StringBuilder stringBuilder = new StringBuilder();
                         try {
-                            fins = (FileInputStream) getContentResolver().openInputStream(uri);
+                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
+                            byte[] b = new byte[1024];
+                            while (fins.read(b) != -1) {
+                                stringBuilder.append(new String(b));
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            String fileContents = stringBuilder.toString();
+                            mEditor.setHtml(TextHelper.toHtml(fileContents));
+                        }
+                    } else {
+                        // TODO
+                    }
+                    break;
+                }
+            }
+            case READ_REQUEST_CODE_HTML: {
+                if (data != null) {
+                    Uri uri = data.getData();
+                    if (uri != null) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        try {
+                            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
                             byte[] b = new byte[1024];
                             while (fins.read(b) != -1) {
                                 stringBuilder.append(new String(b));
