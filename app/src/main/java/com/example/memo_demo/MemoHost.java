@@ -242,7 +242,7 @@ public class MemoHost extends EditorActivity {
         mPeerAdapter.setListener(new PeerItemAdapter.PeerItemListener() {
             @Override
             public void onItemClick(final int position) {
-                updateStatusText(getPrefix() + "start relay\n",
+                updateStatusText(getPrefix() + "start establish connection\n",
                         MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                 log(getPrefix() + "start relay\n");
 
@@ -344,7 +344,7 @@ public class MemoHost extends EditorActivity {
                         }
                         String msg = getEditText();
                         log(msg);
-                        updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                        updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                         for (SocketThread client: mClients)
                             client.write(StringProcessor.htmlToByteArray(msg));
                     }
