@@ -15,10 +15,13 @@ public class TextHelper {
     }
 
     public static String toHtml(String plainText) {
-        return plainText.replaceAll(" ", "&nbsp;")
-                .replaceAll("&", "&amp;")
+        return plainText.replaceAll("&", "&amp;")
+                .replaceAll(" ", "&nbsp;")
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;")
+                .replaceAll("¥", "&yen;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("\'", "&apos;")
                 .replaceAll("\n", "<br>");
     }
 }
