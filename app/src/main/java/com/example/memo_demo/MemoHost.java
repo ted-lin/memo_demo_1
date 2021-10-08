@@ -75,13 +75,13 @@ public class MemoHost extends EditorActivity {
         @Override
         public void onConnect(WifiP2pInfo p2pInfo) {
             log("Connect group: " + p2pInfo.groupOwnerAddress.getHostAddress() + "  " + p2pInfo.isGroupOwner + " " + p2pInfo.groupFormed);
-            String msg = getEditText();
-            log(msg);
-            updateStatusText(getPrefix() + "client connected\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-            for (SocketThread client: mClients) {
-                client.write(StringProcessor.htmlToByteArray(msg));
-            }
+            //String msg = getEditText();
+            //log(msg);
+            //updateStatusText(getPrefix() + "client connected\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            //updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            //for (SocketThread client: mClients) {
+            //    client.write(StringProcessor.htmlToByteArray(msg));
+            //}
         }
 
         @Override
