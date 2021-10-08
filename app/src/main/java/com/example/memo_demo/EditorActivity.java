@@ -508,15 +508,24 @@ public class EditorActivity extends AppCompatActivity {
             return;
         }
 
-        switch (type) {
-            case MEMO_TEXT_SET:
-                tv.setText(msg);
-                break;
-            case MEMO_TEXT_APPEND:
+        synchronized (this) {
+            try {
+                switch (type) {
+                    case MEMO_TEXT_SET:
+                        tv.setText(msg);
+                        break;
+                    case MEMO_TEXT_APPEND:
+                        tv.append(msg);
+                        break;
+                }
+                log("update status: " + type + " " + msg);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+                log("index out of bound\n");
+                tv.setText("");
                 tv.append(msg);
-                break;
+            }
         }
-        log("update status: " + type + " " + msg);
     }
 
     public void updateEditText(String msg, EditorActivity.MEMO_SET_TYPE type) {

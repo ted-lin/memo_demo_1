@@ -360,21 +360,11 @@ public class MemoHost extends EditorActivity {
 
             @Override
             public void onRead(SocketThread socketThread, byte[] message) {
-                final String str = String.format("%s\n", new String(message, StandardCharsets.UTF_8));
                 final ReturnMessage ret = StringProcessor.decodeByteArray(message);
                 log(getPrefix() + ret.data);
                 MemoHost.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-/*
-                        if (!mFirstMsg) {
-                            updateStatusText(getPrefix() + "client stop relay back\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            //updateEditText(str, MEMO_SET_TYPE.MEMO_TEXT_SET);
-                        } else {
-                            //updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                            mFirstMsg = false;
-                        }
-                        */
                         switch (ret.type) {
                             case StringProcessor.status:
                                 updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
