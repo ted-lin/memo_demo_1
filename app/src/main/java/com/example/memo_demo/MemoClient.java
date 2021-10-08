@@ -22,7 +22,7 @@ import androidx.constraintlayout.widget.ConstraintSet;
 
 public class MemoClient extends EditorActivity {
     private SocketThread mClient;
-    //private boolean mConnected = false;
+    private boolean mConnected = false;
 
     private boolean mFirstMsg = true;
     private WifiP2p mP2p;
@@ -55,7 +55,7 @@ public class MemoClient extends EditorActivity {
             log("connect group owner:" + p2pInfo.isGroupOwner);
             log("connect group formed:" + p2pInfo.groupFormed);
             log("--------------------------------");
-            //mConnected = true;
+            mConnected = true;
 
             if (mClient == null) {
                 mClient = new SocketThread(p2pInfo.groupOwnerAddress, new SocketListener() {
@@ -107,7 +107,7 @@ public class MemoClient extends EditorActivity {
             log("disconnect group owner:" + p2pInfo.isGroupOwner);
             log("disconnect group formed:" + p2pInfo.groupFormed);
             log("--------------------------------");
-           // mConnected = false;
+            mConnected = false;
             disconnect();
 
             if (mClient != null) {
@@ -129,7 +129,7 @@ public class MemoClient extends EditorActivity {
         public void onDiscoveryChanged(int discoveryState) {
             switch (discoveryState) {
                 case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
-                    //if (mConnected) return;
+                    if (mConnected) return;
 
                     mP2p.discover(new WifiP2pManager.ActionListener() {
                         @Override
@@ -199,6 +199,17 @@ public class MemoClient extends EditorActivity {
 
     private void disconnect() {
         if (mP2p != null) {
+            mP2p.cancelConnect(new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    log("cancelConnect success");
+                }
+
+                @Override
+                public void onFailure(int status) {
+                    log("cancelConnect failed " + WifiP2p.getActionFailure(status));
+                }
+            });
             mP2p.disconnect(new WifiP2pManager.ActionListener() {
                 @Override
                 public void onSuccess() {
