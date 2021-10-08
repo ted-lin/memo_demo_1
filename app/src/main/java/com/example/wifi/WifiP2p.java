@@ -162,6 +162,20 @@ public class WifiP2p {
         });
     }
 
+    public void cancelConnect(final WifiP2pManager.ActionListener listener) {
+        mConnectThread.addTask(new Runnable() {
+
+            @Override
+            public void run() {
+                ProxyListener proxyListener = new ProxyListener();
+                proxyListener.setConnect(mConnectThread);
+                proxyListener.addListener(listener);
+                deletePersistentGroups();
+                mManager.cancelConnect(mChannel, proxyListener);
+            }
+        });
+    }
+
     public void disconnect(final WifiP2pManager.ActionListener listener) {
         mConnectThread.addTask(new Runnable() {
 
