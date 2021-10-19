@@ -312,13 +312,6 @@ public class EditorActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertYoutubeVideo(youtube_url);
-            }
-        });
-
         findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
