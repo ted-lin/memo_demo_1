@@ -93,28 +93,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean checkName() {
+    public void updateName() {
         EditText editView = (EditText) findViewById(R.id.editText);
         String string = editView.getText().toString();
-        if (0 == string.length())
-            return false;
-        user = string;
-        return true;
+        user = string.length() > 0 ? string : "User";
     }
 
     /**
      * As Host
      */
     public void asHost(View v) {
-        if (!checkName()) {
-            showToast("Need a name");
-            return;
-        }
+        updateName();
         performPermissionGrant();
         if (!mPermissaionValid) {
             showToast("permission failure");
-            return ;
+            return;
         }
+        showToast("You run as " + user);
 
         Intent intent = new Intent(this, MemoHost.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_HOST, "host", user));
@@ -126,15 +121,13 @@ public class MainActivity extends AppCompatActivity {
      * As client
      */
     public void asClient(View v) {
-        if (!checkName()) {
-            showToast("Need a name");
-            return;
-        }
+        updateName();
         performPermissionGrant();
         if (!mPermissaionValid) {
             showToast("permission failure");
             return;
         }
+        showToast("You run as " + user);
 
         Intent intent = new Intent(this, MemoClient.class);
         intent.putExtra(MEMO_EXTRA, new MemoInfo(MEMO_CLIENT, "client", user));
