@@ -450,13 +450,6 @@ public class RichEditorFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertYoutubeVideo("https://www.youtube.com/embed/pS5peqApgUA");
-            }
-        });
-
         view.findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
