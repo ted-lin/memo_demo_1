@@ -27,4 +27,13 @@ public class StringProcessorUnitTest {
         assertEquals("status", html);
         assertEquals(type, StringProcessor.status);
     }
+
+    @Test
+    public void clipResult_isCorrect() {
+        byte[] bytes = StringProcessor.clipResultToByteArray("clipData");
+        String result = StringProcessor.decodeByteArray(bytes).data;
+        int type = StringProcessor.decodeByteArray(bytes).type;
+        assertEquals("clipData", result);
+        assertEquals(type, StringProcessor.clipResult);
+    }
 }
