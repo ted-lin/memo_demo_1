@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.wifi.GroupListener;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
+import com.example.wifi.UdpClientThread;
 import com.example.wifi.WifiDirectListener;
 import com.example.wifi.WifiP2p;
 
 import java.lang.reflect.Constructor;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
@@ -21,44 +24,20 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 
 public class MemoClient extends EditorActivity {
+    private UdpClientThread mUdpThread;
     private SocketThread mClient;
     private boolean mConnected = false;
 
     private boolean mFirstMsg = true;
-    private WifiP2p mP2p;
 
-    private WifiDirectListener mClientListener = new WifiDirectListener() {
+    private GroupListener mGroupListener = new GroupListener() {
         @Override
-        public void onChannelDisconnected() {
-            log("channel disconnect");
-        }
-
-        @Override
-        public void onWifiDirectEnabled(boolean enabled) {
-            log("wifi direct enabled:" + enabled);
-        }
-
-        @Override
-        public void onPeersChanged(Collection<WifiP2pDevice> wifiP2pDeviceList) {
-            for (WifiP2pDevice device : wifiP2pDeviceList) {
-                log("peer address:" + device.deviceAddress);
-                log("peer name:" + device.deviceName);
-                log("peer owner:" + device.isGroupOwner());
-                log("peer status:" + WifiP2p.getConnectStatus(device.status));
-                log("--------------------------------");
-            }
-        }
-
-        @Override
-        public void onConnect(WifiP2pInfo p2pInfo) {
-            log("connect group address:" + p2pInfo.groupOwnerAddress.getHostAddress());
-            log("connect group owner:" + p2pInfo.isGroupOwner);
-            log("connect group formed:" + p2pInfo.groupFormed);
-            log("--------------------------------");
+        public void onGroupHostConnect(InetAddress hostAddress, String user) {
+            log(String.format("group connect %s,%s", user, hostAddress.getHostAddress()));
             mConnected = true;
 
             if (mClient == null) {
-                mClient = new SocketThread(p2pInfo.groupOwnerAddress, new SocketListener() {
+                mClient = new SocketThread(hostAddress, new SocketListener() {
                     @Override
                     public void onAdded(SocketThread socketThread) {
                         log(String.format("Socket add: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
@@ -102,11 +81,11 @@ public class MemoClient extends EditorActivity {
         }
 
         @Override
-        public void onDisconnect(WifiP2pInfo p2pInfo) {
-            log("disconnect group address: null");
-            log("disconnect group owner:" + p2pInfo.isGroupOwner);
-            log("disconnect group formed:" + p2pInfo.groupFormed);
-            log("--------------------------------");
+        public void obGroupHostDisConnect(InetAddress hostAddress, String user) {
+            if (!mConnected) return;
+
+            log(String.format("group disconnect %s,%s", user, hostAddress.getHostAddress()));
+
             mConnected = false;
             disconnect();
 
@@ -117,43 +96,26 @@ public class MemoClient extends EditorActivity {
         }
 
         @Override
-        public void onSelfChanged(WifiP2pDevice p2pDevice) {
-            log("self address:" + p2pDevice.deviceAddress);
-            log("self name:" + p2pDevice.deviceName);
-            log("self owner:" + p2pDevice.isGroupOwner());
-            log("self status:" + p2pDevice.status);
-            log("--------------------------------");
+        public void onGroupClientConnect(InetAddress clientAddress, String user) {
+
         }
 
         @Override
-        public void onDiscoveryChanged(int discoveryState) {
-            switch (discoveryState) {
-                case WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED:
-                    if (mConnected) return;
+        public void onGroupClientDisConnect(InetAddress clientAddress, String user) {
 
-                    mP2p.discover(new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            log("discover again pass");
-                        }
-
-                        @Override
-                        public void onFailure(int status) {
-                            log("discover again failure:" + status);
-                        }
-                    });
-                    break;
-                case WifiP2pManager.WIFI_P2P_DISCOVERY_STARTED:
-                    break;
-            }
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init(getIntent());
         setTitle("Memo " + mMode);
+
+        mUdpThread = new UdpClientThread(getUser());
+        mUdpThread.setListener(mGroupListener);
+        mUdpThread.start();
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
@@ -192,70 +154,23 @@ public class MemoClient extends EditorActivity {
         super.onDestroy();
 
         stop();
-        if (mP2p != null){
-            mP2p.onDestory();
-        }
     }
 
     private void disconnect() {
-        if (mP2p != null) {
-            mP2p.cancelConnect(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("cancelConnect success");
-                }
-
-                @Override
-                public void onFailure(int status) {
-                    log("cancelConnect failed " + WifiP2p.getActionFailure(status));
-                }
-            });
-            mP2p.disconnect(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("disconnect success");
-                }
-
-                @Override
-                public void onFailure(int status) {
-                    log("disconnect failed " + WifiP2p.getActionFailure(status));
-                }
-            });
-        }
+       mUdpThread.leaveGroup();
     }
 
     private void discover() {
-        if (mP2p != null) {
-            // discovery
-            mP2p.discover(new WifiP2pManager.ActionListener() {
-                @Override
-                public void onSuccess() {
-                    log("discover pass");
-                }
-
-                @Override
-                public void onFailure(int i) {
-                    log("discover failure " + i);
-                }
-            });
-        }
+        mUdpThread.joinGroup();
     }
 
     protected void start() {
         updateStatusText(getPrefix() + "wait relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
-        if (mP2p == null) {
-            mP2p = new WifiP2p(this, mClientListener);
-            mP2p.onCreate();
-        }
+        mFirstMsg = true;
+        discover();
+        log("start finished");
 
-        if (mP2p != null) {
-            mFirstMsg = true;
-            // always disconnect before really use.
-            disconnect();
-            discover();
-            log("start finished");
-        }
     }
 
     protected void stop() {
@@ -266,7 +181,6 @@ public class MemoClient extends EditorActivity {
             mClient.write(StringProcessor.htmlToByteArray(getEditText()));
         }
         disconnect();
-        discover();
         if (mClient != null) {
             mClient.close();
             mClient = null;
