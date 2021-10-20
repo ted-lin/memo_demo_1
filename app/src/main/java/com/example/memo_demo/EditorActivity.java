@@ -1,6 +1,9 @@
 package com.example.memo_demo;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,6 +69,8 @@ public class EditorActivity extends AppCompatActivity {
     private String youtube_url = "https://www.youtube.com/embed/pS5peqApgUA";
     private int img_width = 320;
     private int video_width = 360;
+    private Uri pasteUri;
+    private String pasteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +97,41 @@ public class EditorActivity extends AppCompatActivity {
         mEditor.setHtml("");
         imgBtnInit();
     }
+
+    private void updatePasteUri() {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = clipboardManager.getPrimaryClip();
+        if (clip != null) {
+            ClipData.Item item = clip.getItemAt(0);
+
+            pasteUri = item.getUri();
+            pasteText = (String) item.getText();
+        }
+    }
+
+    private boolean copyToClipBoard(String str) {
+        // TODO use it to complete clipboard feature
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("simple text", str);
+        clipboardManager.setPrimaryClip(clipData);
+        return false;
+    }
+
+    private void updateHTMLFromClipBoardData() {
+        // TODO use it to complete clipboard feature
+        if (pasteUri != null) {
+            ContentResolver cr = getContentResolver();
+            String uriMimeType = cr.getType(pasteUri);
+            if (uriMimeType != null) {
+//            if (uriMimeType.equals(MIME_TYPE_CONTACT))
+//                Cursor pasteCursor = cr.query(uri, null, null, null, null);
+//                if (pasteCursor != null)
+//                    if (pasteCursor.moveToFirst())
+//                pasteCursor.close();
+            }
+        }
+    }
+
 
     private void imgBtnInit() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
