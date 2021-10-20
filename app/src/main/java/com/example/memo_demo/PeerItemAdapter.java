@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHolder> implements Serializable {
 
-    private List<MemoHost.ClientDeviceStatus> mClientList ;
+    private List<MemoHost.ClientDeviceStatus> mClientList;
     private PeerItemListener mListener;
 
     public PeerItemAdapter(List<MemoHost.ClientDeviceStatus> clientList) {

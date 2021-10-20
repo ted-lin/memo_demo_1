@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import jp.wasabeef.richeditor.RichEditor;
@@ -46,7 +45,6 @@ public class EditorActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE_HTML = 41;
     private static final int READ_REQUEST_CODE = 40;
     protected RichEditor mEditor;
-    private String lastString = "";
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
     private boolean hidding = false;
@@ -66,7 +64,6 @@ public class EditorActivity extends AppCompatActivity {
     private String mp3_url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
     private String video_url = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
     private String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private String youtube_url = "https://www.youtube.com/embed/pS5peqApgUA";
     private int img_width = 320;
     private int video_width = 360;
     private Uri pasteUri;

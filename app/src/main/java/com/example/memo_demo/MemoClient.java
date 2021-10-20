@@ -1,8 +1,5 @@
 package com.example.memo_demo;
 
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +9,8 @@ import com.example.wifi.GroupListener;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
-import com.example.wifi.WifiDirectListener;
-import com.example.wifi.WifiP2p;
 
-import java.lang.reflect.Constructor;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
 import jp.wasabeef.richeditor.RichEditor;
 
@@ -169,7 +161,7 @@ public class MemoClient extends EditorActivity {
     }
 
     private void disconnect() {
-       mUdpThread.leaveGroup();
+        mUdpThread.leaveGroup();
     }
 
     private void discover() {
