@@ -82,7 +82,7 @@ public class EditorActivity extends AppCompatActivity {
         imgBtnInit();
     }
 
-    private void updatePasteUri() {
+    protected void updatePasteUri() {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = clipboardManager.getPrimaryClip();
         if (clip != null) {
@@ -93,7 +93,11 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
-    private boolean copyToClipBoard(String str) {
+    protected String getPasteText() {
+        return pasteText;
+    }
+
+    protected boolean copyToClipBoard(String str) {
         // TODO use it to complete clipboard feature
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clipData = ClipData.newPlainText("simple text", str);

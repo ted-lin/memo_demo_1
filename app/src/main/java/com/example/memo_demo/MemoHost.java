@@ -273,6 +273,9 @@ public class MemoHost extends EditorActivity {
                             case StringProcessor.editor:
                                 updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                 break;
+                            case StringProcessor.clipRequest:
+                                sendPaste(ret.data);
+                                break;
                         }
                         log("[" + ret.type + "] " + ret.data);
                     }
@@ -280,6 +283,14 @@ public class MemoHost extends EditorActivity {
             }
         });
         mServer.start();
+    }
+
+    private void sendPaste(String data) {
+        updatePasteUri();
+        String result = getPasteText();
+        for (SocketThread client : mClients) {
+            client.write(StringProcessor.clipResultToByteArray(result));
+        }
     }
 
     protected void start() {

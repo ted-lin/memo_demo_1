@@ -20,7 +20,7 @@ public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     private boolean mConnected = false;
 
-    private boolean mFirstMsg = true;
+//    private boolean mFirstMsg = true;
 
     private GroupListener mGroupListener = new GroupListener() {
         @Override
@@ -53,16 +53,20 @@ public class MemoClient extends EditorActivity {
                                 ReturnMessage ret = StringProcessor.decodeByteArray(message);
                                 log("[" + ret.type + "] " + ret.data);
 
-                                if (mFirstMsg) {
-                                    updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-                                    if (mClient != null) {
-                                        mClient.write(StringProcessor.statusToByteArray("end relay\n"));
-                                    }
-                                    mFirstMsg = false;
-                                } else {
-                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                switch (ret.type) {
+                                    case StringProcessor.editor:
+                                        updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                        break;
+                                    case StringProcessor.clipResult:
+                                        updateStatusText(getPrefix() + "got clip\n" + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                        copyToClipBoard(ret.data);
+                                        break;
+                                    case StringProcessor.status:
+                                        updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                        break;
+
                                 }
+
                             }
                         });
                     }
@@ -121,33 +125,33 @@ public class MemoClient extends EditorActivity {
             }
         });
 
-        Button start = findViewById(R.id.start_relay);
-        start.setOnClickListener(new View.OnClickListener() {
+        final Button waitBtn = findViewById(R.id.start_relay);
+        waitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start();
+                waitBtn.setText("WAITING");
+                waiting();
             }
         });
-        start.setText("WAIT");
-        Button stop = findViewById(R.id.stop_relay);
-        stop.setOnClickListener(new View.OnClickListener() {
+        waitBtn.setText("WAIT");
+        Button stopBtn = findViewById(R.id.stop_relay);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stop();
             }
         });
-        stop.setText("END");
+        stopBtn.setText("END");
         Button writeTo = findViewById(R.id.write_to);
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg = getEditText();
                 if (mClient != null) {
-                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
-                    mClient.write(StringProcessor.htmlToByteArray(msg));
+                    mClient.write(StringProcessor.clipRequestToByteArray());
                 }
             }
         });
+        writeTo.setText("getServerClip");
 
         Button showList = findViewById(R.id.show_list);
         ((ViewGroup) showList.getParent()).removeView(showList);
@@ -168,17 +172,17 @@ public class MemoClient extends EditorActivity {
         mUdpThread.joinGroup();
     }
 
-    protected void start() {
+    protected void waiting() {
         updateStatusText(getPrefix() + "wait relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
-        mFirstMsg = true;
+//        mFirstMsg = true;
         discover();
         log("start finished");
 
     }
 
     protected void stop() {
-        mFirstMsg = true;
+//        mFirstMsg = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
         if (mClient != null) {
             mClient.write(StringProcessor.statusToByteArray("client stop relay\n"));
