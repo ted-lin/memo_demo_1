@@ -33,10 +33,6 @@ public class SocketThread extends Thread {
         mListener = listener;
     }
 
-    public String getConnectAddress() {
-        return mSocket.getInetAddress().getHostAddress();
-    }
-
 
     public void write(String message) {
         if (mSocket == null || mSocket.isClosed()) return;

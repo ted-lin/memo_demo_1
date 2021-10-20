@@ -1,6 +1,7 @@
 package com.example.memo_demo;
 
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,25 +10,20 @@ import android.widget.TextView;
 import com.example.wifi.WifiP2p;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHolder> implements Serializable {
 
-    private List<WifiP2pDevice> mP2pDeviceList;
+    private List<MemoHost.ClientDeviceStatus> mClientList ;
     private PeerItemListener mListener;
 
-    public PeerItemAdapter(List<WifiP2pDevice> p2pDeviceList) {
-        mP2pDeviceList = p2pDeviceList;
-    }
-
-    public void setP2pDeviceList(List<WifiP2pDevice> list) {
-        this.mP2pDeviceList = list;
-    }
-
-    public List<WifiP2pDevice> getP2pDeviceList() {
-        return mP2pDeviceList;
+    public PeerItemAdapter(List<MemoHost.ClientDeviceStatus> clientList) {
+        mClientList = clientList;
     }
 
     public void setListener(PeerItemListener listener) {
@@ -54,15 +50,15 @@ public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.deviceName.setText(mP2pDeviceList.get(position).deviceName);
-        holder.deviceAddress.setText(mP2pDeviceList.get(position).deviceAddress);
-        holder.deviceStatus.setText(WifiP2p.getConnectStatus(mP2pDeviceList.get(position).status));
+        holder.deviceName.setText(mClientList.get(position).name);
+        holder.deviceAddress.setText(mClientList.get(position).address.getHostAddress());
+        holder.deviceStatus.setText(mClientList.get(position).status.toString());
         holder.itemView.setTag(position);
     }
 
     @Override
     public int getItemCount() {
-        return mP2pDeviceList.size();
+        return mClientList.size();
     }
 
     public interface PeerItemListener {
