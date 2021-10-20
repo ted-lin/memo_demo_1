@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import androidx.core.util.Pair;
@@ -52,7 +51,6 @@ public class MemoHost extends EditorActivity {
     private Set<SocketThread> mPendingRemovedClients = new HashSet<SocketThread>();
     public PeerItemAdapter mPeerAdapter;
     private boolean mStop = false;
-    private RichEditor mEditor;
 
     private RecyclerView mRecycleView;
 
@@ -158,6 +156,17 @@ public class MemoHost extends EditorActivity {
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = getEditText();
+                log(msg);
+                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                for (SocketThread client : mClients)
+                    client.write(StringProcessor.htmlToByteArray(msg));
+            }
+        });
+
+        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+            @Override
+            public void onTextChange(String text) {
                 String msg = getEditText();
                 log(msg);
                 updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);

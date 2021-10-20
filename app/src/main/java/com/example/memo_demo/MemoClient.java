@@ -20,8 +20,8 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
+import jp.wasabeef.richeditor.RichEditor;
+
 
 public class MemoClient extends EditorActivity {
     private UdpClientThread mUdpThread;
@@ -116,6 +116,18 @@ public class MemoClient extends EditorActivity {
         mUdpThread = new UdpClientThread(getUser());
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
+
+        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+
+            @Override
+            public void onTextChange(String text) {
+                String msg = getEditText();
+                if (mClient != null) {
+                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
+                    mClient.write(StringProcessor.htmlToByteArray(msg));
+                }
+            }
+        });
 
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {

@@ -45,7 +45,7 @@ public class EditorActivity extends AppCompatActivity {
     private static final int WRITE_REQUEST_CODE = 42;
     private static final int READ_REQUEST_CODE_HTML = 41;
     private static final int READ_REQUEST_CODE = 40;
-    private RichEditor mEditor;
+    protected RichEditor mEditor;
     private String lastString = "";
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
@@ -78,19 +78,6 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         mEditor = findViewById(R.id.editor);
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            LinkedList<DiffMatchPatch.Diff> diff;
-            LinkedList<DiffMatchPatch.Patch> patch;
-
-            @Override
-            public void onTextChange(String text) {
-                //TODO realtime patch
-                diff = dmp.diffMain(lastString, text);
-                patch = dmp.patchMake(diff);
-                lastString = text;
-            }
-        });
 
         mEditor.setPadding(10, 10, 10, 10);
 
