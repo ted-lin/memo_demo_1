@@ -1,8 +1,5 @@
 package com.example.memo_demo;
 
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +9,11 @@ import com.example.wifi.GroupListener;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
-import com.example.wifi.WifiDirectListener;
-import com.example.wifi.WifiP2p;
 
-import java.lang.reflect.Constructor;
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
+import jp.wasabeef.richeditor.RichEditor;
+
 
 public class MemoClient extends EditorActivity {
     private UdpClientThread mUdpThread;
@@ -117,6 +109,18 @@ public class MemoClient extends EditorActivity {
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
 
+        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+
+            @Override
+            public void onTextChange(String text) {
+                String msg = getEditText();
+                if (mClient != null) {
+                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
+                    mClient.write(StringProcessor.htmlToByteArray(msg));
+                }
+            }
+        });
+
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,7 +161,7 @@ public class MemoClient extends EditorActivity {
     }
 
     private void disconnect() {
-       mUdpThread.leaveGroup();
+        mUdpThread.leaveGroup();
     }
 
     private void discover() {

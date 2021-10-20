@@ -183,50 +183,10 @@ public class RichEditorFragment extends Fragment {
         }
     }
 
-    private View.OnClickListener getHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            html = mEditor.getHtml();
-            textView.setText(html);
-        }
-    };
-    private View.OnClickListener saveTxt = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String str = TextHelper.toPlainTxt(lastString);
-            save_file(v, str, txtFileName);
-        }
-    };
-    private View.OnClickListener loadTxt = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String newString = load_file(v, txtFileName, true);
-            mEditor.setHtml(newString);
-            lastString = newString;
-        }
-    };
-    private View.OnClickListener loadHtml = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String newString = load_file(v, htmlFileName, false);
-            if (newString != "") {
-                mEditor.setHtml(newString);
-                lastString = newString;
-            }
-        }
-    };
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//    }
-
     public void recievePatch(byte[] patch) throws InvalidProtocolBufferException {
 
         Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(patch);
     }
-
-
 
     public void apply_patch(List<DiffMatchPatch.Patch> patches) {
         DiffMatchPatch dmp = new DiffMatchPatch();
@@ -447,13 +407,6 @@ public class RichEditorFragment extends Fragment {
             public void onClick(View v) {
                 mEditor.insertImage("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg",
                         "dachshund", 320);
-            }
-        });
-
-        view.findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertYoutubeVideo("https://www.youtube.com/embed/pS5peqApgUA");
             }
         });
 

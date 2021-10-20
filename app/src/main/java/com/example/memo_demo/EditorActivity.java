@@ -1,6 +1,9 @@
 package com.example.memo_demo;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,7 +33,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import jp.wasabeef.richeditor.RichEditor;
@@ -42,8 +44,7 @@ public class EditorActivity extends AppCompatActivity {
     private static final int WRITE_REQUEST_CODE = 42;
     private static final int READ_REQUEST_CODE_HTML = 41;
     private static final int READ_REQUEST_CODE = 40;
-    private RichEditor mEditor;
-    private String lastString = "";
+    protected RichEditor mEditor;
     private String txtFileName = "a.txt";
     private String htmlFileName = "a.html";
     private boolean hidding = false;
@@ -63,9 +64,10 @@ public class EditorActivity extends AppCompatActivity {
     private String mp3_url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
     private String video_url = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
     private String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private String youtube_url = "https://www.youtube.com/embed/pS5peqApgUA";
     private int img_width = 320;
     private int video_width = 360;
+    private Uri pasteUri;
+    private String pasteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,25 +75,47 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         mEditor = findViewById(R.id.editor);
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            LinkedList<DiffMatchPatch.Diff> diff;
-            LinkedList<DiffMatchPatch.Patch> patch;
-
-            @Override
-            public void onTextChange(String text) {
-                //TODO realtime patch
-                diff = dmp.diffMain(lastString, text);
-                patch = dmp.patchMake(diff);
-                lastString = text;
-            }
-        });
 
         mEditor.setPadding(10, 10, 10, 10);
 
         mEditor.setHtml("");
         imgBtnInit();
     }
+
+    private void updatePasteUri() {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = clipboardManager.getPrimaryClip();
+        if (clip != null) {
+            ClipData.Item item = clip.getItemAt(0);
+
+            pasteUri = item.getUri();
+            pasteText = (String) item.getText();
+        }
+    }
+
+    private boolean copyToClipBoard(String str) {
+        // TODO use it to complete clipboard feature
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("simple text", str);
+        clipboardManager.setPrimaryClip(clipData);
+        return false;
+    }
+
+    private void updateHTMLFromClipBoardData() {
+        // TODO use it to complete clipboard feature
+        if (pasteUri != null) {
+            ContentResolver cr = getContentResolver();
+            String uriMimeType = cr.getType(pasteUri);
+            if (uriMimeType != null) {
+//            if (uriMimeType.equals(MIME_TYPE_CONTACT))
+//                Cursor pasteCursor = cr.query(uri, null, null, null, null);
+//                if (pasteCursor != null)
+//                    if (pasteCursor.moveToFirst())
+//                pasteCursor.close();
+            }
+        }
+    }
+
 
     private void imgBtnInit() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
@@ -309,13 +333,6 @@ public class EditorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mEditor.insertImage(img_url, "dachshund", img_width);
-            }
-        });
-
-        findViewById(R.id.action_insert_youtube).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertYoutubeVideo(youtube_url);
             }
         });
 

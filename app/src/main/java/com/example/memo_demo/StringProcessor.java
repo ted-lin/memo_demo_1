@@ -7,6 +7,8 @@ public class StringProcessor {
 
     static final int status = 0;
     static final int editor = 1;
+    static final int clipResult = 2;
+    static final int clipRequest = 3;
 
     static byte[] htmlToByteArray(String data) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
@@ -20,6 +22,21 @@ public class StringProcessor {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
                 .setMessageType(status)
+                .build();
+        return editorMessage.toByteArray();
+    }
+
+    static byte[] clipResultToByteArray(String data) {
+        Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
+                .setData(data)
+                .setMessageType(clipResult)
+                .build();
+        return editorMessage.toByteArray();
+    }
+
+    static byte[] clipRequestToByteArray() {
+        Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
+                .setMessageType(clipRequest)
                 .build();
         return editorMessage.toByteArray();
     }

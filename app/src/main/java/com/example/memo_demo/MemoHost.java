@@ -1,13 +1,6 @@
 package com.example.memo_demo;
 
-import android.net.MacAddress;
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,24 +11,16 @@ import com.example.wifi.SocketConfig;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpServerThread;
-import com.example.wifi.WifiDirectListener;
-import com.example.wifi.WifiP2p;
-
-import org.junit.Assert;
 
 import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import jp.wasabeef.richeditor.RichEditor;
 
 public class MemoHost extends EditorActivity {
@@ -52,7 +37,6 @@ public class MemoHost extends EditorActivity {
     private Set<SocketThread> mPendingRemovedClients = new HashSet<SocketThread>();
     public PeerItemAdapter mPeerAdapter;
     private boolean mStop = false;
-    private RichEditor mEditor;
 
     private RecyclerView mRecycleView;
 
@@ -69,12 +53,11 @@ public class MemoHost extends EditorActivity {
     }
 
 
-
     private GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
 
-            }
+        }
 
         @Override
         public void obGroupHostDisConnect(InetAddress hostAddress, String user) {
@@ -84,7 +67,7 @@ public class MemoHost extends EditorActivity {
         @Override
         public void onGroupClientConnect(InetAddress clientAddress, String user) {
             boolean found = false;
-            for(int i = 0; i < mClientList.size(); i++) {
+            for (int i = 0; i < mClientList.size(); i++) {
                 if (mClientList.get(i).address.getHostAddress().equals(clientAddress.getHostAddress())) {
                     mClientList.get(i).status = SocketConfig.WifiDeviceStatus.Available;
                     found = true;
@@ -101,14 +84,14 @@ public class MemoHost extends EditorActivity {
         @Override
         public void onGroupClientDisConnect(InetAddress clientAddress, String user) {
             int i = 0;
-            for(; i < mClientList.size(); i++) {
+            for (; i < mClientList.size(); i++) {
                 if (mClientList.get(i).address.getHostAddress().equals(clientAddress.getHostAddress())) {
                     break;
 
                 }
             }
 
-            if(i!= mClientList.size()) {
+            if (i != mClientList.size()) {
                 mClientList.remove(i);
             }
 
@@ -155,9 +138,21 @@ public class MemoHost extends EditorActivity {
         });
 
         Button writeTo = findViewById(R.id.write_to);
+
         writeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String msg = getEditText();
+                log(msg);
+                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                for (SocketThread client : mClients)
+                    client.write(StringProcessor.htmlToByteArray(msg));
+            }
+        });
+
+        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
+            @Override
+            public void onTextChange(String text) {
                 String msg = getEditText();
                 log(msg);
                 updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -234,7 +229,7 @@ public class MemoHost extends EditorActivity {
             public void onAdded(SocketThread socketThread) {
                 log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
 
-                for(int i = 0; i < mClientList.size(); i++) {
+                for (int i = 0; i < mClientList.size(); i++) {
                     if (mClientList.get(i).address.getHostAddress().equals(socketThread.getHostAddress())) {
                         mClientList.get(i).status = SocketConfig.WifiDeviceStatus.Connected;
 
@@ -251,7 +246,7 @@ public class MemoHost extends EditorActivity {
                         String msg = getEditText();
                         log(msg);
                         updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                        for (SocketThread client: mClients)
+                        for (SocketThread client : mClients)
                             client.write(StringProcessor.htmlToByteArray(msg));
                     }
                 });
