@@ -24,12 +24,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,13 +34,7 @@ import jp.wasabeef.richeditor.RichEditor;
 public class EditorActivity extends AppCompatActivity {
 
     public static final String TAG = "EditorActivity";
-    private static final int WRITE_REQUEST_CODE_HTML = 43;
-    private static final int WRITE_REQUEST_CODE = 42;
-    private static final int READ_REQUEST_CODE_HTML = 41;
-    private static final int READ_REQUEST_CODE = 40;
     protected RichEditor mEditor;
-    private String txtFileName = "a.txt";
-    private String htmlFileName = "a.html";
     private boolean hidding = false;
     int margin_origin_index = 0;
     int margin_new_index = 1;
@@ -66,14 +54,17 @@ public class EditorActivity extends AppCompatActivity {
     private String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
     private int img_width = 320;
     private int video_width = 360;
-    private Uri pasteUri;
-    private String pasteText;
+    protected Uri pasteUri;
+    protected String pasteText;
+    protected MemoFileManager memoFileManager = null;
+    protected EditorRequestHandler requestHandler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-
+        memoFileManager = new MemoFileManager();
+        requestHandler = new EditorRequestHandler();
         mEditor = findViewById(R.id.editor);
 
         mEditor.setPadding(10, 10, 10, 10);
@@ -369,25 +360,25 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.saveImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createFile("text/html", htmlFileName, true);
+                memoFileManager.createFile("text/html", "a.html", true);
             }
         });
         findViewById(R.id.saveTxtImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createFile("text/plain", txtFileName, false);
+                memoFileManager.createFile("text/plain", "a.txt", false);
             }
         });
         findViewById(R.id.loadImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openFile("text/html", true);
+                memoFileManager.openFile("text/html", true);
             }
         });
         findViewById(R.id.loadTxtImg).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openFile("text/plain", false);
+                memoFileManager.openFile("text/plain", false);
             }
         });
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
@@ -628,107 +619,14 @@ public class EditorActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    private void openFile(String mimeType, boolean isHtml) {
-
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(mimeType);
-        if (isHtml) {
-            startActivityForResult(intent, READ_REQUEST_CODE_HTML);
-        } else {
-            startActivityForResult(intent, READ_REQUEST_CODE);
-        }
-    }
-
-    private void createFile(String mimeType, String fileName, boolean isHtml) {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(mimeType);
-        intent.putExtra(Intent.EXTRA_TITLE, fileName);
-        if (isHtml) {
-            startActivityForResult(intent, WRITE_REQUEST_CODE_HTML);
-        } else {
-            startActivityForResult(intent, WRITE_REQUEST_CODE);
-        }
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode != RESULT_OK)
+        if (resultCode != RESULT_OK || data == null)
             return;
-        switch (requestCode) {
-            case WRITE_REQUEST_CODE: {
-                if (data != null) {
-                    Uri uri = data.getData();
-                    if (uri != null) {
-                        save_file(uri, TextHelper.toPlainTxt(mEditor.getHtml()));
-                    }
-                }
-                break;
-            }
-            case WRITE_REQUEST_CODE_HTML: {
-                if (data != null) {
-                    Uri uri = data.getData();
-                    if (uri != null) {
-                        save_file(uri, mEditor.getHtml());
-                    }
-                }
-                break;
-            }
-            case READ_REQUEST_CODE: {
-                if (data != null) {
-                    Uri uri = data.getData();
-                    if (uri != null) {
-                        load_file(uri, false);
-                    }
-                }
-                break;
-            }
-            case READ_REQUEST_CODE_HTML: {
-                if (data != null) {
-                    Uri uri = data.getData();
-                    if (uri != null) {
-                        load_file(uri, true);
-                    }
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    private void load_file(Uri uri, Boolean isHtml) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            byte[] bytes = new byte[1024];
-            FileInputStream fins = (FileInputStream) getContentResolver().openInputStream(uri);
-            while (fins.read(bytes) != -1) {
-                stringBuilder.append(new String(bytes));
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            String fileContents = stringBuilder.toString();
-            if (isHtml)
-                mEditor.setHtml(fileContents);
-            else
-                mEditor.setHtml(TextHelper.toHtml(fileContents));
-        }
-    }
-
-    private void save_file(Uri uri, String text) {
-        try {
-            byte[] bytes = text.getBytes();
-            FileOutputStream fos = (FileOutputStream) getContentResolver().openOutputStream(uri);
-            fos.write(bytes);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Uri uri = data.getData();
+        if (uri == null)
+            return;
+        requestHandler.handleRequestCode(requestCode, uri);
     }
 }
