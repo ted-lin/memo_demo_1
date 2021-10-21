@@ -13,21 +13,20 @@ public class Dialog {
         this.editorActivity = editorActivity;
     }
 
-    void checkDialog(String positiveString, String negativeString, String title,
-                     DialogInterface.OnClickListener positiveListener,
-                     DialogInterface.OnClickListener negativeListener) {
+    void newFile(DialogInterface.OnClickListener positiveListener,
+                 DialogInterface.OnClickListener negativeListener) {
         // TODO need to fix link problem
         AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
         builder.setCancelable(false);
         View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_new, null, false);
         builder.setView(view);
-        builder.setTitle(title);
-        builder.setPositiveButton(positiveString, positiveListener);
-        builder.setNegativeButton(negativeString, negativeListener);
+        builder.setTitle("New file log");
+        builder.setPositiveButton("OK", positiveListener);
+        builder.setNegativeButton("cancel", negativeListener);
         builder.create().show();
     }
 
-    void showLinkDialog() {
+    void showLink(String content) {
         // TODO need to fix link problem
         AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
         builder.setCancelable(false);
@@ -37,24 +36,19 @@ public class Dialog {
         final EditText editText = view.findViewById(R.id.link_content);
         builder.setView(view);
         builder.setTitle("Insert link");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String url = link.getText().toString().trim();
-                String content = editText.getText().toString().trim();
-                if (TextUtils.isEmpty(url) || TextUtils.isEmpty(content)) {
+        editText.setText(content);
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String url = link.getText().toString().trim();
+            String content1 = editText.getText().toString().trim();
+            if (TextUtils.isEmpty(url) || TextUtils.isEmpty(content1)) {
 
-                    return;
-                }
-                editorActivity.mEditor.insertLink(url, content);
+                return;
             }
+            editorActivity.mEditor.insertLink(url, content1);
         });
 
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // DO NOTHING HERE
-            }
+        builder.setNegativeButton("cancel", (dialog, which) -> {
+            // DO NOTHING HERE
         });
 
         builder.create().show();

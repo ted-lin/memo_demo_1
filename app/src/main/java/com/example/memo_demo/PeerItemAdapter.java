@@ -1,25 +1,20 @@
 package com.example.memo_demo;
 
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.wifi.WifiP2p;
 
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHolder> implements Serializable {
 
-    private List<MemoHost.ClientDeviceStatus> mClientList;
+    private final List<MemoHost.ClientDeviceStatus> mClientList;
     private PeerItemListener mListener;
 
     public PeerItemAdapter(List<MemoHost.ClientDeviceStatus> clientList) {
@@ -34,15 +29,13 @@ public class PeerItemAdapter extends RecyclerView.Adapter<PeerItemAdapter.ViewHo
         return mListener;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.peer_item, parent, false);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onItemClick((int) view.getTag());
-                }
+        view.setOnClickListener(view1 -> {
+            if (mListener != null) {
+                mListener.onItemClick((int) view1.getTag());
             }
         });
         return new ViewHolder(view);

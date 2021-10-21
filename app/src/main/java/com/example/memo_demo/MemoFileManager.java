@@ -4,12 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MemoFileManager {
-    private EditorActivity editorActivity;
+    private final EditorActivity editorActivity;
     public MemoFileManager(EditorActivity editorActivity) {
         this.editorActivity = editorActivity;
     }
@@ -18,9 +17,9 @@ public class MemoFileManager {
         try {
             byte[] bytes = text.getBytes();
             FileOutputStream fos = (FileOutputStream) editorActivity.getContentResolver().openOutputStream(uri);
-            fos.write(bytes);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            if (fos != null) {
+                fos.write(bytes);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -31,20 +30,20 @@ public class MemoFileManager {
         try {
             byte[] bytes = new byte[1024];
             FileInputStream fins = (FileInputStream) editorActivity.getContentResolver().openInputStream(uri);
-            while (fins.read(bytes) != -1) {
-                stringBuilder.append(new String(bytes));
+            if (fins != null) {
+                while (fins.read(bytes) != -1) {
+                    stringBuilder.append(new String(bytes));
+                }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
             String fileContents = stringBuilder.toString();
             if (isHtml)
                 return fileContents;
             else
                 return TextHelper.toHtml(fileContents);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return "";
     }
 
     public void openFile(String mimeType, boolean isHtml) {

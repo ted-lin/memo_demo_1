@@ -19,7 +19,7 @@ public class MemoInfo implements Parcelable {
                 }
             };
     static final String TAG = "MemoInfo";
-    int type = 0;
+    int type;
     String msg;
     String user;
 

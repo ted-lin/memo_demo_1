@@ -21,7 +21,7 @@ public class TextHelper {
                 .replaceAll(">", "&gt;")
                 .replaceAll("¥", "&yen;")
                 .replaceAll("\"", "&quot;")
-                .replaceAll("\'", "&apos;")
+                .replaceAll("'", "&apos;")
                 .replaceAll("\n", "<br>");
     }
 }
