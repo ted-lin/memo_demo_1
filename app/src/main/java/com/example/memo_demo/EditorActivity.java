@@ -1,6 +1,5 @@
 package com.example.memo_demo;
 
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -10,14 +9,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -58,18 +55,19 @@ public class EditorActivity extends AppCompatActivity {
     protected String pasteText;
     protected MemoFileManager memoFileManager = null;
     protected EditorRequestHandler requestHandler = null;
+    protected Dialog dialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        memoFileManager = new MemoFileManager();
-        requestHandler = new EditorRequestHandler();
+        memoFileManager = new MemoFileManager(this);
+        requestHandler = new EditorRequestHandler(this, memoFileManager);
+
         mEditor = findViewById(R.id.editor);
-
         mEditor.setPadding(10, 10, 10, 10);
-
         mEditor.setHtml("");
+        dialog = new Dialog(this);
         imgBtnInit();
     }
 
@@ -348,7 +346,7 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showLinkDialog();
+                dialog.showLinkDialog();
             }
         });
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
@@ -381,10 +379,21 @@ public class EditorActivity extends AppCompatActivity {
                 memoFileManager.openFile("text/plain", false);
             }
         });
+
         findViewById(R.id.new_file).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                newfile_check_dialog();
+                dialog.checkDialog("OK", "cancel", "New file log", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        clearNote();
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // DO NOTHING HERE
+                    }
+                });
             }
         });
 
@@ -405,37 +414,6 @@ public class EditorActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void showLinkDialog() {
-        // TODO need to fix link problem
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-
-        View view = getLayoutInflater().inflate(R.layout.dialog_link, null, false);
-        final EditText editText = view.findViewById(R.id.edit);
-        builder.setView(view);
-        builder.setTitle("Insert link");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String link = editText.getText().toString().trim();
-                if (TextUtils.isEmpty(link)) {
-
-                    return;
-                }
-                mEditor.insertLink("https://github.com/wasabeef", link);
-            }
-        });
-
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // DO NOTHING HERE
-            }
-        });
-
-        builder.create().show();
     }
 
     /* basic */
@@ -594,29 +572,8 @@ public class EditorActivity extends AppCompatActivity {
         return "";
     }
 
-    private void newfile_check_dialog() {
-        // TODO need to fix link problem
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-
-        View view = getLayoutInflater().inflate(R.layout.dialog_new, null, false);
-        builder.setView(view);
-        builder.setTitle("New file log");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mEditor.setHtml("");
-            }
-        });
-
-        builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // DO NOTHING HERE
-            }
-        });
-
-        builder.create().show();
+    private void clearNote() {
+        mEditor.setHtml("");
     }
 
 
