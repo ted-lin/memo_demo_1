@@ -241,12 +241,17 @@ public class MemoHost extends EditorActivity {
                             break;
                         case StringProcessor.editor:
                             updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            /* broadcast to other client */
+                            for (SocketThread client : mClients) {
+                                if (client != socketThread)
+                                    client.write(StringProcessor.htmlToByteArray(ret.data));
+                            }
                             break;
                         case StringProcessor.clipRequest:
                             sendPaste();
                             break;
                     }
-                    log("[" + StringProcessor.getType(ret.type) + "] " + ret.data);
+                    //log("[" + StringProcessor.getType(ret.type) + "] " + ret.data);
                 });
             }
         });
