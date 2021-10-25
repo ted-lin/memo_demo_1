@@ -2,15 +2,53 @@ package com.example.memo_demo;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class MemoFileManager {
     private final EditorActivity editorActivity;
     public MemoFileManager(EditorActivity editorActivity) {
         this.editorActivity = editorActivity;
+    }
+
+
+    protected String quick_load() {
+        String file_name = "quick_save.html";
+        File docDir = editorActivity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File inPutFile = new File(docDir, file_name);
+            StringBuilder stringBuilder = new StringBuilder();
+            try {
+                FileReader fr = new FileReader(inPutFile);
+                BufferedReader br = new BufferedReader(fr);
+                String line = br.readLine();
+                while (line != null) {
+                    stringBuilder.append(line).append('\n');
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return stringBuilder.toString();
+        }
+        return "";
+    }
+
+    protected void quick_save(String str) {
+        String file_name = "quick_save.html";
+        File docDir = editorActivity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File outPutFile = new File(docDir, file_name);
+            try {
+                FileOutputStream fos = new FileOutputStream(outPutFile);
+                byte[] bytes;
+                bytes = str.getBytes();
+                fos.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void saveToFile(Uri uri, String text) {

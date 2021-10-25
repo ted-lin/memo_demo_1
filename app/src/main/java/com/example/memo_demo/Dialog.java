@@ -1,10 +1,12 @@
 package com.example.memo_demo;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class Dialog {
     EditorActivity editorActivity;
@@ -13,14 +15,31 @@ public class Dialog {
         this.editorActivity = editorActivity;
     }
 
+    @SuppressLint("SetTextI18n")
     void newFile(DialogInterface.OnClickListener positiveListener,
                  DialogInterface.OnClickListener negativeListener) {
         // TODO need to fix link problem
         AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
         builder.setCancelable(false);
-        View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_new, null, false);
+        View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_check_box, null, false);
+        ((TextView) view.findViewById(R.id.checkboxTextView)).setText("Clear the editor?");
         builder.setView(view);
         builder.setTitle("New file log");
+        builder.setPositiveButton("OK", positiveListener);
+        builder.setNegativeButton("cancel", negativeListener);
+
+        builder.create().show();
+    }
+
+    @SuppressLint("SetTextI18n")
+    void recoverCover(DialogInterface.OnClickListener positiveListener,
+                      DialogInterface.OnClickListener negativeListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
+        builder.setCancelable(false);
+        View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_check_box, null, false);
+        ((TextView) view.findViewById(R.id.checkboxTextView)).setText("Recover last editor file?");
+        builder.setView(view);
+        builder.setTitle("Recover box");
         builder.setPositiveButton("OK", positiveListener);
         builder.setNegativeButton("cancel", negativeListener);
         builder.create().show();

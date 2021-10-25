@@ -67,12 +67,11 @@ public class EditorActivity extends AppCompatActivity {
         requestHandler = new EditorRequestHandler(this, memoFileManager);
 
         mEditor = findViewById(R.id.editor);
-//        mEditor.setInputEnabled(false);
         mEditor.setPadding(10, 10, 10, 10);
-        mEditor.setHtml("");
         dialog = new Dialog(this);
         imgBtnInit();
     }
+
 
     protected void updatePasteUri() {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
