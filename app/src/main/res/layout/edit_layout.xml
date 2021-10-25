@@ -5,7 +5,7 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
-                                                   tools:showIn="@layout/activity_memo_main">
+                                                   tools:showIn="@layout/activity_main">
 
 
     <LinearLayout
@@ -19,11 +19,8 @@
             tools:layout_editor_absoluteX="16dp">
         <com.example.memo_demo.RichEditorX
                 android:id="@+id/editor"
-                android:layout_width="match_parent" android:layout_height="match_parent"/>
-        <!--        <jp.wasabeef.richeditor.RichEditor-->
-        <!--            android:id="@+id/editor"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="match_parent" />-->
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
     </LinearLayout>
 

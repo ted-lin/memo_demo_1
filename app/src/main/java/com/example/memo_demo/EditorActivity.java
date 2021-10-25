@@ -27,11 +27,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-//import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
 
-    public static final String TAG = "EditorActivity";
+    public static final String TAG = "HyperMemo";
     protected RichEditorX mEditor;
     private boolean hiding = false;
     int margin_origin_index = 0;
