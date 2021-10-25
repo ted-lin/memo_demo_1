@@ -52,12 +52,11 @@ public class UdpServerThread extends Thread {
 
     @Override
     public void run() {
-        while(!mExit) {
-            try  {
-                mSocket = new MulticastSocket(MULTI_CAST_PORT);
-                InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
-                mSocket.joinGroup(group);
-
+        try {
+            mSocket = new MulticastSocket(MULTI_CAST_PORT);
+            InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
+            mSocket.joinGroup(group);
+            while(!mExit) {
                 byte[] recvBuffer = new byte[512];
                 DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
                 mSocket.receive(packet);
@@ -85,11 +84,9 @@ public class UdpServerThread extends Thread {
                         mListener.onGroupClientDisConnect(packet.getAddress(), host);
                     }
                 }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         if (mSocket != null) {
