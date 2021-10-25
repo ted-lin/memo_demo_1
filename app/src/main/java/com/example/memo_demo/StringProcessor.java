@@ -10,6 +10,15 @@ public class StringProcessor {
     static final int clipResult = 2;
     static final int clipRequest = 3;
 
+    static String getType(int type) {
+        switch (type) {
+            case status: return "Status";
+            case editor: return "Editor";
+            case clipResult: return "ClipResult";
+            case clipRequest: return "ClipRequest";
+        }
+        return "Unknown";
+    }
     static byte[] htmlToByteArray(String data) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)

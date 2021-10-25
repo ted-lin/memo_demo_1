@@ -279,13 +279,15 @@ public class EditorActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void init(Intent intent) {
-        Log.e(TAG, "created");
+
 
         MemoInfo memoInfo = intent.getParcelableExtra(MainActivity.MEMO_EXTRA);
         if (memoInfo != null) {
             mMode = memoInfo.type == MainActivity.MEMO_HOST ? "Host" : "Client";
             mUser = memoInfo.user;
         }
+
+        Log.e(TAG, mMode + " created");
 
         TextView title = findViewById(R.id.textViewTitle);
         title.setText("Hi " + mUser + ", you are running as " + mMode + " Mode");
@@ -318,7 +320,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
         public void onFocusChange(View v, boolean hasFocus) {
-            log("touch");
+            //log("touch");
             if (v.getId() == R.id.editor && !hasFocus) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (null != imm)

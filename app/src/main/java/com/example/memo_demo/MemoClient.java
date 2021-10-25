@@ -50,16 +50,20 @@ public class MemoClient extends EditorActivity {
                             ReturnMessage ret = StringProcessor.decodeByteArray(message);
                             log("[" + ret.type + "] " + ret.data);
 
+                            //mClient.write(StringProcessor.statusToByteArray("client gg\n"));
+
                             switch (ret.type) {
                                 case StringProcessor.editor:
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.clipResult:
-                                    updateStatusText(getPrefix() + "got clip\n" + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                    updateStatusText(getPrefix() + "got clip: [" + ret.data + "]\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     copyToClipBoard(ret.data);
                                     break;
                                 case StringProcessor.status:
+                                    //updateStatusText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                    mClient.write(StringProcessor.statusToByteArray("end relay\n"));
                                     break;
 
                             }
@@ -113,7 +117,8 @@ public class MemoClient extends EditorActivity {
         mEditor.setOnTextChangeListener(text -> {
             String msg = getEditText();
             if (mClient != null) {
-                mClient.write(StringProcessor.statusToByteArray("client send back\n"));
+                //mClient.write(StringProcessor.statusToByteArray("client send back\n"));
+                log("client send back\n");
                 mClient.write(StringProcessor.htmlToByteArray(msg));
             }
         });

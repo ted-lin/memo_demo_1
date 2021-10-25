@@ -131,8 +131,9 @@ public class MemoHost extends EditorActivity {
 
         mEditor.setOnTextChangeListener(text -> {
             String msg = getEditText();
-            log(msg);
-            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            //log(msg);
+            //if (mClients.size() > 0)
+            //    updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
             for (SocketThread client : mClients)
                 client.write(StringProcessor.htmlToByteArray(msg));
         });
@@ -214,8 +215,10 @@ public class MemoHost extends EditorActivity {
                     String msg = getEditText();
                     log(msg);
                     updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                    for (SocketThread client : mClients)
+                    for (SocketThread client : mClients) {
+                        client.write(StringProcessor.statusToByteArray("send relay\n"));
                         client.write(StringProcessor.htmlToByteArray(msg));
+                    }
                 });
             }
 
@@ -238,12 +241,17 @@ public class MemoHost extends EditorActivity {
                             break;
                         case StringProcessor.editor:
                             updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            /* broadcast to other client */
+                            for (SocketThread client : mClients) {
+                                if (client != socketThread)
+                                    client.write(StringProcessor.htmlToByteArray(ret.data));
+                            }
                             break;
                         case StringProcessor.clipRequest:
                             sendPaste();
                             break;
                     }
-                    log("[" + ret.type + "] " + ret.data);
+                    //log("[" + StringProcessor.getType(ret.type) + "] " + ret.data);
                 });
             }
         });
