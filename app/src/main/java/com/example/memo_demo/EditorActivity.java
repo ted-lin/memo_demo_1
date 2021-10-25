@@ -27,12 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import jp.wasabeef.richeditor.RichEditor;
+//import jp.wasabeef.richeditor.RichEditor;
 
 public class EditorActivity extends AppCompatActivity {
 
     public static final String TAG = "EditorActivity";
-    protected RichEditor mEditor;
+    protected RichEditorX mEditor;
     private boolean hiding = false;
     int margin_origin_index = 0;
     int margin_new_index = 1;
@@ -58,6 +58,7 @@ public class EditorActivity extends AppCompatActivity {
     protected EditorRequestHandler requestHandler = null;
     protected Dialog dialog = null;
     private String content;
+    boolean editorMode = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class EditorActivity extends AppCompatActivity {
         requestHandler = new EditorRequestHandler(this, memoFileManager);
 
         mEditor = findViewById(R.id.editor);
+//        mEditor.setInputEnabled(false);
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setHtml("");
         dialog = new Dialog(this);
@@ -121,6 +123,18 @@ public class EditorActivity extends AppCompatActivity {
     private void imgBtnInit() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         margin[margin_origin_index] = params.topMargin;
+
+        findViewById(R.id.mode_btn).setOnClickListener(v -> {
+            mEditor.focusEditor();
+            editorMode = !editorMode;
+            mEditor.setInputEnabled(editorMode);
+            if (editorMode) {
+                ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
+            } else {
+                ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
+            }
+        });
+
         findViewById(R.id.action_undo).setOnClickListener(v -> {
             mEditor.focusEditor();
             mEditor.undo();
