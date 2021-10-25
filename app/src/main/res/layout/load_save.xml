@@ -11,6 +11,14 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
+        <ImageButton
+                android:id="@+id/mode_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/e" />
 
         <ImageButton
             android:id="@+id/action_undo"
