@@ -21,6 +21,14 @@ public class RichEditorX extends RichEditor {
         loadUrl("file:///android_asset/editor.html");
     }
 
+    @Override
+    public String getHtml() {
+        if (super.getHtml() != null) {
+            return super.getHtml();
+        } else {
+            return "";
+        }
+    }
 
     private static final String CALLBACK_SCHEME = "re-callback://";
     private static final String STATE_SCHEME = "re-state://";
