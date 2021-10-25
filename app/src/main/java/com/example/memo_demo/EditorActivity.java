@@ -67,12 +67,11 @@ public class EditorActivity extends AppCompatActivity {
         requestHandler = new EditorRequestHandler(this, memoFileManager);
 
         mEditor = findViewById(R.id.editor);
-//        mEditor.setInputEnabled(false);
         mEditor.setPadding(10, 10, 10, 10);
-        mEditor.setHtml("");
         dialog = new Dialog(this);
         imgBtnInit();
     }
+
 
     protected void updatePasteUri() {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -253,9 +252,9 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.loadImg).setOnClickListener(view -> memoFileManager.openFile("text/html", true));
         findViewById(R.id.loadTxtImg).setOnClickListener(view -> memoFileManager.openFile("text/plain", false));
 
-        findViewById(R.id.new_file).setOnClickListener(view -> dialog.newFile((dialog, which) -> clearNote(), (dialog, which) -> {
+        findViewById(R.id.new_file).setOnClickListener(view -> dialog.checkBox((dialog, which) -> clearNote(), (dialog, which) -> {
             // DO NOTHING HERE
-        }));
+        }, "New file log", "Clear the editor?"));
 
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;

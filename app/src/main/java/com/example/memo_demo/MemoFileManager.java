@@ -2,15 +2,54 @@ package com.example.memo_demo;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class MemoFileManager {
     private final EditorActivity editorActivity;
+    private final String quick_save_file_name;
+    private final File externalFilesDir;
+
     public MemoFileManager(EditorActivity editorActivity) {
         this.editorActivity = editorActivity;
+        quick_save_file_name = "quick_save.html";
+        externalFilesDir = editorActivity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+    }
+
+
+    protected String quick_load() {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File inPutFile = new File(externalFilesDir, quick_save_file_name);
+            StringBuilder stringBuilder = new StringBuilder();
+            try {
+                FileReader fr = new FileReader(inPutFile);
+                BufferedReader br = new BufferedReader(fr);
+                String line = br.readLine();
+                while (line != null) {
+                    stringBuilder.append(line).append('\n');
+                    line = br.readLine();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return stringBuilder.toString();
+        }
+        return "";
+    }
+
+    protected void quick_save(String str) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File outPutFile = new File(externalFilesDir, quick_save_file_name);
+            try {
+                FileOutputStream fos = new FileOutputStream(outPutFile);
+                byte[] bytes;
+                bytes = str.getBytes();
+                fos.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void saveToFile(Uri uri, String text) {

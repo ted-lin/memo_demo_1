@@ -1,10 +1,12 @@
 package com.example.memo_demo;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class Dialog {
     EditorActivity editorActivity;
@@ -13,14 +15,15 @@ public class Dialog {
         this.editorActivity = editorActivity;
     }
 
-    void newFile(DialogInterface.OnClickListener positiveListener,
-                 DialogInterface.OnClickListener negativeListener) {
-        // TODO need to fix link problem
+    @SuppressLint("SetTextI18n")
+    void checkBox(DialogInterface.OnClickListener positiveListener,
+                  DialogInterface.OnClickListener negativeListener, String title, String text) {
         AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
         builder.setCancelable(false);
-        View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_new, null, false);
+        View view = editorActivity.getLayoutInflater().inflate(R.layout.dialog_check_box, null, false);
+        ((TextView) view.findViewById(R.id.checkboxTextView)).setText(text);
         builder.setView(view);
-        builder.setTitle("New file log");
+        builder.setTitle(title);
         builder.setPositiveButton("OK", positiveListener);
         builder.setNegativeButton("cancel", negativeListener);
         builder.create().show();
