@@ -19,7 +19,6 @@ import androidx.core.app.ActivityCompat;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    public static final String EXTRA_MESSAGE = "com.example.memo_demo.MESSAGE";
     public static final String MEMO_EXTRA = "memo_extra";
 
     private static final int REQ_WIFI_DIRECT_PERMISSION = 5566;
@@ -29,19 +28,19 @@ public class MainActivity extends AppCompatActivity {
     public static final int MEMO_HOST = 1;
     public static final int MEMO_CLIENT = 2;
 
-    private boolean mPermissaionValid = false;
+    private boolean mPermissionValid = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /* hidding keybox after without focus */
+        /* hiding keyboard after without focus */
         EditText editText = findViewById(R.id.editText);
         View.OnFocusChangeListener ofcListener = new MainActivity.MainFocusChangeListener();
         editText.setOnFocusChangeListener(ofcListener);
 
-        /* acquire reletive permission for connection */
+        /* acquire relative permission for connection */
         performPermissionGrant();
 
     }
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     showToast("permission failure: " + permissions[i]);
                     Log.e(TAG, "set to false");
-                    mPermissaionValid = false;
+                    mPermissionValid = false;
 
                     return;
                 }
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
 
             showToast("permission pass");
-            mPermissaionValid = true;
+            mPermissionValid = true;
             //permissionComplete = true;
             Log.e(TAG, "set to true " + grantResults.length);
         }
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateName() {
-        EditText editView = (EditText) findViewById(R.id.editText);
+        EditText editView = findViewById(R.id.editText);
         String string = editView.getText().toString();
         user = string.length() > 0 ? string : "User";
     }
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     public void asHost(View v) {
         updateName();
         performPermissionGrant();
-        if (!mPermissaionValid) {
+        if (!mPermissionValid) {
             showToast("permission failure");
             return;
         }
@@ -123,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     public void asClient(View v) {
         updateName();
         performPermissionGrant();
-        if (!mPermissaionValid) {
+        if (!mPermissionValid) {
             showToast("permission failure");
             return;
         }

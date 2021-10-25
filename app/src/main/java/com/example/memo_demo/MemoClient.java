@@ -1,7 +1,7 @@
 package com.example.memo_demo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
@@ -12,7 +12,6 @@ import com.example.wifi.UdpClientThread;
 
 import java.net.InetAddress;
 
-import jp.wasabeef.richeditor.RichEditor;
 
 
 public class MemoClient extends EditorActivity {
@@ -20,9 +19,7 @@ public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     private boolean mConnected = false;
 
-    private boolean mFirstMsg = true;
-
-    private GroupListener mGroupListener = new GroupListener() {
+    private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
             log(String.format("group connect %s,%s", user, hostAddress.getHostAddress()));
@@ -30,11 +27,13 @@ public class MemoClient extends EditorActivity {
 
             if (mClient == null) {
                 mClient = new SocketThread(hostAddress, new SocketListener() {
+                    @SuppressLint("DefaultLocale")
                     @Override
                     public void onAdded(SocketThread socketThread) {
                         log(String.format("Socket add: %s %d", socketThread.getHostAddress(), socketThread.getPort()));
                     }
 
+                    @SuppressLint("DefaultLocale")
                     @Override
                     public void onRemoved(SocketThread socketThread) {
                         if (mClient != null) {
@@ -47,23 +46,24 @@ public class MemoClient extends EditorActivity {
 
                     @Override
                     public void onRead(final SocketThread socketThread, final byte[] message) {
-                        MemoClient.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                ReturnMessage ret = StringProcessor.decodeByteArray(message);
-                                log("[" + ret.type + "] " + ret.data);
+                        MemoClient.this.runOnUiThread(() -> {
+                            ReturnMessage ret = StringProcessor.decodeByteArray(message);
+                            log("[" + ret.type + "] " + ret.data);
 
-                                if (mFirstMsg) {
+                            switch (ret.type) {
+                                case StringProcessor.editor:
+                                    updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                    break;
+                                case StringProcessor.clipResult:
+                                    updateStatusText(getPrefix() + "got clip\n" + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                    copyToClipBoard(ret.data);
+                                    break;
+                                case StringProcessor.status:
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-                                    if (mClient != null) {
-                                        mClient.write(StringProcessor.statusToByteArray("end relay\n"));
-                                    }
-                                    mFirstMsg = false;
-                                } else {
-                                    updateEditText(ret.data + "\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                }
+                                    break;
+
                             }
+
                         });
                     }
                 });
@@ -99,6 +99,7 @@ public class MemoClient extends EditorActivity {
     };
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,45 +110,30 @@ public class MemoClient extends EditorActivity {
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
 
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-
-            @Override
-            public void onTextChange(String text) {
-                String msg = getEditText();
-                if (mClient != null) {
-                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
-                    mClient.write(StringProcessor.htmlToByteArray(msg));
-                }
+        mEditor.setOnTextChangeListener(text -> {
+            String msg = getEditText();
+            if (mClient != null) {
+                mClient.write(StringProcessor.statusToByteArray("client send back\n"));
+                mClient.write(StringProcessor.htmlToByteArray(msg));
             }
         });
 
-        Button start = findViewById(R.id.start_relay);
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start();
-            }
+        final Button waitBtn = findViewById(R.id.start_relay);
+        waitBtn.setOnClickListener(v -> {
+            waitBtn.setText("WAITING");
+            waiting();
         });
-        start.setText("WAIT");
-        Button stop = findViewById(R.id.stop_relay);
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stop();
-            }
-        });
-        stop.setText("END");
+        waitBtn.setText("WAIT");
+        Button stopBtn = findViewById(R.id.stop_relay);
+        stopBtn.setOnClickListener(v -> stop());
+        stopBtn.setText("END");
         Button writeTo = findViewById(R.id.write_to);
-        writeTo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String msg = getEditText();
-                if (mClient != null) {
-                    mClient.write(StringProcessor.statusToByteArray("client send back\n"));
-                    mClient.write(StringProcessor.htmlToByteArray(msg));
-                }
+        writeTo.setOnClickListener(v -> {
+            if (mClient != null) {
+                mClient.write(StringProcessor.clipRequestToByteArray());
             }
         });
+        writeTo.setText("getServerClip");
 
         Button showList = findViewById(R.id.show_list);
         ((ViewGroup) showList.getParent()).removeView(showList);
@@ -168,17 +154,17 @@ public class MemoClient extends EditorActivity {
         mUdpThread.joinGroup();
     }
 
-    protected void start() {
+    protected void waiting() {
         updateStatusText(getPrefix() + "wait relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
-        mFirstMsg = true;
+//        mFirstMsg = true;
         discover();
         log("start finished");
 
     }
 
     protected void stop() {
-        mFirstMsg = true;
+//        mFirstMsg = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
         if (mClient != null) {
             mClient.write(StringProcessor.statusToByteArray("client stop relay\n"));

@@ -1,9 +1,9 @@
 package com.example.memo_demo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.wifi.GroupListener;
 import com.example.wifi.ServerThread;
@@ -21,20 +21,15 @@ import java.util.Set;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import jp.wasabeef.richeditor.RichEditor;
-
 public class MemoHost extends EditorActivity {
-    private boolean mFirstMsg = true;
-    public static final String HOST_EXTRA = "RecyclerViewExtra";
-    public static final int HOST_RECYCLER_VIEW_ID = 1;
 
     private ServerThread mServer;
 
     private UdpServerThread mUdpSeverThread;
 
-    private List<ClientDeviceStatus> mClientList = new ArrayList<ClientDeviceStatus>();
-    private Set<SocketThread> mClients = new HashSet<SocketThread>();
-    private Set<SocketThread> mPendingRemovedClients = new HashSet<SocketThread>();
+    private final List<ClientDeviceStatus> mClientList = new ArrayList<>();
+    private final Set<SocketThread> mClients = new HashSet<>();
+    private final Set<SocketThread> mPendingRemovedClients = new HashSet<>();
     public PeerItemAdapter mPeerAdapter;
     private boolean mStop = false;
 
@@ -53,7 +48,7 @@ public class MemoHost extends EditorActivity {
     }
 
 
-    private GroupListener mGroupListener = new GroupListener() {
+    private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
 
@@ -67,9 +62,9 @@ public class MemoHost extends EditorActivity {
         @Override
         public void onGroupClientConnect(InetAddress clientAddress, String user) {
             boolean found = false;
-            for (int i = 0; i < mClientList.size(); i++) {
-                if (mClientList.get(i).address.getHostAddress().equals(clientAddress.getHostAddress())) {
-                    mClientList.get(i).status = SocketConfig.WifiDeviceStatus.Available;
+            for (ClientDeviceStatus clientDeviceStatus : mClientList) {
+                if (clientDeviceStatus.address.getHostAddress().equals(clientAddress.getHostAddress())) {
+                    clientDeviceStatus.status = SocketConfig.WifiDeviceStatus.Available;
                     found = true;
                 }
             }
@@ -100,12 +95,9 @@ public class MemoHost extends EditorActivity {
     };
 
     private void updateClientAdapter() {
-        this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mPeerAdapter != null)
-                    mPeerAdapter.notifyDataSetChanged();
-            }
+        this.runOnUiThread(() -> {
+            if (mPeerAdapter != null)
+                mPeerAdapter.notifyDataSetChanged();
         });
     }
 
@@ -122,53 +114,34 @@ public class MemoHost extends EditorActivity {
         mUdpSeverThread.start();
 
         Button start = findViewById(R.id.start_relay);
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                start();
-            }
-        });
+        start.setOnClickListener(v -> start());
 
         Button stop = findViewById(R.id.stop_relay);
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stop();
-            }
-        });
+        stop.setOnClickListener(v -> stop());
 
         Button writeTo = findViewById(R.id.write_to);
 
-        writeTo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String msg = getEditText();
-                log(msg);
-                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                for (SocketThread client : mClients)
-                    client.write(StringProcessor.htmlToByteArray(msg));
-            }
+        writeTo.setOnClickListener(v -> {
+            String msg = getEditText();
+            log(msg);
+            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            for (SocketThread client : mClients)
+                client.write(StringProcessor.htmlToByteArray(msg));
         });
 
-        mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            @Override
-            public void onTextChange(String text) {
-                String msg = getEditText();
-                log(msg);
-                updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                for (SocketThread client : mClients)
-                    client.write(StringProcessor.htmlToByteArray(msg));
-            }
+        mEditor.setOnTextChangeListener(text -> {
+            String msg = getEditText();
+            log(msg);
+            updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            for (SocketThread client : mClients)
+                client.write(StringProcessor.htmlToByteArray(msg));
         });
 
         Button showList = findViewById(R.id.show_list);
-        showList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mRecycleView != null && mStop == false) {
-                    setAllButtonView(View.INVISIBLE);
-                    mRecycleView.setVisibility(View.VISIBLE);
-                }
+        showList.setOnClickListener(v -> {
+            if (mRecycleView != null && !mStop) {
+                setAllButtonView(View.INVISIBLE);
+                mRecycleView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -190,24 +163,21 @@ public class MemoHost extends EditorActivity {
 
     private void buildConnectionList() {
         mPeerAdapter = new PeerItemAdapter(mClientList);
-        mPeerAdapter.setListener(new PeerItemAdapter.PeerItemListener() {
-            @Override
-            public void onItemClick(final int position) {
-                updateStatusText(getPrefix() + "start establish connection\n",
-                        MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                log(getPrefix() + "start relay\n");
+        mPeerAdapter.setListener(position -> {
+            updateStatusText(getPrefix() + "start establish connection\n",
+                    MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            log(getPrefix() + "start relay\n");
 
-                if (mRecycleView != null)
-                    mRecycleView.setVisibility(View.INVISIBLE);
-                setAllButtonView(View.VISIBLE);
+            if (mRecycleView != null)
+                mRecycleView.setVisibility(View.INVISIBLE);
+            setAllButtonView(View.VISIBLE);
 
-                ClientDeviceStatus clientDevice = mClientList.get(position);
+            ClientDeviceStatus clientDevice = mClientList.get(position);
 
-                log("item status" + clientDevice.status);
-                if (clientDevice.status == SocketConfig.WifiDeviceStatus.Connected) return;
+            log("item status" + clientDevice.status);
+            if (clientDevice.status == SocketConfig.WifiDeviceStatus.Connected) return;
 
-                mUdpSeverThread.connect(clientDevice.address);
-            }
+            mUdpSeverThread.connect(clientDevice.address);
         });
 
         mRecycleView = findViewById(R.id.peer_list_view_2);
@@ -221,17 +191,17 @@ public class MemoHost extends EditorActivity {
     }
 
     private void serverStart() {
-        final TextView textView = findViewById(R.id.textViewStatus);
         if (mServer != null) return;
         mServer = new ServerThread();
         mServer.setListener(new SocketListener() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void onAdded(SocketThread socketThread) {
                 log(String.format("Socket add %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
 
-                for (int i = 0; i < mClientList.size(); i++) {
-                    if (mClientList.get(i).address.getHostAddress().equals(socketThread.getHostAddress())) {
-                        mClientList.get(i).status = SocketConfig.WifiDeviceStatus.Connected;
+                for (ClientDeviceStatus clientDeviceStatus : mClientList) {
+                    if (clientDeviceStatus.address.getHostAddress().equals(socketThread.getHostAddress())) {
+                        clientDeviceStatus.status = SocketConfig.WifiDeviceStatus.Connected;
 
                     }
                 }
@@ -240,18 +210,16 @@ public class MemoHost extends EditorActivity {
 
                 mClients.add(socketThread);
                 updateStatusText(getPrefix() + "client added\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                MemoHost.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String msg = getEditText();
-                        log(msg);
-                        updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                        for (SocketThread client : mClients)
-                            client.write(StringProcessor.htmlToByteArray(msg));
-                    }
+                MemoHost.this.runOnUiThread(() -> {
+                    String msg = getEditText();
+                    log(msg);
+                    updateStatusText(getPrefix() + "start relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                    for (SocketThread client : mClients)
+                        client.write(StringProcessor.htmlToByteArray(msg));
                 });
             }
 
+            @SuppressLint("DefaultLocale")
             @Override
             public void onRemoved(SocketThread socketThread) {
                 log(String.format("Socket remove %s:%d", socketThread.getHostAddress(), socketThread.getPort()));
@@ -263,23 +231,31 @@ public class MemoHost extends EditorActivity {
             public void onRead(SocketThread socketThread, byte[] message) {
                 final ReturnMessage ret = StringProcessor.decodeByteArray(message);
                 log(getPrefix() + ret.data);
-                MemoHost.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        switch (ret.type) {
-                            case StringProcessor.status:
-                                updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                break;
-                            case StringProcessor.editor:
-                                updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
-                                break;
-                        }
-                        log("[" + ret.type + "] " + ret.data);
+                MemoHost.this.runOnUiThread(() -> {
+                    switch (ret.type) {
+                        case StringProcessor.status:
+                            updateStatusText(getPrefix() + ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                            break;
+                        case StringProcessor.editor:
+                            updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            break;
+                        case StringProcessor.clipRequest:
+                            sendPaste();
+                            break;
                     }
+                    log("[" + ret.type + "] " + ret.data);
                 });
             }
         });
         mServer.start();
+    }
+
+    private void sendPaste() {
+        updatePasteUri();
+        String result = getPasteText();
+        for (SocketThread client : mClients) {
+            client.write(StringProcessor.clipResultToByteArray(result));
+        }
     }
 
     protected void start() {
@@ -295,10 +271,7 @@ public class MemoHost extends EditorActivity {
         mStop = true;
         updateStatusText(getPrefix() + "stop relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
 
-        mFirstMsg = true;
-        if (mClientList != null) {
-            mClientList.clear();
-        }
+        mClientList.clear();
         if (mPeerAdapter != null) {
             mPeerAdapter.notifyDataSetChanged();
             //mPeerAdapter = null;
