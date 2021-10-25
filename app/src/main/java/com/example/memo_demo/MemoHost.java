@@ -13,10 +13,7 @@ import com.example.wifi.SocketThread;
 import com.example.wifi.UdpServerThread;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,6 +44,19 @@ public class MemoHost extends EditorActivity {
         }
     }
 
+    private void recoverHtmlIfNeeded() {
+        String last_string = memoFileManager.quick_load();
+        if (!Objects.equals(last_string, "")) {
+            dialog.checkBox((dialog, which) -> mEditor.setHtml(last_string), (dialog, which) -> {
+            }, "Recover box", "Recover last editor file?");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        memoFileManager.quick_save(mEditor.getHtml());
+        super.onPause();
+    }
 
     private final GroupListener mGroupListener = new GroupListener() {
         @Override
@@ -105,6 +115,7 @@ public class MemoHost extends EditorActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        recoverHtmlIfNeeded();
 
         init(getIntent());
         setTitle("Memo " + mMode);
