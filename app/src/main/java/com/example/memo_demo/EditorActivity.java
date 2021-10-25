@@ -252,9 +252,9 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.loadImg).setOnClickListener(view -> memoFileManager.openFile("text/html", true));
         findViewById(R.id.loadTxtImg).setOnClickListener(view -> memoFileManager.openFile("text/plain", false));
 
-        findViewById(R.id.new_file).setOnClickListener(view -> dialog.newFile((dialog, which) -> clearNote(), (dialog, which) -> {
+        findViewById(R.id.new_file).setOnClickListener(view -> dialog.checkBox((dialog, which) -> clearNote(), (dialog, which) -> {
             // DO NOTHING HERE
-        }));
+        }, "New file log", "Clear the editor?"));
 
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;

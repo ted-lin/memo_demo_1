@@ -47,8 +47,8 @@ public class MemoHost extends EditorActivity {
     private void recoverHtmlIfNeeded() {
         String last_string = memoFileManager.quick_load();
         if (!Objects.equals(last_string, "")) {
-            dialog.recoverCover((dialog, which) -> mEditor.setHtml(last_string), (dialog, which) -> {
-            });
+            dialog.checkBox((dialog, which) -> mEditor.setHtml(last_string), (dialog, which) -> {
+            }, "Recover box", "Recover last editor file?");
         }
     }
 
