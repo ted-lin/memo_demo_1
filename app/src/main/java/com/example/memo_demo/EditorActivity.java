@@ -271,32 +271,6 @@ public class EditorActivity extends AppCompatActivity {
             mEditor.setUnderline();
         });
 
-        findViewById(R.id.action_heading1).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(1);
-        });
-
-        findViewById(R.id.action_heading2).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(2);
-        });
-
-        findViewById(R.id.action_heading3).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(3);
-        });
-
-        findViewById(R.id.action_heading4).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(4);
-        });
-
-        findViewById(R.id.action_heading5).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(5);
-        });
-
-        findViewById(R.id.action_heading6).setOnClickListener(v -> mEditor.setHeading(6));
         findViewById(R.id.change_txt_color).setOnClickListener(v -> {
             text_color_index += 1;
             if (text_color_index >= text_color_src_id.length) {
