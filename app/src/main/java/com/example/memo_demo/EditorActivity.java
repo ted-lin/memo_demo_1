@@ -247,10 +247,22 @@ public class EditorActivity extends AppCompatActivity {
             dialog.showLink(getContentString());
         });
         findViewById(R.id.action_insert_checkbox).setOnClickListener(v -> mEditor.insertTodo());
-        findViewById(R.id.saveImg).setOnClickListener(v -> memoFileManager.createFile("text/html", "a.html", true));
-        findViewById(R.id.saveTxtImg).setOnClickListener(v -> memoFileManager.createFile("text/plain", "a.txt", false));
-        findViewById(R.id.loadImg).setOnClickListener(view -> memoFileManager.openFile("text/html", true));
-        findViewById(R.id.loadTxtImg).setOnClickListener(view -> memoFileManager.openFile("text/plain", false));
+
+        findViewById(R.id.saveImg).setOnClickListener(v -> dialog.select((dialogInterface, i) -> {
+            if (i == 0) {
+                memoFileManager.createFile("text/html", "a.html", true);
+            } else {
+                memoFileManager.createFile("text/plain", "a.txt", false);
+            }
+        }, new String[]{"html", "text"}, "choose type"));
+
+        findViewById(R.id.loadImg).setOnClickListener(v -> dialog.select((dialogInterface, i) -> {
+            if (i == 0) {
+                memoFileManager.openFile("text/html", true);
+            } else {
+                memoFileManager.openFile("text/plain", false);
+            }
+        }, new String[]{"html", "text"}, "choose type"));
 
         findViewById(R.id.new_file).setOnClickListener(view -> dialog.checkBox((dialog, which) -> clearNote(), (dialog, which) -> {
             // DO NOTHING HERE
