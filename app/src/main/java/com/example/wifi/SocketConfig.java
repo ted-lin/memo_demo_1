@@ -1,5 +1,11 @@
 package com.example.wifi;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -53,5 +59,19 @@ public class SocketConfig {
         } catch (SocketException e) {
         }
         return null;
+    }
+
+    public static boolean isWifiAvailable (Context context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager != null) {
+            for (Network net : connectivityManager.getAllNetworks()) {
+                NetworkCapabilities nc = connectivityManager.getNetworkCapabilities(net);
+                if (nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        && nc.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET))
+                    return true;
+            }
+        }
+        return false;
     }
 }

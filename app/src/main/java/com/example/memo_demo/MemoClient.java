@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.wifi.GroupListener;
+import com.example.wifi.SocketConfig;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
@@ -19,13 +20,13 @@ public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     private boolean mConnected = false;
 
-    private final GroupListener mGroupListener = new GroupListener() {
+                private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
             log(String.format("group connect %s,%s", user, hostAddress.getHostAddress()));
             mConnected = true;
 
-            if (mClient == null) {
+            if (mClient == null || mClient.isClosed()) {
                 mClient = new SocketThread(hostAddress, new SocketListener() {
                     @SuppressLint("DefaultLocale")
                     @Override
@@ -100,6 +101,17 @@ public class MemoClient extends EditorActivity {
         public void onGroupClientDisConnect(InetAddress clientAddress, String user) {
 
         }
+
+        @Override
+        public void onSocketFailed() {
+            MemoClient.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    MemoClient.this.stop();
+                }
+            });
+        }
     };
 
 
@@ -110,7 +122,7 @@ public class MemoClient extends EditorActivity {
         init(getIntent());
         setTitle("Memo " + mMode);
 
-        mUdpThread = new UdpClientThread(getUser());
+        mUdpThread = new UdpClientThread(getUser(), this);
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
 

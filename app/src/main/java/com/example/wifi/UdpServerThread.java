@@ -1,5 +1,6 @@
 package com.example.wifi;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -24,13 +25,15 @@ public class UdpServerThread extends Thread {
     private MulticastSocket mSocket = null;
     private HandlerThread mHandlerThread = null;
     private Handler mHandler = null;
+    private Context mContext = null;
 
 
     private boolean mExit = false;
     private GroupListener mListener = null;
 
-    public UdpServerThread(String user) {
+    public UdpServerThread(String user, Context context) {
         mUser = user;
+        mContext = context;
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
@@ -41,22 +44,36 @@ public class UdpServerThread extends Thread {
     }
 
     public void connect(InetAddress address) {
+        if (!isValid()) return;
         ConnectRunnable connectRunnable = new ConnectRunnable(mUser, mSocket, address);
         mHandler.post(connectRunnable);
     }
 
     public void disconnect() {
+        if (!isValid()) return;
         LeaveRunnable leaveRunnable = new LeaveRunnable(mUser, mSocket);
         mHandler.post(leaveRunnable);
     }
 
+    private boolean isValid() {
+        if (!SocketConfig.isWifiAvailable(mContext)) return false;
+
+        return mSocket != null && !mSocket.isClosed();
+    }
+
     @Override
     public void run() {
-        try {
-            mSocket = new MulticastSocket(MULTI_CAST_PORT);
-            InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
-            mSocket.joinGroup(group);
-            while(!mExit) {
+        while (!mExit) {
+            try {
+                while(!SocketConfig.isWifiAvailable(mContext)) {
+                    Thread.sleep(2000);
+                }
+
+                if (mSocket == null) {
+                    mSocket = new MulticastSocket(MULTI_CAST_PORT);
+                    InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
+                    mSocket.joinGroup(group);
+                }
                 byte[] recvBuffer = new byte[512];
                 DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
                 mSocket.receive(packet);
@@ -84,14 +101,20 @@ public class UdpServerThread extends Thread {
                         mListener.onGroupClientDisConnect(packet.getAddress(), host);
                     }
                 }
+            } catch(IOException e){
+                e.printStackTrace();
+                if (mListener != null) {
+                    mListener.onSocketFailed();
+                }
+                if (mSocket != null) {
+                    mSocket.close();
+                    mSocket = null;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        if (mSocket != null) {
-            mSocket.close();
-        }
     }
 
     private static byte[] generateMsgPackage(String user, String address, String msg) {
@@ -112,7 +135,7 @@ public class UdpServerThread extends Thread {
         @Override
         public void run() {
             try {
-                if (mSocket != null) {
+                if (mSocket != null && !mSocket.isClosed()) {
                     InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
                     byte[] buf = generateMsgPackage(mUser, mClient.getHostAddress(), CONNECT_MSG);
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, MULTI_CAST_PORT);
@@ -136,7 +159,7 @@ public class UdpServerThread extends Thread {
         @Override
         public void run() {
             try {
-                if (mSocket != null) {
+                if (mSocket != null && !mSocket.isClosed()) {
                     InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
                     byte[] buf = generateMsgPackage(mUser, SocketConfig.getHostAddress().getHostAddress(), DISCONNECT_MSG);
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, MULTI_CAST_PORT);
