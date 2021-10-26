@@ -23,11 +23,8 @@ public class RichEditorX extends RichEditor {
 
     @Override
     public String getHtml() {
-        if (super.getHtml() != null) {
-            return super.getHtml();
-        } else {
-            return "";
-        }
+        String str = super.getHtml();
+        return str != null ? str : "";
     }
 
     private static final String CALLBACK_SCHEME = "re-callback://";

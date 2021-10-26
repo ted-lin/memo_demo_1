@@ -434,9 +434,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public String getEditText() {
-        if (mEditor != null)
-            return mEditor.getHtml();
-        return "";
+        return mEditor.getHtml();
     }
 
     private void clearNote() {
