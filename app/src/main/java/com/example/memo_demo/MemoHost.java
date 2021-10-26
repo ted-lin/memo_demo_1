@@ -1,7 +1,9 @@
 package com.example.memo_demo;
 
 import android.annotation.SuppressLint;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -159,6 +161,17 @@ public class MemoHost extends EditorActivity {
     }
 
     @Override
+    public void sendImg() {
+        super.sendImg();
+        byte[] s = imgEncoding();
+        for (SocketThread client : mClients) {
+            if (client != null)
+                client.write(s);
+        }
+    }
+
+
+    @Override
     public void onBackPressed() {
         if (mRecycleView != null && mRecycleView.getVisibility() == View.VISIBLE) {
             mRecycleView.setVisibility(View.INVISIBLE);
@@ -260,6 +273,13 @@ public class MemoHost extends EditorActivity {
                             break;
                         case StringProcessor.clipRequest:
                             sendPaste();
+                            break;
+                        case StringProcessor.img:
+                            byte[] bytes = Base64.getDecoder().decode(ret.bytes);
+                            loadEditingImg(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                            break;
+                        default:
+                            Log.e("", "nothing");
                             break;
                     }
                     //log("[" + StringProcessor.getType(ret.type) + "] " + ret.data);

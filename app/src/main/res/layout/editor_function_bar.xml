@@ -12,6 +12,15 @@
         android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
+        <ImageButton
+                android:id="@+id/sync"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/sync" />
 
         <ImageButton
             android:id="@+id/action_bold"
