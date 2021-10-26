@@ -60,7 +60,7 @@ public class MemoHost extends EditorActivity {
         super.onPause();
     }
 
-    private final GroupListener mGroupListener = new GroupListener() {
+                private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
 
@@ -104,6 +104,17 @@ public class MemoHost extends EditorActivity {
 
             updateClientAdapter();
         }
+
+        @Override
+        public void onSocketFailed() {
+            MemoHost.this.runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    MemoHost.this.stop();
+                }
+            });
+        }
     };
 
     private void updateClientAdapter() {
@@ -122,7 +133,7 @@ public class MemoHost extends EditorActivity {
         init(getIntent());
         setTitle("Memo " + mMode);
 
-        mUdpSeverThread = new UdpServerThread(getUser());
+        mUdpSeverThread = new UdpServerThread(getUser(), this);
         mUdpSeverThread.setListener(mGroupListener);
         mUdpSeverThread.start();
 
@@ -180,6 +191,8 @@ public class MemoHost extends EditorActivity {
             super.onBackPressed();
         }
     }
+
+
 
     private void disconnect() {
         mUdpSeverThread.disconnect();
@@ -332,6 +345,7 @@ public class MemoHost extends EditorActivity {
             mServer = null;
         }
     }
+
 
     @Override
     protected void onDestroy() {

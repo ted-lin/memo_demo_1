@@ -64,6 +64,10 @@ public class SocketThread extends Thread {
         return -1;
     }
 
+    public boolean isClosed() {
+        return mSocket.isClosed();
+    }
+
     public void close() {
         try {
             if (mSocket != null) {
