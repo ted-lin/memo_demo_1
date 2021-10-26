@@ -8,4 +8,6 @@ public interface GroupListener {
     void onGroupClientConnect(InetAddress clientAddress, String user);
     void onGroupClientDisConnect(InetAddress clientAddress, String user);
 
+    void onSocketFailed();
+
 }

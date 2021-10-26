@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void performPermissionGrant() {
+        if (mPermissionValid) return;
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{
                         Manifest.permission.CHANGE_NETWORK_STATE,
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         updateName();
         performPermissionGrant();
         if (!mPermissionValid) {
-            showToast("permission failure");
+            //showToast("permission failure");
             return;
         }
         showToast("You run as " + user);
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         updateName();
         performPermissionGrant();
         if (!mPermissionValid) {
-            showToast("permission failure");
+            //showToast("permission failure");
             return;
         }
         showToast("You run as " + user);

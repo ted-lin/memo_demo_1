@@ -1,5 +1,6 @@
 package com.example.wifi;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -28,10 +29,11 @@ public class UdpClientThread extends Thread {
     private Handler mHandler = null;
     private MulticastSocket mSocket = null;
     private GroupListener mListener = null;
+    private Context mContext = null;
 
-
-    public UdpClientThread(String user) {
+    public UdpClientThread(String user, Context context) {
         mUser = user;
+        mContext = context;
         mHandlerThread = new HandlerThread(TAG);
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
@@ -42,23 +44,37 @@ public class UdpClientThread extends Thread {
     }
 
     public void joinGroup() {
+        if (!isValid()) return;
         JoinRunnable joinRunnable = new JoinRunnable(mUser, mSocket);
         mHandler.post(joinRunnable);
     }
 
     public void leaveGroup() {
+        if (!isValid()) return;
         LeaveRunnable leaveRunnable = new LeaveRunnable(mUser, mSocket);
         mHandler.post(leaveRunnable);
     }
 
+    private boolean isValid() {
+        if (!SocketConfig.isWifiAvailable(mContext)) return false;
+
+        return mSocket != null && !mSocket.isClosed();
+    }
+
     @Override
     public void run() {
-        try {
-            mSocket = new MulticastSocket(MULTI_CAST_PORT);
-            InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
-            mSocket.joinGroup(group);
+        while (true) {
+            try {
+                while(!SocketConfig.isWifiAvailable(mContext)) {
+                    Thread.sleep(2000);
+                }
 
-            while (true) {
+                if (mSocket == null) {
+                    mSocket = new MulticastSocket(MULTI_CAST_PORT);
+                    InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
+                    mSocket.joinGroup(group);
+                }
+
                 byte[] recvBuffer = new byte[512];
                 DatagramPacket packet = new DatagramPacket(recvBuffer, recvBuffer.length);
                 mSocket.receive(packet);
@@ -90,10 +106,19 @@ public class UdpClientThread extends Thread {
                         mListener.obGroupHostDisConnect(packet.getAddress(), host);
                     }
                 }
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+                if (mListener != null) {
+                    mListener.onSocketFailed();
+                }
+                if (mSocket != null) {
+                    mSocket.close();
+                    mSocket = null;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -113,7 +138,7 @@ public class UdpClientThread extends Thread {
         @Override
         public void run() {
             try {
-                if (mSocket != null) {
+                if (mSocket != null && !mSocket.isClosed()) {
                     InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
                     byte[] buf = generateMsgPackage(mUser, JOIN_GROUP_MSG);
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, MULTI_CAST_PORT);
@@ -137,7 +162,7 @@ public class UdpClientThread extends Thread {
         @Override
         public void run() {
             try {
-                if (mSocket != null) {
+                if (mSocket != null && !mSocket.isClosed()) {
                     InetAddress group = InetAddress.getByName(GROUP_ADDRESS);
                     byte[] buf = generateMsgPackage(mUser, LEAVE_GROUP_MSG);
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, MULTI_CAST_PORT);
