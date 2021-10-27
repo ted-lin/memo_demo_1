@@ -164,7 +164,7 @@ public class MemoClient extends EditorActivity {
     public void sendImg() {
         super.sendImg();
         byte[] s = imgEncoding();
-        if (mClient != null)
+        if (mClient != null && s != null)
             mClient.write(s);
     }
 

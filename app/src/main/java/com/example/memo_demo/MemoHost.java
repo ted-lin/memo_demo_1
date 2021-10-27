@@ -175,9 +175,11 @@ public class MemoHost extends EditorActivity {
     public void sendImg() {
         super.sendImg();
         byte[] s = imgEncoding();
-        for (SocketThread client : mClients) {
-            if (client != null)
-                client.write(s);
+        if (s != null) {
+            for (SocketThread client : mClients) {
+                if (client != null)
+                    client.write(s);
+            }
         }
     }
 

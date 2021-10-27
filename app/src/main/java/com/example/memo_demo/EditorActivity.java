@@ -128,6 +128,8 @@ public class EditorActivity extends AppCompatActivity {
 
     protected byte[] imgEncoding() {
         byte[] bytes = getImgByteArray();
+        if(bytes == null)
+            return null;
         byte[] byte64 = Base64.getEncoder().encode(bytes);
         return StringProcessor.imgToByteArray(byte64);
     }
