@@ -11,6 +11,8 @@ public class StringProcessor {
     static final int clipResult = 2;
     static final int clipRequest = 3;
     static final int img = 4;
+    static final int clientReturn = 5;
+    static final int editorWithId = 6;
 
     static String getType(int type) {
         switch (type) {
@@ -32,6 +34,21 @@ public class StringProcessor {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
                 .setMessageType(editor)
+                .build();
+        return editorMessage.toByteArray();
+    }
+    static byte[] htmlToByteArrayWithMsgId(String data, int msgId) {
+        Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
+                .setData(data)
+                .setMessageType(editorWithId)
+                .setMessageId(msgId)
+                .build();
+        return editorMessage.toByteArray();
+    }
+    static byte[] clientRet(int msgId) {
+        Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
+                .setMessageType(clientReturn)
+                .setMessageId(msgId)
                 .build();
         return editorMessage.toByteArray();
     }
@@ -70,10 +87,10 @@ public class StringProcessor {
     static ReturnMessage decodeByteArray(byte[] msg) {
         try {
             Data.EditorMessage editorMessage = Data.EditorMessage.parseFrom(msg);
-            return new ReturnMessage(editorMessage.getMessageType(), editorMessage.getData(), editorMessage.getImageData());
+            return new ReturnMessage(editorMessage.getMessageType(), editorMessage.getData(), editorMessage.getImageData(), editorMessage.getMessageId());
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
-            return new ReturnMessage(-1, "");
+            return new ReturnMessage(-1, "", -1);
         }
     }
 }

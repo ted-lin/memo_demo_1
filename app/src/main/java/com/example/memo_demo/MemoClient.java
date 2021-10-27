@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.example.wifi.GroupListener;
-import com.example.wifi.SocketConfig;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
@@ -57,6 +55,10 @@ public class MemoClient extends EditorActivity {
 
                             switch (ret.type) {
                                 case StringProcessor.editor:
+                                    updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                    break;
+                                case StringProcessor.editorWithId:
+                                    mClient.write(StringProcessor.clientRet(ret.messageId));
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.clipResult:

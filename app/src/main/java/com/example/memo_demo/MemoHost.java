@@ -6,19 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import com.example.wifi.GroupListener;
-import com.example.wifi.ServerThread;
-import com.example.wifi.SocketConfig;
-import com.example.wifi.SocketListener;
-import com.example.wifi.SocketThread;
-import com.example.wifi.UdpServerThread;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.wifi.*;
 
 import java.net.InetAddress;
 import java.util.*;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class MemoHost extends EditorActivity {
 
@@ -33,6 +26,8 @@ public class MemoHost extends EditorActivity {
     private boolean mStop = false;
 
     private RecyclerView mRecycleView;
+    private HashMap<Integer, Long> msgMap = new HashMap<>();
+    private int lastMsgId;
 
     public static class ClientDeviceStatus {
         public String name;
@@ -147,8 +142,12 @@ public class MemoHost extends EditorActivity {
             //log(msg);
             //if (mClients.size() > 0)
             //    updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-            for (SocketThread client : mClients)
-                client.write(StringProcessor.htmlToByteArray(msg));
+            for (SocketThread client : mClients) {
+
+                msgMap.put(lastMsgId, System.currentTimeMillis());
+                client.write(StringProcessor.htmlToByteArrayWithMsgId(msg, lastMsgId));
+                lastMsgId += 1;
+            }
         });
     }
 
@@ -312,6 +311,14 @@ public class MemoHost extends EditorActivity {
                         case StringProcessor.img:
                             byte[] bytes = Base64.getDecoder().decode(ret.bytes);
                             loadEditingImg(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                            break;
+                        case StringProcessor.clientReturn:
+                            int messageId = ret.messageId;
+                            Long current = System.currentTimeMillis();
+                            Long last = msgMap.get(messageId);
+                            msgMap.remove(messageId);
+                            log("sync time delay " + (current - last) + " ms");
+                            updateStatusText("sync time delay " + (current - last) + " ms\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             break;
                         default:
                             Log.e("", "nothing");
