@@ -37,24 +37,24 @@ public class EditorActivity extends AppCompatActivity {
     PhotoEditor mPhotoEditor;
 
     private boolean hiding = false;
-    int margin_origin_index = 0;
-    int margin_new_index = 1;
+    int marginOriginIndex = 0;
+    int marginNewIndex = 1;
     int[] margin = {0, 0};
 
     // color changers
-    int text_color_index = 0;
-    int text_bg_color_index = 6;
-    int[] text_color_src_id = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
+    int textColorIndex = 0;
+    int textBgColorIndex = 6;
+    int[] textColorSrcId = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
             R.color.CYAN, R.color.RED, R.color.WHITE};
-    int[] text_colors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
+    int[] textColors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
             Color.CYAN, Color.RED, Color.WHITE};
 
     // default test url
-    private final String mp3_url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
-    private final String video_url = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
-    private final String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private final int img_width = 320;
-    private final int video_width = 360;
+    private final String mp3Url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
+    private final String videoUrl = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
+    private final String imgUrl = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
+    private final int imgWidth = 320;
+    private final int videoWidth = 360;
     protected Uri pasteUri;
     protected String pasteText;
     protected MemoFileManager memoFileManager = null;
@@ -242,7 +242,7 @@ public class EditorActivity extends AppCompatActivity {
         setVisibleTable();
         updateVisibilities();
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
-        margin[margin_origin_index] = params.topMargin;
+        margin[marginOriginIndex] = params.topMargin;
 
         findViewById(R.id.sync).setOnClickListener(v -> sendImg());
 
@@ -292,25 +292,25 @@ public class EditorActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.change_txt_color).setOnClickListener(v -> {
-            text_color_index += 1;
-            if (text_color_index >= text_color_src_id.length) {
-                text_color_index = 0;
+            textColorIndex += 1;
+            if (textColorIndex >= textColorSrcId.length) {
+                textColorIndex = 0;
             }
-            ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(text_color_src_id[text_color_index]);
-            mEditor.setTextColor(text_colors[text_color_index]);
+            ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(textColorSrcId[textColorIndex]);
+            mEditor.setTextColor(textColors[textColorIndex]);
         });
 
         findViewById(R.id.change_bg_txt_color).setOnClickListener(v -> {
-            text_bg_color_index += 1;
-            if (text_bg_color_index >= text_color_src_id.length)
-                text_bg_color_index = 0;
-            ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(text_color_src_id[text_bg_color_index]);
-            mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
+            textBgColorIndex += 1;
+            if (textBgColorIndex >= textColorSrcId.length)
+                textBgColorIndex = 0;
+            ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(textColorSrcId[textBgColorIndex]);
+            mEditor.setTextBackgroundColor(textColors[textBgColorIndex]);
         });
 
-        findViewById(R.id.action_txt_color).setOnClickListener(v -> mEditor.setTextColor(text_colors[text_color_index]));
+        findViewById(R.id.action_txt_color).setOnClickListener(v -> mEditor.setTextColor(textColors[textColorIndex]));
 
-        findViewById(R.id.action_bg_color).setOnClickListener(v -> mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]));
+        findViewById(R.id.action_bg_color).setOnClickListener(v -> mEditor.setTextBackgroundColor(textColors[textBgColorIndex]));
 
         findViewById(R.id.action_indent).setOnClickListener(v -> mEditor.setIndent());
 
@@ -328,11 +328,11 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.action_insert_numbers).setOnClickListener(v -> mEditor.setNumbers());
 
-        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(img_url, "dachshund", img_width));
+        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(imgUrl, "dachshund", imgWidth));
 
-        findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3_url));
+        findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3Url));
 
-        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(video_url, video_width));
+        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(videoUrl, videoWidth));
 
         findViewById(R.id.action_insert_link).setOnClickListener(v -> {
             mEditor.evaluateJavascript("(function(){return window.getSelection().toString()})()",
@@ -423,14 +423,14 @@ public class EditorActivity extends AppCompatActivity {
     public void hideMsg() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
-        params.topMargin = margin[margin_new_index];
+        params.topMargin = margin[marginNewIndex];
         findViewById(R.id.editor_view).setLayoutParams(params);
     }
 
     public void showMsg() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
-        params.topMargin = margin[margin_origin_index];
+        params.topMargin = margin[marginOriginIndex];
         findViewById(R.id.editor_view).setLayoutParams(params);
     }
 

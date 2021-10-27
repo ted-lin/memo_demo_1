@@ -57,11 +57,11 @@ public class Dialog {
         builder.create().show();
     }
 
-    void select(DialogInterface.OnClickListener onClickListener, String[] list_items, String choose_type) {
+    void select(DialogInterface.OnClickListener onClickListener, String[] listItems, String chooseType) {
         AlertDialog.Builder builder = new AlertDialog.Builder(editorActivity);
-        builder.setTitle(choose_type);
+        builder.setTitle(chooseType);
         builder.setCancelable(true);
-        builder.setItems(list_items, onClickListener);
+        builder.setItems(listItems, onClickListener);
 
         builder.create().show();
     }
