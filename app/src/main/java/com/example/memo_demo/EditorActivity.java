@@ -1,11 +1,7 @@
 package com.example.memo_demo;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,12 +15,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import ja.burhanrashid52.photoeditor.*;
+import ja.burhanrashid52.photoeditor.shape.ShapeBuilder;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -262,7 +260,20 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     protected void initBtnClickListeners() {
-        findViewById(R.id.sync).setOnClickListener(v -> sendImg());
+        findViewById(R.id.sync).setOnClickListener(v ->
+                ColorPickerDialogBuilder.with(this).setTitle("Choose color")
+                        .initialColor(mPhotoEditor.getBrushColor())
+                        .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                        .density(5)
+                        .setOnColorSelectedListener(selectedColor -> {
+                        })
+                        .setPositiveButton("ok", (dialog, selectedColor, allColors) -> mPhotoEditor.setShape(new ShapeBuilder().withShapeColor(selectedColor))
+                        )
+                        .setNegativeButton("cancel", (dialog, which) -> {
+                        })
+                        .build()
+                        .show()
+        );
 
         findViewById(R.id.mode_btn).setOnClickListener(v -> {
             mEditor.focusEditor();
