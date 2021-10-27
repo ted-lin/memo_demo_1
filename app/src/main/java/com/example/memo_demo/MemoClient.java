@@ -3,6 +3,7 @@ package com.example.memo_demo;
 import android.annotation.SuppressLint;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
@@ -158,6 +159,18 @@ public class MemoClient extends EditorActivity {
 
         Button showList = findViewById(R.id.show_list);
         ((ViewGroup) showList.getParent()).removeView(showList);
+    }
+
+    @Override
+    public void hideMsg() {
+        super.hideMsg();
+        findViewById(R.id.network_view).setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showMsg() {
+        super.showMsg();
+        findViewById(R.id.network_view).setVisibility(View.VISIBLE);
     }
 
     @Override

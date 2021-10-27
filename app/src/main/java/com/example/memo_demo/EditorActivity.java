@@ -65,7 +65,9 @@ public class EditorActivity extends AppCompatActivity {
     final int EDITOR = 0;
     final int VIEW = 1;
     final int DRAW = 2;
+    final int editorModeSize = 3;
     int editorMode = EDITOR;
+    protected HashMap<Integer, int[]> visibleTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +201,46 @@ public class EditorActivity extends AppCompatActivity {
         return content;
     }
 
+    protected void setVisibleTable() {
+        visibleTable = new HashMap<>();
+        visibleTable.put(R.id.editorX, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_bold, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_italic, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_subscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_superscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_strikethrough, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_underline, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.change_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.change_bg_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_bg_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_indent, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_outdent, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_left, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_center, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_right, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_blockquote, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_bullets, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_numbers, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_image, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_audio, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_video, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_link, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_checkbox, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.hideImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+
+        visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
+        visibleTable.put(R.id.sync, new int[]{View.GONE, View.GONE, View.VISIBLE});
+    }
+
     private void imgBtnInit() {
+        setVisibleTable();
+        updateVisibilities();
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         margin[margin_origin_index] = params.topMargin;
 
@@ -207,31 +248,8 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.mode_btn).setOnClickListener(v -> {
             mEditor.focusEditor();
-            editorMode = (editorMode + 1) % 3;
-            switch (editorMode) {
-                case EDITOR:
-                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
-                    mEditor.setInputEnabled(true);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
-                    break;
-                case VIEW:
-                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
-                    mEditor.setInputEnabled(false);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
-                    break;
-                case DRAW:
-                    findViewById(R.id.editorX).setVisibility(View.GONE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.VISIBLE);
-                    mPhotoEditorView.setFocusable(true);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
-                    mPhotoEditor.setBrushDrawingMode(true);
-                    break;
-
-            }
+            modeChange();
         });
-
         findViewById(R.id.action_undo).setOnClickListener(v -> {
             mEditor.focusEditor();
             mEditor.undo();
@@ -344,21 +362,74 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;
             if (hiding) {
-                ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
-                params.topMargin = margin[margin_new_index];
-                findViewById(R.id.editor_view).setLayoutParams(params);
+                hideMsg();
             } else {
-                ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
-                params.topMargin = margin[margin_origin_index];
-                findViewById(R.id.editor_view).setLayoutParams(params);
+                showMsg();
             }
         });
+    }
+
+    private void modeChange() {
+        editorMode = (editorMode + 1) % editorModeSize;
+        switch (editorMode) {
+            case EDITOR:
+                editorModeActions();
+                break;
+            case VIEW:
+                viewModeActions();
+                break;
+            case DRAW:
+                drawModeActions();
+                break;
+        }
+        updateVisibilities();
+    }
+
+    private void drawModeActions() {
+        mPhotoEditorView.setFocusable(true);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
+        mPhotoEditor.setBrushDrawingMode(true);
+    }
+
+    private void viewModeActions() {
+        mEditor.setInputEnabled(false);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
+    }
+
+    private void editorModeActions() {
+        mEditor.setInputEnabled(true);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
+    }
+
+    private void updateVisibilities() {
+        Set<Integer> ids = visibleTable.keySet();
+        for (int id : ids) {
+            int[] visibilities = visibleTable.get(id);
+            if (visibilities != null) {
+                int visiblity = visibilities[editorMode];
+                findViewById(id).setVisibility(visiblity);
+            }
+        }
     }
 
     /* basic */
     public static String mMode;
     public static String mUser;
     private List<Button> mButtons;
+
+    public void hideMsg() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
+        ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
+        params.topMargin = margin[margin_new_index];
+        findViewById(R.id.editor_view).setLayoutParams(params);
+    }
+
+    public void showMsg() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
+        ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
+        params.topMargin = margin[margin_origin_index];
+        findViewById(R.id.editor_view).setLayoutParams(params);
+    }
 
     public void sendImg() {
 

@@ -172,6 +172,18 @@ public class MemoHost extends EditorActivity {
     }
 
     @Override
+    public void hideMsg() {
+        super.hideMsg();
+        findViewById(R.id.network_view).setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showMsg() {
+        super.showMsg();
+        findViewById(R.id.network_view).setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void sendImg() {
         super.sendImg();
         byte[] s = imgEncoding();
