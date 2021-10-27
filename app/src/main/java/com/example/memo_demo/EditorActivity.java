@@ -1,11 +1,7 @@
 package com.example.memo_demo;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
+import android.content.*;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -19,12 +15,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import ja.burhanrashid52.photoeditor.*;
+import ja.burhanrashid52.photoeditor.shape.ShapeBuilder;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -37,24 +35,24 @@ public class EditorActivity extends AppCompatActivity {
     PhotoEditor mPhotoEditor;
 
     private boolean hiding = false;
-    int margin_origin_index = 0;
-    int margin_new_index = 1;
+    int marginOriginIndex = 0;
+    int marginNewIndex = 1;
     int[] margin = {0, 0};
 
     // color changers
-    int text_color_index = 0;
-    int text_bg_color_index = 6;
-    int[] text_color_src_id = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
+    int textColorIndex = 0;
+    int textBgColorIndex = 6;
+    int[] textColorSrcId = {R.color.BLACK, R.color.GREEN, R.color.BLUE, R.color.YELLOW,
             R.color.CYAN, R.color.RED, R.color.WHITE};
-    int[] text_colors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
+    int[] textColors = {Color.BLACK, Color.GREEN, Color.BLUE, Color.YELLOW,
             Color.CYAN, Color.RED, Color.WHITE};
 
     // default test url
-    private final String mp3_url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
-    private final String video_url = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
-    private final String img_url = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private final int img_width = 320;
-    private final int video_width = 360;
+    private final String mp3Url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
+    private final String videoUrl = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
+    private final String imgUrl = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
+    private final int imgWidth = 320;
+    private final int videoWidth = 360;
     protected Uri pasteUri;
     protected String pasteText;
     protected MemoFileManager memoFileManager = null;
@@ -65,24 +63,38 @@ public class EditorActivity extends AppCompatActivity {
     final int EDITOR = 0;
     final int VIEW = 1;
     final int DRAW = 2;
+    final int editorModeSize = 3;
     int editorMode = EDITOR;
+    protected HashMap<Integer, int[]> visibleTable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        memoFileManager = new MemoFileManager(this);
-        requestHandler = new EditorRequestHandler(this, memoFileManager);
+        helperClassInit();
+        editorInit();
+        photoEditorInit();
+        imgBtnInit();
+    }
 
+    protected void editorInit() {
         mEditor = findViewById(R.id.editorX);
         mEditor.setPadding(10, 10, 10, 10);
+    }
+
+    protected void helperClassInit() {
+        memoFileManager = new MemoFileManager(this);
+        requestHandler = new EditorRequestHandler(this, memoFileManager);
         dialog = new Dialog(this);
+    }
+
+    protected void photoEditorInit() {
         mPhotoEditorView = findViewById(R.id.photoEditorView);
         mPhotoEditorView.getSource().setImageResource(R.drawable.v);
         mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
                 .setPinchTextScalable(true)
                 .build();
-
+        mPhotoEditor.setShape(new ShapeBuilder().withShapeColor(Color.RED));
         mPhotoEditor.setOnPhotoEditorListener(new OnPhotoEditorListener() {
             @Override
             public void onEditTextChangeListener(View rootView, String text, int colorCode) {
@@ -113,7 +125,6 @@ public class EditorActivity extends AppCompatActivity {
             public void onTouchSourceImage(MotionEvent event) {
             }
         });
-        imgBtnInit();
     }
 
     protected byte[] getImgByteArray() {
@@ -128,6 +139,8 @@ public class EditorActivity extends AppCompatActivity {
 
     protected byte[] imgEncoding() {
         byte[] bytes = getImgByteArray();
+        if (bytes == null)
+            return null;
         byte[] byte64 = Base64.getEncoder().encode(bytes);
         return StringProcessor.imgToByteArray(byte64);
     }
@@ -138,6 +151,7 @@ public class EditorActivity extends AppCompatActivity {
             public void onBitmapReady(Bitmap saveBitmap) {
                 Log.e("PhotoEditor", "Image Saved Successfully");
                 bitmap = saveBitmap;
+                sendImg();
             }
 
             @Override
@@ -197,39 +211,75 @@ public class EditorActivity extends AppCompatActivity {
         return content;
     }
 
-    private void imgBtnInit() {
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
-        margin[margin_origin_index] = params.topMargin;
+    protected void setVisibleTable() {
+        visibleTable = new HashMap<>();
+        visibleTable.put(R.id.editorX, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_bold, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_italic, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_subscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_superscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_strikethrough, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_underline, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.change_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.change_bg_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_bg_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_indent, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_outdent, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_left, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_center, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_align_right, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_blockquote, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_bullets, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_numbers, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_image, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_audio, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_video, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_link, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_insert_checkbox, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.hideImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
 
-        findViewById(R.id.sync).setOnClickListener(v -> sendImg());
+        visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
+        visibleTable.put(R.id.sync, new int[]{View.GONE, View.GONE, View.VISIBLE});
+    }
+
+    private void imgBtnInit() {
+        setVisibleTable();
+        updateVisibilities();
+        initLayout();
+        initBtnClickListeners();
+    }
+
+    protected void initLayout() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
+        margin[marginOriginIndex] = params.topMargin;
+    }
+
+    protected void initBtnClickListeners() {
+        findViewById(R.id.sync).setOnClickListener(v ->
+                ColorPickerDialogBuilder.with(this).setTitle("Choose color")
+                        .initialColor(mPhotoEditor.getBrushColor())
+                        .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+                        .density(5)
+                        .setOnColorSelectedListener(selectedColor -> {
+                        })
+                        .setPositiveButton("ok", (dialog, selectedColor, allColors) -> mPhotoEditor.setShape(new ShapeBuilder().withShapeColor(selectedColor))
+                        )
+                        .setNegativeButton("cancel", (dialog, which) -> {
+                        })
+                        .build()
+                        .show()
+        );
 
         findViewById(R.id.mode_btn).setOnClickListener(v -> {
             mEditor.focusEditor();
-            editorMode = (editorMode + 1) % 3;
-            switch (editorMode) {
-                case EDITOR:
-                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
-                    mEditor.setInputEnabled(true);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
-                    break;
-                case VIEW:
-                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
-                    mEditor.setInputEnabled(false);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
-                    break;
-                case DRAW:
-                    findViewById(R.id.editorX).setVisibility(View.GONE);
-                    findViewById(R.id.photoEditorView).setVisibility(View.VISIBLE);
-                    mPhotoEditorView.setFocusable(true);
-                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
-                    mPhotoEditor.setBrushDrawingMode(true);
-                    break;
-
-            }
+            modeChange();
         });
-
         findViewById(R.id.action_undo).setOnClickListener(v -> {
             mEditor.focusEditor();
             mEditor.undo();
@@ -272,24 +322,25 @@ public class EditorActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.change_txt_color).setOnClickListener(v -> {
-            text_color_index += 1;
-            if (text_color_index >= text_color_src_id.length) {
-                text_color_index = 0;
+            textColorIndex += 1;
+            if (textColorIndex >= textColorSrcId.length) {
+                textColorIndex = 0;
             }
-            ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(text_color_src_id[text_color_index]);
-            mEditor.setTextColor(text_colors[text_color_index]);
+            ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(textColorSrcId[textColorIndex]);
+            mEditor.setTextColor(textColors[textColorIndex]);
         });
+
         findViewById(R.id.change_bg_txt_color).setOnClickListener(v -> {
-            text_bg_color_index += 1;
-            if (text_bg_color_index >= text_color_src_id.length)
-                text_bg_color_index = 0;
-            ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(text_color_src_id[text_bg_color_index]);
-            mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]);
+            textBgColorIndex += 1;
+            if (textBgColorIndex >= textColorSrcId.length)
+                textBgColorIndex = 0;
+            ((ImageButton) findViewById(R.id.change_bg_txt_color)).setImageResource(textColorSrcId[textBgColorIndex]);
+            mEditor.setTextBackgroundColor(textColors[textBgColorIndex]);
         });
 
-        findViewById(R.id.action_txt_color).setOnClickListener(v -> mEditor.setTextColor(text_colors[text_color_index]));
+        findViewById(R.id.action_txt_color).setOnClickListener(v -> mEditor.setTextColor(textColors[textColorIndex]));
 
-        findViewById(R.id.action_bg_color).setOnClickListener(v -> mEditor.setTextBackgroundColor(text_colors[text_bg_color_index]));
+        findViewById(R.id.action_bg_color).setOnClickListener(v -> mEditor.setTextBackgroundColor(textColors[textBgColorIndex]));
 
         findViewById(R.id.action_indent).setOnClickListener(v -> mEditor.setIndent());
 
@@ -307,16 +358,18 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.action_insert_numbers).setOnClickListener(v -> mEditor.setNumbers());
 
-        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(img_url, "dachshund", img_width));
+        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(imgUrl, "dachshund", imgWidth));
 
-        findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3_url));
+        findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3Url));
 
-        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(video_url, video_width));
+        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(videoUrl, videoWidth));
+
         findViewById(R.id.action_insert_link).setOnClickListener(v -> {
             mEditor.evaluateJavascript("(function(){return window.getSelection().toString()})()",
                     this::setContentString);
             dialog.showLink(getContentString());
         });
+
         findViewById(R.id.action_insert_checkbox).setOnClickListener(v -> mEditor.insertTodo());
 
         findViewById(R.id.saveImg).setOnClickListener(v -> dialog.select((dialogInterface, i) -> {
@@ -342,21 +395,74 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;
             if (hiding) {
-                ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
-                params.topMargin = margin[margin_new_index];
-                findViewById(R.id.editor_view).setLayoutParams(params);
+                hideMsg();
             } else {
-                ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
-                params.topMargin = margin[margin_origin_index];
-                findViewById(R.id.editor_view).setLayoutParams(params);
+                showMsg();
             }
         });
+    }
+
+    private void modeChange() {
+        editorMode = (editorMode + 1) % editorModeSize;
+        switch (editorMode) {
+            case EDITOR:
+                editorModeActions();
+                break;
+            case VIEW:
+                viewModeActions();
+                break;
+            case DRAW:
+                drawModeActions();
+                break;
+        }
+        updateVisibilities();
+    }
+
+    private void drawModeActions() {
+        mPhotoEditorView.setFocusable(true);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
+        mPhotoEditor.setBrushDrawingMode(true);
+    }
+
+    private void viewModeActions() {
+        mEditor.setInputEnabled(false);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
+    }
+
+    private void editorModeActions() {
+        mEditor.setInputEnabled(true);
+        ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
+    }
+
+    protected void updateVisibilities() {
+        Set<Integer> ids = visibleTable.keySet();
+        for (int id : ids) {
+            int[] visibilities = visibleTable.get(id);
+            if (visibilities != null) {
+                int visiblity = visibilities[editorMode];
+                findViewById(id).setVisibility(visiblity);
+            }
+        }
     }
 
     /* basic */
     public static String mMode;
     public static String mUser;
     private List<Button> mButtons;
+
+    public void hideMsg() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
+        ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_show);
+        params.topMargin = margin[marginNewIndex];
+        findViewById(R.id.editor_view).setLayoutParams(params);
+    }
+
+    public void showMsg() {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
+        ((ImageButton) findViewById(R.id.hideImg)).setImageResource(R.drawable.to_hide);
+        params.topMargin = margin[marginOriginIndex];
+        findViewById(R.id.editor_view).setLayoutParams(params);
+    }
 
     public void sendImg() {
 

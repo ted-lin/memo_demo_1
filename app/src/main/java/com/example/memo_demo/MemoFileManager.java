@@ -8,19 +8,19 @@ import java.io.*;
 
 public class MemoFileManager {
     private final EditorActivity editorActivity;
-    private final String quick_save_file_name;
+    private final String quickSaveFileName;
     private final File externalFilesDir;
 
     public MemoFileManager(EditorActivity editorActivity) {
         this.editorActivity = editorActivity;
-        quick_save_file_name = "quick_save.html";
+        quickSaveFileName = "quick_save.html";
         externalFilesDir = editorActivity.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
     }
 
 
     protected String quick_load() {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File inPutFile = new File(externalFilesDir, quick_save_file_name);
+            File inPutFile = new File(externalFilesDir, quickSaveFileName);
             StringBuilder stringBuilder = new StringBuilder();
             try {
                 FileReader fr = new FileReader(inPutFile);
@@ -40,7 +40,7 @@ public class MemoFileManager {
 
     protected void quick_save(String str) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File outPutFile = new File(externalFilesDir, quick_save_file_name);
+            File outPutFile = new File(externalFilesDir, quickSaveFileName);
             try {
                 FileOutputStream fos = new FileOutputStream(outPutFile);
                 byte[] bytes;

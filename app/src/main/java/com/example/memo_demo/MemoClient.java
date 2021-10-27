@@ -3,11 +3,10 @@ package com.example.memo_demo;
 import android.annotation.SuppressLint;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.example.wifi.GroupListener;
-import com.example.wifi.SocketConfig;
 import com.example.wifi.SocketListener;
 import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
@@ -21,7 +20,7 @@ public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     private boolean mConnected = false;
 
-                private final GroupListener mGroupListener = new GroupListener() {
+    private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
             log(String.format("group connect %s,%s", user, hostAddress.getHostAddress()));
@@ -56,6 +55,10 @@ public class MemoClient extends EditorActivity {
 
                             switch (ret.type) {
                                 case StringProcessor.editor:
+                                    updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                                    break;
+                                case StringProcessor.editorWithId:
+                                    mClient.write(StringProcessor.clientRet(ret.messageId));
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.clipResult:
@@ -129,7 +132,11 @@ public class MemoClient extends EditorActivity {
         mUdpThread = new UdpClientThread(getUser(), this);
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
+    }
 
+    @Override
+    protected void editorInit() {
+        super.editorInit();
         mEditor.setOnTextChangeListener(text -> {
             String msg = getEditText();
             if (mClient != null) {
@@ -138,6 +145,12 @@ public class MemoClient extends EditorActivity {
                 mClient.write(StringProcessor.htmlToByteArray(msg));
             }
         });
+    }
+
+    @Override
+    protected void initBtnClickListeners() {
+        super.initBtnClickListeners();
+
 
         final Button waitBtn = findViewById(R.id.start_relay);
         waitBtn.setOnClickListener(v -> {
@@ -161,10 +174,22 @@ public class MemoClient extends EditorActivity {
     }
 
     @Override
+    public void hideMsg() {
+        super.hideMsg();
+        findViewById(R.id.network_view).setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showMsg() {
+        super.showMsg();
+        findViewById(R.id.network_view).setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void sendImg() {
         super.sendImg();
         byte[] s = imgEncoding();
-        if (mClient != null)
+        if (mClient != null && s != null)
             mClient.write(s);
     }
 
