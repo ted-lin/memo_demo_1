@@ -94,7 +94,7 @@ public class EditorActivity extends AppCompatActivity {
         mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
                 .setPinchTextScalable(true)
                 .build();
-
+        mPhotoEditor.setShape(new ShapeBuilder().withShapeColor(Color.RED));
         mPhotoEditor.setOnPhotoEditorListener(new OnPhotoEditorListener() {
             @Override
             public void onEditTextChangeListener(View rootView, String text, int colorCode) {
@@ -151,6 +151,7 @@ public class EditorActivity extends AppCompatActivity {
             public void onBitmapReady(Bitmap saveBitmap) {
                 Log.e("PhotoEditor", "Image Saved Successfully");
                 bitmap = saveBitmap;
+                sendImg();
             }
 
             @Override
