@@ -130,7 +130,11 @@ public class MemoClient extends EditorActivity {
         mUdpThread = new UdpClientThread(getUser(), this);
         mUdpThread.setListener(mGroupListener);
         mUdpThread.start();
+    }
 
+    @Override
+    protected void editorInit() {
+        super.editorInit();
         mEditor.setOnTextChangeListener(text -> {
             String msg = getEditText();
             if (mClient != null) {
@@ -139,6 +143,12 @@ public class MemoClient extends EditorActivity {
                 mClient.write(StringProcessor.htmlToByteArray(msg));
             }
         });
+    }
+
+    @Override
+    protected void initBtnClickListeners() {
+        super.initBtnClickListeners();
+
 
         final Button waitBtn = findViewById(R.id.start_relay);
         waitBtn.setOnClickListener(v -> {

@@ -137,6 +137,24 @@ public class MemoHost extends EditorActivity {
         mUdpSeverThread.setListener(mGroupListener);
         mUdpSeverThread.start();
 
+    }
+
+    @Override
+    protected void editorInit() {
+        super.editorInit();
+        mEditor.setOnTextChangeListener(text -> {
+            String msg = getEditText();
+            //log(msg);
+            //if (mClients.size() > 0)
+            //    updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+            for (SocketThread client : mClients)
+                client.write(StringProcessor.htmlToByteArray(msg));
+        });
+    }
+
+    @Override
+    protected void initBtnClickListeners() {
+        super.initBtnClickListeners();
         Button start = findViewById(R.id.start_relay);
         start.setOnClickListener(v -> start());
 
@@ -149,15 +167,6 @@ public class MemoHost extends EditorActivity {
             String msg = getEditText();
             log(msg);
             updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-            for (SocketThread client : mClients)
-                client.write(StringProcessor.htmlToByteArray(msg));
-        });
-
-        mEditor.setOnTextChangeListener(text -> {
-            String msg = getEditText();
-            //log(msg);
-            //if (mClients.size() > 0)
-            //    updateStatusText(getPrefix() + "write message to clients\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
             for (SocketThread client : mClients)
                 client.write(StringProcessor.htmlToByteArray(msg));
         });

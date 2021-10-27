@@ -73,12 +73,24 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        memoFileManager = new MemoFileManager(this);
-        requestHandler = new EditorRequestHandler(this, memoFileManager);
+        helperClassInit();
+        editorInit();
+        photoEditorInit();
+        imgBtnInit();
+    }
 
+    protected void editorInit() {
         mEditor = findViewById(R.id.editorX);
         mEditor.setPadding(10, 10, 10, 10);
+    }
+
+    protected void helperClassInit() {
+        memoFileManager = new MemoFileManager(this);
+        requestHandler = new EditorRequestHandler(this, memoFileManager);
         dialog = new Dialog(this);
+    }
+
+    protected void photoEditorInit() {
         mPhotoEditorView = findViewById(R.id.photoEditorView);
         mPhotoEditorView.getSource().setImageResource(R.drawable.v);
         mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
@@ -115,7 +127,6 @@ public class EditorActivity extends AppCompatActivity {
             public void onTouchSourceImage(MotionEvent event) {
             }
         });
-        imgBtnInit();
     }
 
     protected byte[] getImgByteArray() {
@@ -241,9 +252,16 @@ public class EditorActivity extends AppCompatActivity {
     private void imgBtnInit() {
         setVisibleTable();
         updateVisibilities();
+        initLayout();
+        initBtnClickListeners();
+    }
+
+    protected void initLayout() {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         margin[marginOriginIndex] = params.topMargin;
+    }
 
+    protected void initBtnClickListeners() {
         findViewById(R.id.sync).setOnClickListener(v -> sendImg());
 
         findViewById(R.id.mode_btn).setOnClickListener(v -> {
@@ -404,7 +422,7 @@ public class EditorActivity extends AppCompatActivity {
         ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
     }
 
-    private void updateVisibilities() {
+    protected void updateVisibilities() {
         Set<Integer> ids = visibleTable.keySet();
         for (int id : ids) {
             int[] visibilities = visibleTable.get(id);
