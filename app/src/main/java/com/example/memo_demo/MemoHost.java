@@ -60,7 +60,7 @@ public class MemoHost extends EditorActivity {
         super.onPause();
     }
 
-                private final GroupListener mGroupListener = new GroupListener() {
+    private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
 
@@ -205,7 +205,6 @@ public class MemoHost extends EditorActivity {
             super.onBackPressed();
         }
     }
-
 
 
     private void disconnect() {

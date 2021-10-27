@@ -130,7 +130,7 @@ public class EditorActivity extends AppCompatActivity {
 
     protected byte[] imgEncoding() {
         byte[] bytes = getImgByteArray();
-        if(bytes == null)
+        if (bytes == null)
             return null;
         byte[] byte64 = Base64.getEncoder().encode(bytes);
         return StringProcessor.imgToByteArray(byte64);
@@ -299,6 +299,7 @@ public class EditorActivity extends AppCompatActivity {
             ((ImageButton) findViewById(R.id.change_txt_color)).setImageResource(text_color_src_id[text_color_index]);
             mEditor.setTextColor(text_colors[text_color_index]);
         });
+
         findViewById(R.id.change_bg_txt_color).setOnClickListener(v -> {
             text_bg_color_index += 1;
             if (text_bg_color_index >= text_color_src_id.length)
@@ -332,11 +333,13 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3_url));
 
         findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(video_url, video_width));
+
         findViewById(R.id.action_insert_link).setOnClickListener(v -> {
             mEditor.evaluateJavascript("(function(){return window.getSelection().toString()})()",
                     this::setContentString);
             dialog.showLink(getContentString());
         });
+
         findViewById(R.id.action_insert_checkbox).setOnClickListener(v -> mEditor.insertTodo());
 
         findViewById(R.id.saveImg).setOnClickListener(v -> dialog.select((dialogInterface, i) -> {

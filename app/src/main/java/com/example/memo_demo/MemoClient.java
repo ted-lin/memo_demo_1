@@ -22,7 +22,7 @@ public class MemoClient extends EditorActivity {
     private SocketThread mClient;
     private boolean mConnected = false;
 
-                private final GroupListener mGroupListener = new GroupListener() {
+    private final GroupListener mGroupListener = new GroupListener() {
         @Override
         public void onGroupHostConnect(InetAddress hostAddress, String user) {
             log(String.format("group connect %s,%s", user, hostAddress.getHostAddress()));
