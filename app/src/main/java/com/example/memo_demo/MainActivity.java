@@ -93,17 +93,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateName() {
+    public void updateName(String defaultStr) {
         EditText editView = findViewById(R.id.editText);
         String string = editView.getText().toString();
-        user = string.length() > 0 ? string : "User";
+        user = string.length() > 0 ? string : defaultStr;
     }
 
     /**
      * As Host
      */
     public void asHost(View v) {
-        updateName();
+        updateName("HOST");
         performPermissionGrant();
         if (!mPermissionValid) {
             //showToast("permission failure");
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
      * As client
      */
     public void asClient(View v) {
-        updateName();
+        updateName("CLIENT");
         performPermissionGrant();
         if (!mPermissionValid) {
             //showToast("permission failure");

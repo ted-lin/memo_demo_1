@@ -5,4 +5,5 @@ option optimize_for = LITE_RUNTIME;
 message EditorMessage{
   string data = 1;
   int32 messageType = 2;
+  bytes image_data = 3;
 }

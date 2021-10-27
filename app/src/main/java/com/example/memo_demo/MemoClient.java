@@ -1,6 +1,7 @@
 package com.example.memo_demo;
 
 import android.annotation.SuppressLint;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,7 +13,7 @@ import com.example.wifi.SocketThread;
 import com.example.wifi.UdpClientThread;
 
 import java.net.InetAddress;
-
+import java.util.Base64;
 
 
 public class MemoClient extends EditorActivity {
@@ -66,7 +67,10 @@ public class MemoClient extends EditorActivity {
                                     updateStatusText(getPrefix() + "got relay\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     mClient.write(StringProcessor.statusToByteArray("end relay\n"));
                                     break;
-
+                                case StringProcessor.img:
+                                    byte[] bytes = Base64.getDecoder().decode(ret.bytes);
+                                    loadEditingImg(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                                    break;
                             }
 
                         });
@@ -154,6 +158,14 @@ public class MemoClient extends EditorActivity {
 
         Button showList = findViewById(R.id.show_list);
         ((ViewGroup) showList.getParent()).removeView(showList);
+    }
+
+    @Override
+    public void sendImg() {
+        super.sendImg();
+        byte[] s = imgEncoding();
+        if (mClient != null)
+            mClient.write(s);
     }
 
     @Override

@@ -6,11 +6,13 @@ import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -20,18 +22,20 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import ja.burhanrashid52.photoeditor.*;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class EditorActivity extends AppCompatActivity {
 
     public static final String TAG = "HyperMemo";
     protected RichEditorX mEditor;
+    PhotoEditorView mPhotoEditorView;
+    PhotoEditor mPhotoEditor;
+
     private boolean hiding = false;
     int margin_origin_index = 0;
     int margin_new_index = 1;
@@ -57,7 +61,11 @@ public class EditorActivity extends AppCompatActivity {
     protected EditorRequestHandler requestHandler = null;
     protected Dialog dialog = null;
     private String content;
-    boolean editorMode = true;
+    protected Bitmap bitmap;
+    final int EDITOR = 0;
+    final int VIEW = 1;
+    final int DRAW = 2;
+    int editorMode = EDITOR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,12 +74,83 @@ public class EditorActivity extends AppCompatActivity {
         memoFileManager = new MemoFileManager(this);
         requestHandler = new EditorRequestHandler(this, memoFileManager);
 
-        mEditor = findViewById(R.id.editor);
+        mEditor = findViewById(R.id.editorX);
         mEditor.setPadding(10, 10, 10, 10);
         dialog = new Dialog(this);
+        mPhotoEditorView = findViewById(R.id.photoEditorView);
+        mPhotoEditorView.getSource().setImageResource(R.drawable.v);
+        mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
+                .setPinchTextScalable(true)
+                .build();
+
+        mPhotoEditor.setOnPhotoEditorListener(new OnPhotoEditorListener() {
+            @Override
+            public void onEditTextChangeListener(View rootView, String text, int colorCode) {
+
+            }
+
+            @Override
+            public void onAddViewListener(ViewType viewType, int numberOfAddedViews) {
+
+            }
+
+            @Override
+            public void onRemoveViewListener(ViewType viewType, int numberOfAddedViews) {
+
+            }
+
+            @Override
+            public void onStartViewChangeListener(ViewType viewType) {
+
+            }
+
+            @Override
+            public void onStopViewChangeListener(ViewType viewType) {
+                saveEditingImg();
+            }
+
+            @Override
+            public void onTouchSourceImage(MotionEvent event) {
+            }
+        });
         imgBtnInit();
     }
 
+    protected byte[] getImgByteArray() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        if (bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.WEBP, 100, stream);
+            return stream.toByteArray();
+        } else {
+            return null;
+        }
+    }
+
+    protected byte[] imgEncoding() {
+        byte[] bytes = getImgByteArray();
+        byte[] byte64 = Base64.getEncoder().encode(bytes);
+        return StringProcessor.imgToByteArray(byte64);
+    }
+
+    protected void saveEditingImg() {
+        mPhotoEditor.saveAsBitmap(new SaveSettings.Builder().setClearViewsEnabled(false).build(), new OnSaveBitmap() {
+            @Override
+            public void onBitmapReady(Bitmap saveBitmap) {
+                Log.e("PhotoEditor", "Image Saved Successfully");
+                bitmap = saveBitmap;
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("PhotoEditor", "Fail to save");
+            }
+        });
+    }
+
+    protected void loadEditingImg(Bitmap newBitmap) {
+        mPhotoEditor.clearAllViews();
+        mPhotoEditorView.getSource().setImageBitmap(newBitmap);
+    }
 
     protected void updatePasteUri() {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -122,14 +201,32 @@ public class EditorActivity extends AppCompatActivity {
         ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) findViewById(R.id.editor_view).getLayoutParams();
         margin[margin_origin_index] = params.topMargin;
 
+        findViewById(R.id.sync).setOnClickListener(v -> sendImg());
+
         findViewById(R.id.mode_btn).setOnClickListener(v -> {
             mEditor.focusEditor();
-            editorMode = !editorMode;
-            mEditor.setInputEnabled(editorMode);
-            if (editorMode) {
-                ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
-            } else {
-                ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
+            editorMode = (editorMode + 1) % 3;
+            switch (editorMode) {
+                case EDITOR:
+                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
+                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
+                    mEditor.setInputEnabled(true);
+                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.e);
+                    break;
+                case VIEW:
+                    findViewById(R.id.editorX).setVisibility(View.VISIBLE);
+                    findViewById(R.id.photoEditorView).setVisibility(View.GONE);
+                    mEditor.setInputEnabled(false);
+                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.v);
+                    break;
+                case DRAW:
+                    findViewById(R.id.editorX).setVisibility(View.GONE);
+                    findViewById(R.id.photoEditorView).setVisibility(View.VISIBLE);
+                    mPhotoEditorView.setFocusable(true);
+                    ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
+                    mPhotoEditor.setBrushDrawingMode(true);
+                    break;
+
             }
         });
 
@@ -174,32 +271,6 @@ public class EditorActivity extends AppCompatActivity {
             mEditor.setUnderline();
         });
 
-        findViewById(R.id.action_heading1).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(1);
-        });
-
-        findViewById(R.id.action_heading2).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(2);
-        });
-
-        findViewById(R.id.action_heading3).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(3);
-        });
-
-        findViewById(R.id.action_heading4).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(4);
-        });
-
-        findViewById(R.id.action_heading5).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setHeading(5);
-        });
-
-        findViewById(R.id.action_heading6).setOnClickListener(v -> mEditor.setHeading(6));
         findViewById(R.id.change_txt_color).setOnClickListener(v -> {
             text_color_index += 1;
             if (text_color_index >= text_color_src_id.length) {
@@ -287,6 +358,9 @@ public class EditorActivity extends AppCompatActivity {
     public static String mUser;
     private List<Button> mButtons;
 
+    public void sendImg() {
+
+    }
 
     @SuppressLint("SetTextI18n")
     public void init(Intent intent) {
@@ -332,7 +406,7 @@ public class EditorActivity extends AppCompatActivity {
     private class MemoFocusChangeListener implements View.OnFocusChangeListener {
         public void onFocusChange(View v, boolean hasFocus) {
             //log("touch");
-            if (v.getId() == R.id.editor && !hasFocus) {
+            if (v.getId() == R.id.editorX && !hasFocus) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (null != imm)
                     imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -434,9 +508,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public String getEditText() {
-        if (mEditor != null)
-            return mEditor.getHtml();
-        return "";
+        return mEditor.getHtml();
     }
 
     private void clearNote() {

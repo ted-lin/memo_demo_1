@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.wifi.SocketConfig.END_CHAR;
+import static com.example.wifi.SocketConfig.END_STR;
 
 public class SocketThread extends Thread {
     private static final String TAG = SocketThread.class.getSimpleName();
@@ -106,8 +106,17 @@ public class SocketThread extends Thread {
 
                 ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
                 int c;
+                int i = 0;
                 while ((c = bis.read()) != -1) {
-                    if (c == END_CHAR) break;
+                    if (c == END_STR.charAt(i)) {
+                        i++;
+                        if (i == END_STR.length()) {
+                            break;
+                        }
+                        continue;
+                    } else {
+                        i = 0;
+                    }
                     byteArrayOS.write(c);
                 }
 
@@ -200,7 +209,7 @@ public class SocketThread extends Thread {
 
                     for (byte[] message : next) {
                         bos.write(message);
-                        bos.write(END_CHAR);
+                        bos.write(END_STR.getBytes(StandardCharsets.UTF_8));
                         Log.d(TAG, String.format("SocketThread write: %s, addr:%s", message, mSocket.getInetAddress().getHostAddress()));
                     }
                     bos.flush();

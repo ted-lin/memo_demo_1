@@ -14,7 +14,7 @@ import java.util.Enumeration;
 
 public class SocketConfig {
     public static final int SOCKET_PORT = 9999;
-    public static final int END_CHAR = '`';
+    public static final String END_STR = "`/30175G~";
 
     //any address between 224.0.0.0 to 239.255.255.255
     public static final String GROUP_ADDRESS = "237.251.252.253";
