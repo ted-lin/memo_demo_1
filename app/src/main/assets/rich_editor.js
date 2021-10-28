@@ -238,6 +238,11 @@ RE.insertHTML = function (html) {
     document.execCommand('insertHTML', false, html);
 }
 
+RE.insertText = function (text) {
+    RE.restorerange();
+    document.execCommand('insertText', false, text);
+}
+
 RE.insertLink = function (url, title) {
     RE.restorerange();
     var sel = document.getSelection();

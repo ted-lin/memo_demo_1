@@ -61,17 +61,19 @@ public class StringProcessor {
         return editorMessage.toByteArray();
     }
 
-    static byte[] clipResultToByteArray(String data) {
+    static byte[] clipResultToByteArray(String data, int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
+                .setMessageId(msgId)
                 .setMessageType(clipResult)
                 .build();
         return editorMessage.toByteArray();
     }
 
-    static byte[] clipRequestToByteArray() {
+    static byte[] clipRequestToByteArray(int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setMessageType(clipRequest)
+                .setMessageId(msgId)
                 .build();
         return editorMessage.toByteArray();
     }

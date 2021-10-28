@@ -54,7 +54,7 @@ public class EditorActivity extends AppCompatActivity {
     private final int imgWidth = 320;
     private final int videoWidth = 360;
     protected Uri pasteUri;
-    protected String pasteText;
+    protected String pasteText = "";
     protected MemoFileManager memoFileManager = null;
     protected EditorRequestHandler requestHandler = null;
     protected Dialog dialog = null;
@@ -170,10 +170,21 @@ public class EditorActivity extends AppCompatActivity {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = Objects.requireNonNull(clipboardManager).getPrimaryClip();
         ClipData.Item item = Objects.requireNonNull(clip).getItemAt(0);
-
         pasteUri = item.getUri();
-        pasteText = (String) item.getText();
+
+        if (pasteUri != null) {
+            ContentResolver cr = getContentResolver();
+            if (cr != null) {
+                String uriMimeType = cr.getType(pasteUri);
+                pasteText = uriMimeType;
+            } else {
+                pasteText = (String) item.getText();
+            }
+        } else {
+            pasteText = (String) item.getText();
+        }
     }
+
 
     protected String getPasteText() {
         return pasteText;

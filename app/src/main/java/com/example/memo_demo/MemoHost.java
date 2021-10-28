@@ -306,7 +306,8 @@ public class MemoHost extends EditorActivity {
                             }
                             break;
                         case StringProcessor.clipRequest:
-                            sendPaste();
+                            updatePasteUri();
+                            sendPaste(ret.messageId);
                             break;
                         case StringProcessor.img:
                             byte[] bytes = Base64.getDecoder().decode(ret.bytes);
@@ -331,11 +332,11 @@ public class MemoHost extends EditorActivity {
         mServer.start();
     }
 
-    private void sendPaste() {
-        updatePasteUri();
+    private void sendPaste(int msgId) {
         String result = getPasteText();
+        // TODO need to fixed multipersons pasteReturnId
         for (SocketThread client : mClients) {
-            client.write(StringProcessor.clipResultToByteArray(result));
+            client.write(StringProcessor.clipResultToByteArray(result, msgId));
         }
     }
 
