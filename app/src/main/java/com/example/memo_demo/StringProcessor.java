@@ -26,8 +26,13 @@ public class StringProcessor {
                 return "ClipRequest";
             case img:
                 return "img";
+            case editorWithId:
+                return "editorWithId";
+            case clientReturn:
+                return "clientReturn";
+            default:
+                return "Unknown";
         }
-        return "Unknown";
     }
 
     static byte[] htmlToByteArray(String data) {
@@ -37,6 +42,7 @@ public class StringProcessor {
                 .build();
         return editorMessage.toByteArray();
     }
+
     static byte[] htmlToByteArrayWithMsgId(String data, int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
@@ -45,6 +51,7 @@ public class StringProcessor {
                 .build();
         return editorMessage.toByteArray();
     }
+
     static byte[] clientRet(int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setMessageType(clientReturn)
