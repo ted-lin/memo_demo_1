@@ -321,6 +321,21 @@ public class MemoHost extends EditorActivity {
                             log("sync time delay " + (current - last) + " ms");
                             updateStatusText("sync time delay " + (current - last) + " ms\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                             break;
+                        case StringProcessor.editorWithId:
+                            updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
+                            for (SocketThread client : mClients) {
+                                if (client != socketThread)
+                                    client.write(StringProcessor.htmlToByteArray(ret.data));
+                                if (client == socketThread)
+                                    client.write(StringProcessor.editorRetMsg(ret.messageId));
+                            }
+
+                            /* broadcast to other client */
+                            for (SocketThread client : mClients) {
+                                if (client != socketThread)
+                                    client.write(StringProcessor.htmlToByteArray(ret.data));
+                            }
+                            break;
                         default:
                             Log.e("", "nothing");
                             break;

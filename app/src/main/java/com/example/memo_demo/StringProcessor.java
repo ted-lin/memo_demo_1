@@ -52,7 +52,7 @@ public class StringProcessor {
         return editorMessage.toByteArray();
     }
 
-    static byte[] clientRet(int msgId) {
+    static byte[] editorRetMsg(int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setMessageType(clientReturn)
                 .setMessageId(msgId)

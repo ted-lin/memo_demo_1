@@ -62,15 +62,16 @@ public class MemoClient extends EditorActivity {
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.editorWithId:
-                                    mClient.write(StringProcessor.clientRet(ret.messageId));
+                                    mClient.write(StringProcessor.editorRetMsg(ret.messageId));
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.clipResult:
                                     Long cur = System.currentTimeMillis();
-                                    if (msgMap.containsKey(ret.messageId))
+                                    if (msgMap.containsKey(ret.messageId)) {
                                         updateStatusText(getPrefix() + "clip times: " + (cur - msgMap.get(ret.messageId)) + " ms \n",
                                                 MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-
+                                        log("end clipboard share " + (cur - msgMap.get(ret.messageId) + " ms"));
+                                    }
                                     updateStatusText(getPrefix() + "got clip: [" + ret.data + "]\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     clipData = ret.data;
                                     break;
@@ -82,6 +83,14 @@ public class MemoClient extends EditorActivity {
                                 case StringProcessor.img:
                                     byte[] bytes = Base64.getDecoder().decode(ret.bytes);
                                     loadEditingImg(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                                    break;
+                                case StringProcessor.clientReturn:
+                                    int messageId = ret.messageId;
+                                    Long current = System.currentTimeMillis();
+                                    Long last = msgMap.get(messageId);
+                                    msgMap.remove(messageId);
+                                    log("sync time delay " + (current - last) + " ms");
+                                    updateStatusText("sync time delay " + (current - last) + " ms\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     break;
                             }
 
@@ -151,7 +160,10 @@ public class MemoClient extends EditorActivity {
             if (mClient != null) {
                 //mClient.write(StringProcessor.statusToByteArray("client send back\n"));
                 log("client send back\n");
-                mClient.write(StringProcessor.htmlToByteArray(msg));
+
+                msgMap.put(lastMsgId, System.currentTimeMillis());
+                mClient.write(StringProcessor.htmlToByteArrayWithMsgId(msg, lastMsgId));
+                lastMsgId++;
             }
         });
     }
@@ -176,6 +188,7 @@ public class MemoClient extends EditorActivity {
             if (mClient != null) {
                 byte[] b = StringProcessor.clipRequestToByteArray(lastMsgId);
                 msgMap.put(lastMsgId, System.currentTimeMillis());
+                log("request clipboard share");
                 mClient.write(b);
                 lastMsgId += 1;
             }

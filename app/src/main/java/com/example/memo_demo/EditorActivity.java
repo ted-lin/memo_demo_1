@@ -91,7 +91,7 @@ public class EditorActivity extends AppCompatActivity {
 
     protected void photoEditorInit() {
         mPhotoEditorView = findViewById(R.id.photoEditorView);
-        mPhotoEditorView.getSource().setImageResource(R.drawable.v);
+        mPhotoEditorView.getSource().setImageResource(R.drawable.white);
         mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
                 .setPinchTextScalable(true)
                 .build();
@@ -226,8 +226,8 @@ public class EditorActivity extends AppCompatActivity {
     protected void setVisibleTable() {
         visibleTable = new HashMap<>();
         visibleTable.put(R.id.editorX, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
-        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
-        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_bold, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_italic, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_strikethrough, new int[]{View.VISIBLE, View.GONE, View.GONE});
@@ -249,10 +249,12 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_insert_video, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_link, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_checkbox, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
-        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
-        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.GONE, View.VISIBLE});
         visibleTable.put(R.id.hideImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.copyFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.pasteFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
 
         visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
         visibleTable.put(R.id.sync, new int[]{View.GONE, View.GONE, View.VISIBLE});
