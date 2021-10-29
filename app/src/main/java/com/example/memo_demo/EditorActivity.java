@@ -229,8 +229,6 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
         visibleTable.put(R.id.action_bold, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_italic, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_subscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_superscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_strikethrough, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_underline, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.change_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
@@ -309,16 +307,6 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_italic).setOnClickListener(v -> {
             mEditor.focusEditor();
             mEditor.setItalic();
-        });
-
-        findViewById(R.id.action_subscript).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setSubscript();
-        });
-
-        findViewById(R.id.action_superscript).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setSuperscript();
         });
 
         findViewById(R.id.action_strikethrough).setOnClickListener(v -> {

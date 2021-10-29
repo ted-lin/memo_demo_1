@@ -41,25 +41,6 @@
             android:src="@drawable/italic" />
 
         <ImageButton
-            android:id="@+id/action_subscript"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/subscript" />
-
-        <ImageButton
-            android:id="@+id/action_superscript"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/superscript" />
-
-        <ImageButton
             android:id="@+id/action_strikethrough"
             android:layout_width="48dp"
             android:layout_height="48dp"
