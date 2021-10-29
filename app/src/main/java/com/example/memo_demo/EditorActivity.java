@@ -49,10 +49,9 @@ public class EditorActivity extends AppCompatActivity {
 
     // default test url
     private final String mp3Url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
-    private final String videoUrl = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
-    private final String imgUrl = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private final int imgWidth = 320;
-    private final int videoWidth = 360;
+    private final String link_url = "https://www.oppo.com/cn/";
+    private final String videoUrl = "https://www.oppo.com/content/dam/oppo/common/mkt/reno-page/renoSeriesBackGroundPc.mp4";
+    private final String imgUrl = "https://www.oppo.com/content/dam/oppo/product-asset-library/reno/reno6-cn/reno6/v2/index/assets/kv-phone-purple-0249e2.png.webp";
     protected Uri pasteUri;
     protected String pasteText = "";
     protected MemoFileManager memoFileManager = null;
@@ -75,6 +74,8 @@ public class EditorActivity extends AppCompatActivity {
         editorInit();
         photoEditorInit();
         imgBtnInit();
+        mEditor.focusEditor();
+        mEditor.setFontSize(100);
     }
 
     protected void editorInit() {
@@ -357,17 +358,13 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.action_insert_numbers).setOnClickListener(v -> mEditor.setNumbers());
 
-        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(imgUrl, "dachshund", imgWidth));
+        findViewById(R.id.action_insert_image).setOnClickListener(v -> dialog.showImg(imgUrl));
 
         findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3Url));
 
-        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(videoUrl, videoWidth));
+        findViewById(R.id.action_insert_video).setOnClickListener(v -> dialog.showVideo(videoUrl));
 
-        findViewById(R.id.action_insert_link).setOnClickListener(v -> {
-            mEditor.evaluateJavascript("(function(){return window.getSelection().toString()})()",
-                    this::setContentString);
-            dialog.showLink(getContentString());
-        });
+        findViewById(R.id.action_insert_link).setOnClickListener(v -> dialog.showLink(getContentString(), link_url));
 
         findViewById(R.id.action_insert_checkbox).setOnClickListener(v -> mEditor.insertTodo());
 
@@ -438,8 +435,8 @@ public class EditorActivity extends AppCompatActivity {
         for (int id : ids) {
             int[] visibilities = visibleTable.get(id);
             if (visibilities != null) {
-                int visiblity = visibilities[editorMode];
-                findViewById(id).setVisibility(visiblity);
+                int visibility = visibilities[editorMode];
+                findViewById(id).setVisibility(visibility);
             }
         }
     }
