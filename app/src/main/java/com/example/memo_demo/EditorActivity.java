@@ -75,8 +75,9 @@ public class EditorActivity extends AppCompatActivity {
         photoEditorInit();
         imgBtnInit();
         mEditor.focusEditor();
-        mEditor.setFontSize(100);
+        mEditor.setFontSize(5);
     }
+
 
     protected void editorInit() {
         mEditor = findViewById(R.id.editorX);
@@ -259,6 +260,15 @@ public class EditorActivity extends AppCompatActivity {
 
         visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
         visibleTable.put(R.id.color, new int[]{View.GONE, View.GONE, View.VISIBLE});
+
+        visibleTable.put(R.id.h1, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h2, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h3, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h4, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h5, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h6, new int[]{View.VISIBLE, View.GONE, View.GONE});
+
+
     }
 
     private void imgBtnInit() {
@@ -354,6 +364,13 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_align_center).setOnClickListener(v -> mEditor.setAlignCenter());
 
         findViewById(R.id.action_align_right).setOnClickListener(v -> mEditor.setAlignRight());
+
+        findViewById(R.id.h1).setOnClickListener(v -> mEditor.setHeading(1));
+        findViewById(R.id.h2).setOnClickListener(v -> mEditor.setHeading(2));
+        findViewById(R.id.h3).setOnClickListener(v -> mEditor.setHeading(3));
+        findViewById(R.id.h4).setOnClickListener(v -> mEditor.setHeading(4));
+        findViewById(R.id.h5).setOnClickListener(v -> mEditor.setHeading(5));
+        findViewById(R.id.h6).setOnClickListener(v -> mEditor.setHeading(6));
 
 //        findViewById(R.id.action_blockquote).setOnClickListener(v -> mEditor.setBlockquote());
 
@@ -560,7 +577,6 @@ public class EditorActivity extends AppCompatActivity {
 
     public void clearText(View v) {
         updateStatusText(getPrefix() + "reset\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-        updateEditText("", MEMO_SET_TYPE.MEMO_TEXT_SET);
         resetStatusTextCursor();
     }
 

@@ -101,6 +101,60 @@
                 android:src="@color/WHITE"/>
 
         <ImageButton
+                android:id="@+id/h1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h1"/>
+        <ImageButton
+                android:id="@+id/h2"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h2"/>
+        <ImageButton
+                android:id="@+id/h3"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h3"/>
+        <ImageButton
+                android:id="@+id/h4"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h4"/>
+        <ImageButton
+                android:id="@+id/h5"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h5"/>
+        <ImageButton
+                android:id="@+id/h6"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/h6"/>
+        <ImageButton
                 android:id="@+id/action_indent"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
