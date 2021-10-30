@@ -1,234 +1,234 @@
 <?xml version="1.0" encoding="utf-8"?>
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    tools:showIn="@layout/activity_editor">
+                      xmlns:tools="http://schemas.android.com/tools"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@color/colorPrimary"
+                      tools:showIn="@layout/activity_editor">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
 
         <ImageButton
-                android:id="@+id/sync"
+                android:id="@+id/color"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/background"
                 android:contentDescription="@null"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/sync" />
+                android:src="@drawable/color"/>
 
         <ImageButton
-            android:id="@+id/action_bold"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bold" />
+                android:id="@+id/action_bold"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/bold"/>
 
         <ImageButton
-            android:id="@+id/action_italic"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/italic" />
+                android:id="@+id/action_italic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/italic"/>
 
         <ImageButton
-            android:id="@+id/action_strikethrough"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/strikethrough" />
+                android:id="@+id/action_strikethrough"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/strikethrough"/>
 
         <ImageButton
-            android:id="@+id/action_underline"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/underline" />
+                android:id="@+id/action_underline"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/underline"/>
 
         <ImageButton
-            android:id="@+id/action_txt_color"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/txt_color" />
+                android:id="@+id/action_txt_color"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/txt_color"/>
 
         <ImageButton
-            android:id="@+id/change_txt_color"
-            android:layout_width="24dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="6dp"
-            android:scaleType="fitCenter"
-            android:src="@color/BLACK" />
+                android:id="@+id/change_txt_color"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@color/BLACK"/>
 
         <ImageButton
-            android:id="@+id/action_bg_color"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bg_color" />
+                android:id="@+id/action_bg_color"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/bg_color"/>
 
         <ImageButton
-            android:id="@+id/change_bg_txt_color"
-            android:layout_width="24dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="6dp"
-            android:scaleType="fitCenter"
-            android:src="@color/WHITE" />
+                android:id="@+id/change_bg_txt_color"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="6dp"
+                android:scaleType="fitCenter"
+                android:src="@color/WHITE"/>
 
         <ImageButton
-            android:id="@+id/action_indent"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/indent" />
+                android:id="@+id/action_indent"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/indent"/>
 
         <ImageButton
-            android:id="@+id/action_outdent"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/outdent" />
+                android:id="@+id/action_outdent"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/outdent"/>
 
         <ImageButton
-            android:id="@+id/action_align_left"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/justify_left" />
+                android:id="@+id/action_align_left"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/justify_left"/>
 
         <ImageButton
-            android:id="@+id/action_align_center"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/justify_center" />
+                android:id="@+id/action_align_center"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/justify_center"/>
 
         <ImageButton
-            android:id="@+id/action_align_right"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/justify_right" />
+                android:id="@+id/action_align_right"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/justify_right"/>
 
         <ImageButton
-            android:id="@+id/action_insert_bullets"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/bullets" />
+                android:id="@+id/action_insert_bullets"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/bullets"/>
 
         <ImageButton
-            android:id="@+id/action_insert_numbers"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/numbers" />
+                android:id="@+id/action_insert_numbers"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/numbers"/>
 
         <ImageButton
-            android:id="@+id/action_blockquote"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/blockquote" />
+                android:id="@+id/action_blockquote"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/blockquote"/>
 
         <ImageButton
-            android:id="@+id/action_insert_image"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/insert_image" />
+                android:id="@+id/action_insert_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/insert_image"/>
 
         <ImageButton
-            android:id="@+id/action_insert_audio"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/music" />
+                android:id="@+id/action_insert_audio"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/music"/>
 
         <ImageButton
-            android:id="@+id/action_insert_video"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/video" />
+                android:id="@+id/action_insert_video"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/video"/>
 
         <ImageButton
-            android:id="@+id/action_insert_link"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/insert_link" />
+                android:id="@+id/action_insert_link"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/insert_link"/>
 
         <ImageButton
-            android:id="@+id/action_insert_checkbox"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:contentDescription="@null"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/checkbox_on_background" />
+                android:id="@+id/action_insert_checkbox"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:contentDescription="@null"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/checkbox_on_background"/>
 
     </LinearLayout>
 </HorizontalScrollView>

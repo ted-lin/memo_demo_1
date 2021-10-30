@@ -40,7 +40,16 @@
             android:src="@drawable/redo" />
 
         <ImageButton
-            android:id="@+id/new_file"
+                android:id="@+id/new_file"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/new_blank" />
+
+        <ImageButton
+            android:id="@+id/new_draw"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/background"

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/editor_layout"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:id="@+id/editor_layout"
 
-    tools:context=".EditorActivity">
+                                                   tools:context=".EditorActivity">
     <!--    <fragment-->
     <!--        android:layout_width="match_parent"-->
     <!--        android:layout_height="match_parent">-->
@@ -15,70 +15,69 @@
 
 
     <LinearLayout
-        android:id="@+id/network_view"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/RelayWindowSize"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/textViewTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Status"
-            app:layout_constraintBottom_toTopOf="@+id/textViewStatus"
-            app:layout_constraintStart_toStartOf="@+id/textViewStatus" />
-
-        <TextView
-            android:id="@+id/textViewStatus"
+            android:id="@+id/network_view"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            android:background="@android:drawable/editbox_background_normal"
-            android:contentDescription="show the processing message"
-            android:editable="false"
+            android:layout_height="@dimen/RelayWindowSize"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:overScrollMode="always"
-            android:scrollbarSize="8dp"
-            android:scrollbars="vertical"
-            android:selectAllOnFocus="false"
-            android:textSize="22sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                app:layout_constraintBottom_toTopOf="@+id/textViewStatus"
+                app:layout_constraintStart_toStartOf="@+id/textViewStatus"/>
+
+        <TextView
+                android:id="@+id/textViewStatus"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:contentDescription="show the processing message"
+                android:editable="false"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:overScrollMode="always"
+                android:scrollbarSize="8dp"
+                android:scrollbars="vertical"
+                android:selectAllOnFocus="false"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
 
         <include
-            layout="@layout/buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+                layout="@layout/buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/editor_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/RelayWindowSize"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/network_view">
+            android:id="@+id/editor_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/RelayWindowSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/network_view">
 
         <include layout="@layout/fragment_richeditor"></include>
 
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/peer_list_view_2"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@android:drawable/editbox_background_normal"
-        android:visibility="invisible"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
+            android:id="@+id/peer_list_view_2"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="invisible"
+            android:background="@color/color_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

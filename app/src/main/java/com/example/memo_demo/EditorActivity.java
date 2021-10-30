@@ -241,7 +241,7 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_align_left, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_align_center, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_align_right, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_blockquote, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_blockquote, new int[]{View.GONE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_bullets, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_numbers, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_image, new int[]{View.VISIBLE, View.GONE, View.GONE});
@@ -251,13 +251,14 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_insert_checkbox, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.GONE, View.VISIBLE});
+        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.new_draw, new int[]{View.GONE, View.GONE, View.VISIBLE});
         visibleTable.put(R.id.hideImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
         visibleTable.put(R.id.copyFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.pasteFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
 
         visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
-        visibleTable.put(R.id.sync, new int[]{View.GONE, View.GONE, View.VISIBLE});
+        visibleTable.put(R.id.color, new int[]{View.GONE, View.GONE, View.VISIBLE});
     }
 
     private void imgBtnInit() {
@@ -273,7 +274,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     protected void initBtnClickListeners() {
-        findViewById(R.id.sync).setOnClickListener(v ->
+        findViewById(R.id.color).setOnClickListener(v ->
                 ColorPickerDialogBuilder.with(this).setTitle("Choose color")
                         .initialColor(mPhotoEditor.getBrushColor())
                         .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
@@ -354,7 +355,7 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.action_align_right).setOnClickListener(v -> mEditor.setAlignRight());
 
-        findViewById(R.id.action_blockquote).setOnClickListener(v -> mEditor.setBlockquote());
+//        findViewById(R.id.action_blockquote).setOnClickListener(v -> mEditor.setBlockquote());
 
         findViewById(R.id.action_insert_bullets).setOnClickListener(v -> mEditor.setBullets());
 
@@ -390,6 +391,9 @@ public class EditorActivity extends AppCompatActivity {
             // DO NOTHING HERE
         }, "New file log", "Clear the editor?"));
 
+        findViewById(R.id.new_draw).setOnClickListener(view -> {
+            mPhotoEditor.clearAllViews();
+        });
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;
             if (hiding) {
@@ -420,6 +424,7 @@ public class EditorActivity extends AppCompatActivity {
         mPhotoEditorView.setFocusable(true);
         ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
         mPhotoEditor.setBrushDrawingMode(true);
+        mPhotoEditorView.setBackgroundColor(Color.WHITE);
     }
 
     private void viewModeActions() {
