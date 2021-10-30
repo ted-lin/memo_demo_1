@@ -391,6 +391,12 @@ public class MemoHost extends EditorActivity {
         }
     }
 
+    @Override
+    protected void setVisibleTable() {
+        super.setVisibleTable();
+        visibleTable.put(R.id.copyFromServer, new int[]{View.GONE, View.GONE, View.GONE});
+        visibleTable.put(R.id.pasteFromServer, new int[]{View.GONE, View.GONE, View.GONE});
+    }
 
     @Override
     protected void onDestroy() {
