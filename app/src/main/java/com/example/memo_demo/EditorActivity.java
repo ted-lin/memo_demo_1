@@ -180,10 +180,11 @@ public class EditorActivity extends AppCompatActivity {
                 String uriMimeType = cr.getType(pasteUri);
                 pasteText = uriMimeType;
             } else {
-                pasteText = (String) item.getText();
+                pasteText = item.getText().toString();
             }
         } else {
-            pasteText = (String) item.getText();
+            if (item.getText() != null)
+                pasteText = item.getText().toString();
         }
     }
 
