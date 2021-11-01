@@ -26,8 +26,13 @@ public class StringProcessor {
                 return "ClipRequest";
             case img:
                 return "img";
+            case editorWithId:
+                return "editorWithId";
+            case clientReturn:
+                return "clientReturn";
+            default:
+                return "Unknown";
         }
-        return "Unknown";
     }
 
     static byte[] htmlToByteArray(String data) {
@@ -37,6 +42,7 @@ public class StringProcessor {
                 .build();
         return editorMessage.toByteArray();
     }
+
     static byte[] htmlToByteArrayWithMsgId(String data, int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
@@ -45,7 +51,8 @@ public class StringProcessor {
                 .build();
         return editorMessage.toByteArray();
     }
-    static byte[] clientRet(int msgId) {
+
+    static byte[] editorRetMsg(int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setMessageType(clientReturn)
                 .setMessageId(msgId)
@@ -61,17 +68,19 @@ public class StringProcessor {
         return editorMessage.toByteArray();
     }
 
-    static byte[] clipResultToByteArray(String data) {
+    static byte[] clipResultToByteArray(String data, int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setData(data)
+                .setMessageId(msgId)
                 .setMessageType(clipResult)
                 .build();
         return editorMessage.toByteArray();
     }
 
-    static byte[] clipRequestToByteArray() {
+    static byte[] clipRequestToByteArray(int msgId) {
         Data.EditorMessage editorMessage = Data.EditorMessage.newBuilder()
                 .setMessageType(clipRequest)
+                .setMessageId(msgId)
                 .build();
         return editorMessage.toByteArray();
     }

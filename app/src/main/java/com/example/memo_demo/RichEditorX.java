@@ -49,4 +49,15 @@ public class RichEditorX extends RichEditor {
             super.onPageFinished(view, url);
         }
     }
+
+    public void insertText(String html) {
+        String s = html;
+        for (int i = 0; i < s.length(); i++) {
+            exec("javascript:RE.prepareInsert();");
+            if (s.charAt(i) != '\n')
+                exec("javascript:RE.insertText('" + s.charAt(i) + "');");
+            if (s.charAt(i) == '\n')
+                exec("javascript:document.execCommand('insertParagraph',false);");
+        }
+    }
 }

@@ -30,7 +30,7 @@ public class StringProcessorUnitTest {
 
     @Test
     public void clipResult_isCorrect() {
-        byte[] bytes = StringProcessor.clipResultToByteArray("clipData");
+        byte[] bytes = StringProcessor.clipResultToByteArray("clipData", 1);
         String result = StringProcessor.decodeByteArray(bytes).data;
         int type = StringProcessor.decodeByteArray(bytes).type;
         assertEquals("clipData", result);

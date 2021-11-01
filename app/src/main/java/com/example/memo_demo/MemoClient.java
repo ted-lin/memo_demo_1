@@ -13,12 +13,16 @@ import com.example.wifi.UdpClientThread;
 
 import java.net.InetAddress;
 import java.util.Base64;
+import java.util.HashMap;
 
 
 public class MemoClient extends EditorActivity {
     private UdpClientThread mUdpThread;
     private SocketThread mClient;
     private boolean mConnected = false;
+    private String clipData = "";
+    private HashMap<Integer, Long> msgMap = new HashMap<>();
+    private int lastMsgId = 0;
 
     private final GroupListener mGroupListener = new GroupListener() {
         @Override
@@ -58,12 +62,18 @@ public class MemoClient extends EditorActivity {
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.editorWithId:
-                                    mClient.write(StringProcessor.clientRet(ret.messageId));
+                                    mClient.write(StringProcessor.editorRetMsg(ret.messageId));
                                     updateEditText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_SET);
                                     break;
                                 case StringProcessor.clipResult:
+                                    Long cur = System.currentTimeMillis();
+                                    if (msgMap.containsKey(ret.messageId)) {
+                                        updateStatusText(getPrefix() + "clip times: " + (cur - msgMap.get(ret.messageId)) + " ms \n",
+                                                MEMO_SET_TYPE.MEMO_TEXT_APPEND);
+                                        log("end clipboard share " + (cur - msgMap.get(ret.messageId) + " ms"));
+                                    }
                                     updateStatusText(getPrefix() + "got clip: [" + ret.data + "]\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
-                                    copyToClipBoard(ret.data);
+                                    clipData = ret.data;
                                     break;
                                 case StringProcessor.status:
                                     //updateStatusText(ret.data, MEMO_SET_TYPE.MEMO_TEXT_APPEND);
@@ -73,6 +83,14 @@ public class MemoClient extends EditorActivity {
                                 case StringProcessor.img:
                                     byte[] bytes = Base64.getDecoder().decode(ret.bytes);
                                     loadEditingImg(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                                    break;
+                                case StringProcessor.clientReturn:
+                                    int messageId = ret.messageId;
+                                    Long current = System.currentTimeMillis();
+                                    Long last = msgMap.get(messageId);
+                                    msgMap.remove(messageId);
+                                    log("sync time delay " + (current - last) + " ms");
+                                    updateStatusText("sync time delay " + (current - last) + " ms\n", MEMO_SET_TYPE.MEMO_TEXT_APPEND);
                                     break;
                             }
 
@@ -142,7 +160,10 @@ public class MemoClient extends EditorActivity {
             if (mClient != null) {
                 //mClient.write(StringProcessor.statusToByteArray("client send back\n"));
                 log("client send back\n");
-                mClient.write(StringProcessor.htmlToByteArray(msg));
+
+                msgMap.put(lastMsgId, System.currentTimeMillis());
+                mClient.write(StringProcessor.htmlToByteArrayWithMsgId(msg, lastMsgId));
+                lastMsgId++;
             }
         });
     }
@@ -162,12 +183,21 @@ public class MemoClient extends EditorActivity {
         stopBtn.setOnClickListener(v -> stop());
         stopBtn.setText("END");
         Button writeTo = findViewById(R.id.write_to);
-        writeTo.setOnClickListener(v -> {
+        writeTo.setVisibility(View.GONE);
+        findViewById(R.id.copyFromServer).setOnClickListener(v -> {
             if (mClient != null) {
-                mClient.write(StringProcessor.clipRequestToByteArray());
+                byte[] b = StringProcessor.clipRequestToByteArray(lastMsgId);
+                msgMap.put(lastMsgId, System.currentTimeMillis());
+                log("request clipboard share");
+                mClient.write(b);
+                lastMsgId += 1;
             }
         });
-        writeTo.setText("getServerClip");
+
+        findViewById(R.id.pasteFromServer).setOnClickListener(v -> {
+
+            mEditor.insertText(clipData);
+        });
 
         Button showList = findViewById(R.id.show_list);
         ((ViewGroup) showList.getParent()).removeView(showList);

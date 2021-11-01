@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    tools:showIn="@layout/activity_editor">
+                      xmlns:tools="http://schemas.android.com/tools"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:background="@color/colorPrimary"
+                      tools:showIn="@layout/activity_editor">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:orientation="horizontal">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+        <ImageButton
+                android:id="@+id/hideImg"
+                android:layout_width="36dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="1dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/to_hide"/>
         <ImageButton
                 android:id="@+id/mode_btn"
                 android:layout_width="48dp"
@@ -18,61 +26,80 @@
                 android:background="@drawable/background"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/e" />
+                android:src="@drawable/e"/>
 
         <ImageButton
-            android:id="@+id/action_undo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/undo" />
+                android:id="@+id/action_undo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/undo"/>
 
 
         <ImageButton
-            android:id="@+id/action_redo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/redo" />
+                android:id="@+id/action_redo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/redo"/>
 
         <ImageButton
-            android:id="@+id/new_file"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/new_blank" />
+                android:id="@+id/new_file"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/new_blank"/>
 
         <ImageButton
-            android:id="@+id/loadImg"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="4dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/load" />
+                android:id="@+id/new_draw"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/new_blank"/>
 
         <ImageButton
-            android:id="@+id/saveImg"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="4dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/save" />
+                android:id="@+id/loadImg"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/load"/>
 
         <ImageButton
-            android:id="@+id/hideImg"
-            android:layout_width="36dp"
-            android:layout_height="48dp"
-            android:background="@drawable/background"
-            android:padding="1dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/to_hide" />
+                android:id="@+id/saveImg"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/save"/>
+
+        <ImageButton
+                android:id="@+id/copyFromServer"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/copy_from_server"/>
+
+        <ImageButton
+                android:id="@+id/pasteFromServer"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/background"
+                android:padding="0dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/paste"/>
+
     </LinearLayout>
 </HorizontalScrollView>

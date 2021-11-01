@@ -65,6 +65,9 @@ public class SocketThread extends Thread {
     }
 
     public boolean isClosed() {
+        // TODO need to check in the future
+        if (mSocket == null)
+            return false;
         return mSocket.isClosed();
     }
 

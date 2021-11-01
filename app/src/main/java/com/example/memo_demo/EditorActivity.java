@@ -49,12 +49,11 @@ public class EditorActivity extends AppCompatActivity {
 
     // default test url
     private final String mp3Url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_5MG.mp3";
-    private final String videoUrl = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_10MB.mp4";
-    private final String imgUrl = "https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg";
-    private final int imgWidth = 320;
-    private final int videoWidth = 360;
+    private final String link_url = "https://www.oppo.com/cn/";
+    private final String videoUrl = "https://www.oppo.com/content/dam/oppo/common/mkt/reno-page/renoSeriesBackGroundPc.mp4";
+    private final String imgUrl = "https://www.oppo.com/content/dam/oppo/product-asset-library/reno/reno6-cn/reno6/v2/index/assets/kv-phone-purple-0249e2.png.webp";
     protected Uri pasteUri;
-    protected String pasteText;
+    protected String pasteText = "";
     protected MemoFileManager memoFileManager = null;
     protected EditorRequestHandler requestHandler = null;
     protected Dialog dialog = null;
@@ -75,7 +74,10 @@ public class EditorActivity extends AppCompatActivity {
         editorInit();
         photoEditorInit();
         imgBtnInit();
+        mEditor.focusEditor();
+        mEditor.setFontSize(5);
     }
+
 
     protected void editorInit() {
         mEditor = findViewById(R.id.editorX);
@@ -90,7 +92,7 @@ public class EditorActivity extends AppCompatActivity {
 
     protected void photoEditorInit() {
         mPhotoEditorView = findViewById(R.id.photoEditorView);
-        mPhotoEditorView.getSource().setImageResource(R.drawable.v);
+        mPhotoEditorView.getSource().setImageResource(R.drawable.white);
         mPhotoEditor = new PhotoEditor.Builder(this, mPhotoEditorView)
                 .setPinchTextScalable(true)
                 .build();
@@ -170,10 +172,22 @@ public class EditorActivity extends AppCompatActivity {
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = Objects.requireNonNull(clipboardManager).getPrimaryClip();
         ClipData.Item item = Objects.requireNonNull(clip).getItemAt(0);
-
         pasteUri = item.getUri();
-        pasteText = (String) item.getText();
+
+        if (pasteUri != null) {
+            ContentResolver cr = getContentResolver();
+            if (cr != null) {
+                String uriMimeType = cr.getType(pasteUri);
+                pasteText = uriMimeType;
+            } else {
+                pasteText = item.getText().toString();
+            }
+        } else {
+            if (item.getText() != null)
+                pasteText = item.getText().toString();
+        }
     }
+
 
     protected String getPasteText() {
         return pasteText;
@@ -214,12 +228,10 @@ public class EditorActivity extends AppCompatActivity {
     protected void setVisibleTable() {
         visibleTable = new HashMap<>();
         visibleTable.put(R.id.editorX, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
-        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
-        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.VISIBLE, View.GONE});
+        visibleTable.put(R.id.action_undo, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_redo, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_bold, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_italic, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_subscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_superscript, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_strikethrough, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_underline, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.change_txt_color, new int[]{View.VISIBLE, View.GONE, View.GONE});
@@ -231,7 +243,7 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_align_left, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_align_center, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_align_right, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.action_blockquote, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.action_blockquote, new int[]{View.GONE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_bullets, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_numbers, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_image, new int[]{View.VISIBLE, View.GONE, View.GONE});
@@ -239,13 +251,25 @@ public class EditorActivity extends AppCompatActivity {
         visibleTable.put(R.id.action_insert_video, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_link, new int[]{View.VISIBLE, View.GONE, View.GONE});
         visibleTable.put(R.id.action_insert_checkbox, new int[]{View.VISIBLE, View.GONE, View.GONE});
-        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
-        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
-        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.saveImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.loadImg, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.new_file, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.new_draw, new int[]{View.GONE, View.GONE, View.VISIBLE});
         visibleTable.put(R.id.hideImg, new int[]{View.VISIBLE, View.VISIBLE, View.VISIBLE});
+        visibleTable.put(R.id.copyFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.pasteFromServer, new int[]{View.VISIBLE, View.GONE, View.GONE});
 
         visibleTable.put(R.id.photoEditorView, new int[]{View.GONE, View.GONE, View.VISIBLE});
-        visibleTable.put(R.id.sync, new int[]{View.GONE, View.GONE, View.VISIBLE});
+        visibleTable.put(R.id.color, new int[]{View.GONE, View.GONE, View.VISIBLE});
+
+        visibleTable.put(R.id.h1, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h2, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h3, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h4, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h5, new int[]{View.VISIBLE, View.GONE, View.GONE});
+        visibleTable.put(R.id.h6, new int[]{View.VISIBLE, View.GONE, View.GONE});
+
+
     }
 
     private void imgBtnInit() {
@@ -261,7 +285,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     protected void initBtnClickListeners() {
-        findViewById(R.id.sync).setOnClickListener(v ->
+        findViewById(R.id.color).setOnClickListener(v ->
                 ColorPickerDialogBuilder.with(this).setTitle("Choose color")
                         .initialColor(mPhotoEditor.getBrushColor())
                         .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
@@ -298,16 +322,6 @@ public class EditorActivity extends AppCompatActivity {
         findViewById(R.id.action_italic).setOnClickListener(v -> {
             mEditor.focusEditor();
             mEditor.setItalic();
-        });
-
-        findViewById(R.id.action_subscript).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setSubscript();
-        });
-
-        findViewById(R.id.action_superscript).setOnClickListener(v -> {
-            mEditor.focusEditor();
-            mEditor.setSuperscript();
         });
 
         findViewById(R.id.action_strikethrough).setOnClickListener(v -> {
@@ -352,23 +366,26 @@ public class EditorActivity extends AppCompatActivity {
 
         findViewById(R.id.action_align_right).setOnClickListener(v -> mEditor.setAlignRight());
 
-        findViewById(R.id.action_blockquote).setOnClickListener(v -> mEditor.setBlockquote());
+        findViewById(R.id.h1).setOnClickListener(v -> mEditor.setHeading(1));
+        findViewById(R.id.h2).setOnClickListener(v -> mEditor.setHeading(2));
+        findViewById(R.id.h3).setOnClickListener(v -> mEditor.setHeading(3));
+        findViewById(R.id.h4).setOnClickListener(v -> mEditor.setHeading(4));
+        findViewById(R.id.h5).setOnClickListener(v -> mEditor.setHeading(5));
+        findViewById(R.id.h6).setOnClickListener(v -> mEditor.setHeading(6));
+
+//        findViewById(R.id.action_blockquote).setOnClickListener(v -> mEditor.setBlockquote());
 
         findViewById(R.id.action_insert_bullets).setOnClickListener(v -> mEditor.setBullets());
 
         findViewById(R.id.action_insert_numbers).setOnClickListener(v -> mEditor.setNumbers());
 
-        findViewById(R.id.action_insert_image).setOnClickListener(v -> mEditor.insertImage(imgUrl, "dachshund", imgWidth));
+        findViewById(R.id.action_insert_image).setOnClickListener(v -> dialog.showImg(imgUrl));
 
         findViewById(R.id.action_insert_audio).setOnClickListener(v -> mEditor.insertAudio(mp3Url));
 
-        findViewById(R.id.action_insert_video).setOnClickListener(v -> mEditor.insertVideo(videoUrl, videoWidth));
+        findViewById(R.id.action_insert_video).setOnClickListener(v -> dialog.showVideo(videoUrl));
 
-        findViewById(R.id.action_insert_link).setOnClickListener(v -> {
-            mEditor.evaluateJavascript("(function(){return window.getSelection().toString()})()",
-                    this::setContentString);
-            dialog.showLink(getContentString());
-        });
+        findViewById(R.id.action_insert_link).setOnClickListener(v -> dialog.showLink(getContentString(), link_url));
 
         findViewById(R.id.action_insert_checkbox).setOnClickListener(v -> mEditor.insertTodo());
 
@@ -392,6 +409,9 @@ public class EditorActivity extends AppCompatActivity {
             // DO NOTHING HERE
         }, "New file log", "Clear the editor?"));
 
+        findViewById(R.id.new_draw).setOnClickListener(view -> {
+            mPhotoEditor.clearAllViews();
+        });
         findViewById(R.id.hideImg).setOnClickListener(v -> {
             hiding = !hiding;
             if (hiding) {
@@ -422,6 +442,7 @@ public class EditorActivity extends AppCompatActivity {
         mPhotoEditorView.setFocusable(true);
         ((ImageButton) (findViewById(R.id.mode_btn))).setImageResource(R.drawable.drawing);
         mPhotoEditor.setBrushDrawingMode(true);
+        mPhotoEditorView.setBackgroundColor(Color.WHITE);
     }
 
     private void viewModeActions() {
@@ -439,8 +460,8 @@ public class EditorActivity extends AppCompatActivity {
         for (int id : ids) {
             int[] visibilities = visibleTable.get(id);
             if (visibilities != null) {
-                int visiblity = visibilities[editorMode];
-                findViewById(id).setVisibility(visiblity);
+                int visibility = visibilities[editorMode];
+                findViewById(id).setVisibility(visibility);
             }
         }
     }
@@ -557,7 +578,6 @@ public class EditorActivity extends AppCompatActivity {
 
     public void clearText(View v) {
         updateStatusText(getPrefix() + "reset\n", MEMO_SET_TYPE.MEMO_TEXT_SET);
-        updateEditText("", MEMO_SET_TYPE.MEMO_TEXT_SET);
         resetStatusTextCursor();
     }
 
